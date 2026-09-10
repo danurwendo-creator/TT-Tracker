@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FTTT Helpdesk Monitoring & TTR Tracker</title>
+  <title>FTTT Helpdesk Monitoring & TTR Tracker (Cloud Connected)</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Feather Icons -->
   <script src="https://unpkg.com/feather-icons"></script>
@@ -12,9 +12,7 @@
   <!-- Google Fonts Inter -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    body {
-      font-family: 'Inter', sans-serif;
-    }
+    body { font-family: 'Inter', sans-serif; }
     .glass-card {
       background: rgba(30, 41, 59, 0.7);
       backdrop-filter: blur(12px);
@@ -26,21 +24,9 @@
       backdrop-filter: blur(8px);
       border: 1px solid rgba(255, 255, 255, 0.05);
     }
-    /* Custom Scrollbar */
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-    ::-webkit-scrollbar-track {
-      background: rgba(15, 23, 42, 0.6);
-    }
-    ::-webkit-scrollbar-thumb {
-      background: rgba(51, 65, 85, 0.8);
-      border-radius: 4px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: rgba(71, 85, 105, 1);
-    }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
+    ::-webkit-scrollbar-thumb { background: rgba(51, 65, 85, 0.8); border-radius: 4px; }
   </style>
 </head>
 <body class="bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-100 min-h-screen p-4 md:p-8 antialiased selection:bg-blue-500 selection:text-white">
@@ -54,7 +40,9 @@
       <div>
         <h1 class="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
           FTTT Helpdesk Monitoring
-          <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">Live Tracker</span>
+          <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Cloud Sync
+          </span>
         </h1>
         <p class="text-xs text-slate-400 mt-0.5">Dashboard Rekapitulasi, Real-Time TTR Tracking & Timely Report</p>
       </div>
@@ -67,40 +55,28 @@
     </div>
   </header>
 
-  <!-- Summary Cards / Header Component KPI -->
+  <!-- KPI Summary Cards -->
   <div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
-    <!-- Total Ticket -->
-    <div class="glass-card p-4 rounded-2xl relative overflow-hidden group hover:border-slate-600/50 transition-all">
-      <div class="absolute -right-2 -bottom-2 opacity-5 group-hover:opacity-10 transition-opacity">
-        <i data-feather="inbox" class="w-20 h-20 text-white"></i>
-      </div>
+    <div class="glass-card p-4 rounded-2xl relative overflow-hidden group">
       <p class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Total Ticket</p>
       <h3 id="stat-total" class="text-3xl font-extrabold text-white mt-1">0</h3>
     </div>
-
-    <!-- Ticket Open -->
-    <div class="glass-card p-4 rounded-2xl relative overflow-hidden group hover:border-rose-500/30 transition-all">
+    <div class="glass-card p-4 rounded-2xl relative overflow-hidden group">
       <div class="absolute top-0 left-0 bottom-0 w-1 bg-gradient-to-b from-rose-500 to-red-600"></div>
       <p class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Ticket Open</p>
       <h3 id="stat-open" class="text-3xl font-extrabold text-rose-400 mt-1">0</h3>
     </div>
-
-    <!-- Ticket In Progress -->
-    <div class="glass-card p-4 rounded-2xl relative overflow-hidden group hover:border-cyan-500/30 transition-all">
+    <div class="glass-card p-4 rounded-2xl relative overflow-hidden group">
       <div class="absolute top-0 left-0 bottom-0 w-1 bg-gradient-to-b from-cyan-400 to-blue-500"></div>
       <p class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">In Progress</p>
       <h3 id="stat-progress" class="text-3xl font-extrabold text-cyan-400 mt-1">0</h3>
     </div>
-
-    <!-- Ticket Pending -->
-    <div class="glass-card p-4 rounded-2xl relative overflow-hidden group hover:border-amber-500/30 transition-all">
+    <div class="glass-card p-4 rounded-2xl relative overflow-hidden group">
       <div class="absolute top-0 left-0 bottom-0 w-1 bg-gradient-to-b from-amber-400 to-orange-500"></div>
       <p class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Pending</p>
       <h3 id="stat-pending" class="text-3xl font-extrabold text-amber-400 mt-1">0</h3>
     </div>
-
-    <!-- Ticket Close + MTTR -->
-    <div class="glass-card p-4 rounded-2xl relative overflow-hidden group hover:border-emerald-500/30 transition-all">
+    <div class="glass-card p-4 rounded-2xl relative overflow-hidden group">
       <div class="absolute top-0 left-0 bottom-0 w-1 bg-gradient-to-b from-emerald-400 to-teal-500"></div>
       <p class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Ticket Close</p>
       <div class="flex items-baseline justify-between mt-1">
@@ -117,16 +93,16 @@
     <div class="flex flex-wrap gap-3 items-center w-full md:w-auto">
       <div class="relative w-full md:w-60">
         <i data-feather="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"></i>
-        <input type="text" id="search-input" oninput="renderTable()" placeholder="Cari Ticket, Site, Link..." class="bg-slate-900/90 border border-slate-700/80 text-xs text-white rounded-xl pl-9 pr-3 py-2.5 w-full focus:outline-none focus:border-blue-500/80 transition-colors placeholder:text-slate-500">
+        <input type="text" id="search-input" oninput="renderTable()" placeholder="Cari Ticket, Site, Link..." class="bg-slate-900/90 border border-slate-700/80 text-xs text-white rounded-xl pl-9 pr-3 py-2.5 w-full focus:outline-none focus:border-blue-500/80">
       </div>
       
-      <select id="filter-customer" onchange="renderTable()" class="bg-slate-900/90 border border-slate-700/80 text-xs text-slate-300 rounded-xl px-3 py-2.5 focus:outline-none focus:border-blue-500/80 transition-colors cursor-pointer">
+      <select id="filter-customer" onchange="renderTable()" class="bg-slate-900/90 border border-slate-700/80 text-xs text-slate-300 rounded-xl px-3 py-2.5 focus:outline-none focus:border-blue-500/80 cursor-pointer">
         <option value="">Semua Customer</option>
         <option value="XLS">XLS (XL Axiata)</option>
         <option value="IOH">IOH (Indosat)</option>
       </select>
 
-      <select id="filter-area" onchange="renderTable()" class="bg-slate-900/90 border border-slate-700/80 text-xs text-slate-300 rounded-xl px-3 py-2.5 focus:outline-none focus:border-blue-500/80 transition-colors cursor-pointer">
+      <select id="filter-area" onchange="renderTable()" class="bg-slate-900/90 border border-slate-700/80 text-xs text-slate-300 rounded-xl px-3 py-2.5 focus:outline-none focus:border-blue-500/80 cursor-pointer">
         <option value="">Semua Area / Klaster</option>
         <option value="JABODETABEK & BANTEN">JABODETABEK & BANTEN</option>
         <option value="JAWA BARAT">JAWA BARAT</option>
@@ -137,7 +113,7 @@
         <option value="OTHER / UNMAPPED">OTHER / UNMAPPED</option>
       </select>
 
-      <select id="filter-status" onchange="renderTable()" class="bg-slate-900/90 border border-slate-700/80 text-xs text-slate-300 rounded-xl px-3 py-2.5 focus:outline-none focus:border-blue-500/80 transition-colors cursor-pointer">
+      <select id="filter-status" onchange="renderTable()" class="bg-slate-900/90 border border-slate-700/80 text-xs text-slate-300 rounded-xl px-3 py-2.5 focus:outline-none focus:border-blue-500/80 cursor-pointer">
         <option value="">Semua Status</option>
         <option value="Open">Open</option>
         <option value="In Progress">In Progress</option>
@@ -147,8 +123,8 @@
     </div>
     
     <div class="text-[11px] text-slate-400 flex items-center gap-1.5 self-end md:self-auto">
-      <i data-feather="info" class="w-3.5 h-3.5 text-blue-400"></i>
-      TTR dihitung otomatis dari timestamp deteksi awal.
+      <i data-feather="cloud" class="w-3.5 h-3.5 text-blue-400"></i>
+      Data tersinkronisasi otomatis via Cloud.
     </div>
   </div>
 
@@ -171,14 +147,14 @@
           </tr>
         </thead>
         <tbody id="ticket-table-body" class="divide-y divide-slate-800/60">
-          <!-- Data diisi oleh Javascript -->
+          <!-- Data diisi oleh Javascript / Firebase -->
         </tbody>
       </table>
     </div>
   </div>
 
   <!-- MODAL 1: Input Raw Broadcast Ticket -->
-  <div id="modal-input" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center p-4 z-50 transition-all">
+  <div id="modal-input" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
     <div class="glass-card rounded-3xl w-full max-w-xl p-6 shadow-2xl border border-slate-700/60">
       <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-800">
         <h3 class="text-base font-bold text-white flex items-center gap-2">
@@ -188,11 +164,11 @@
       </div>
       <p class="text-xs text-slate-400 mb-3">Tempelkan pesan broadcast/WhatsApp dari NOC/Partner di bawah ini.</p>
       
-      <textarea id="raw-ticket-input" rows="5" placeholder="Contoh: Fiber Cut CSR ## IP Link From_3G_GEREM_RAYA... INCM-20260910-00029680 TR-20260910-00000635 [2026-09-10 15:25:38]" class="w-full bg-slate-900/90 border border-slate-700/80 text-xs text-slate-200 rounded-xl p-3.5 focus:outline-none focus:border-blue-500 font-mono transition-colors"></textarea>
+      <textarea id="raw-ticket-input" rows="5" placeholder="Contoh: Fiber Cut CSR ## IP Link From_3G_GEREM_RAYA... INCM-20260910-00029680 TR-20260910-00000635 [2026-09-10 15:25:38]" class="w-full bg-slate-900/90 border border-slate-700/80 text-xs text-slate-200 rounded-xl p-3.5 focus:outline-none focus:border-blue-500 font-mono"></textarea>
       
       <div class="mt-5 flex justify-end gap-2.5">
         <button onclick="closeInputModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-medium transition">Batal</button>
-        <button onclick="processRawTicket()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-medium rounded-xl text-xs transition shadow-lg shadow-blue-600/25">Parse & Simpan Tiket</button>
+        <button onclick="processRawTicket()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-medium rounded-xl text-xs transition shadow-lg shadow-blue-600/25">Parse & Simpan ke Cloud</button>
       </div>
     </div>
   </div>
@@ -270,7 +246,7 @@
               <i data-feather="clock" class="w-3.5 h-3.5"></i> Kondisi Stop Clock
             </span>
             <label class="flex items-center gap-2 text-[11px] text-slate-300 cursor-pointer select-none">
-              <input type="checkbox" id="enable-stopclock" onchange="toggleStopClockSection()" class="rounded bg-slate-900 border-slate-700 text-indigo-600 focus:ring-0">
+              <input type="checkbox" id="enable-stopclock" onchange="toggleStopClockSection()" class="rounded bg-slate-900 border-slate-700 text-indigo-600">
               Aktifkan Stop Clock
             </label>
           </div>
@@ -304,7 +280,7 @@
           <div class="grid grid-cols-1 md:grid-cols-2 gap-3 items-center">
             <div>
               <label class="block text-[10px] text-slate-400 mb-1">Upload Foto Titik FO Cut</label>
-              <input type="file" id="evidence-file" accept="image/*" onchange="handleEvidenceUpload(event)" class="w-full text-slate-300 bg-slate-900 border border-slate-700/80 rounded-lg p-1.5 text-xs file:mr-2 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:text-xs file:bg-emerald-600 file:text-white hover:file:bg-emerald-500 cursor-pointer">
+              <input type="file" id="evidence-file" accept="image/*" onchange="handleEvidenceUpload(event)" class="w-full text-slate-300 bg-slate-900 border border-slate-700/80 rounded-lg p-1.5 text-xs file:mr-2 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:text-xs file:bg-emerald-600 file:text-white cursor-pointer">
             </div>
 
             <div>
@@ -325,7 +301,7 @@
 
       <div class="mt-6 flex justify-end gap-2.5">
         <button onclick="closeProgressModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-medium transition">Batal</button>
-        <button onclick="saveProgressUpdate()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-medium rounded-xl text-xs transition shadow-lg shadow-emerald-600/25">Simpan Log Progress</button>
+        <button onclick="saveProgressUpdate()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-medium rounded-xl text-xs transition shadow-lg shadow-emerald-600/25">Update Cloud</button>
       </div>
     </div>
   </div>
@@ -356,9 +332,56 @@
     </div>
   </div>
 
-  <!-- SCRIPT LOGIC -->
+  <!-- FIREBASE SDK MODULAR (V9+) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, push, set, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    // ----------------------------------------------------
+    // GANTI KONFIGURASI DI BAWAH INI DENGAN MILIK FIREBASE ANDA
+    // ----------------------------------------------------
+    const firebaseConfig = {
+    apiKey: "AIzaSyB4OYo3R5qoM2AjQQpHlanOfn2PMsXa8Qc",
+    authDomain: "tt-tracker-47eaf.firebaseapp.com",
+    projectId: "tt-tracker-47eaf",
+    storageBucket: "tt-tracker-47eaf.firebasestorage.app",
+    messagingSenderId: "387726174094",
+    appId: "1:387726174094:web:6c8168c1e889db134e66df",
+    measurementId: "G-0WTJ9VWXL4"
+    };
+
+    // Inisialisasi Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const ticketsRef = ref(db, 'tickets');
+
+    // Menerima data real-time dari Firebase
+    onValue(ticketsRef, (snapshot) => {
+      const data = snapshot.val();
+      window.ticketList = [];
+      if (data) {
+        Object.keys(data).forEach(key => {
+          window.ticketList.unshift({ firebaseKey: key, ...data[key] });
+        });
+      }
+      renderTable();
+    });
+
+    // Helper simpan tiket baru ke Firebase
+    window.saveTicketToFirebase = function(ticketObj) {
+      const newRef = push(ticketsRef);
+      set(newRef, ticketObj);
+    };
+
+    // Helper update tiket di Firebase
+    window.updateTicketInFirebase = function(key, updatedFields) {
+      const itemRef = ref(db, `tickets/${key}`);
+      update(itemRef, updatedFields);
+    };
+  </script>
+
+  <!-- MAIN APP SCRIPT -->
   <script>
-    // MATRIX DATA RCA & STOP CLOCK
     const rcaDataMatrix = {
       "Ticket Confirm": {
         "FLP & FOB": {
@@ -430,13 +453,11 @@
       return "OTHER / UNMAPPED";
     }
 
-    let ticketList = [];
+    window.ticketList = [];
 
     window.onload = () => {
       feather.replace();
       initStopClockOptions();
-
-      renderTable();
       setInterval(renderTable, 60000);
     };
 
@@ -474,7 +495,7 @@
       const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       const dateStr = now.toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
-      ticketList.unshift({
+      const newTicketObj = {
         id: Date.now() + Math.random(),
         customer: customerTag,
         areaCluster: areaCluster,
@@ -492,7 +513,12 @@
         timelyLogs: [
           { time: timeStr, date: dateStr, text: `Tiket dicreate [Klaster: ${areaCluster}]` }
         ]
-      });
+      };
+
+      // Simpan langsung ke Firebase Database
+      if (window.saveTicketToFirebase) {
+        window.saveTicketToFirebase(newTicketObj);
+      }
     }
 
     function calculateTicketTTR(ticket) {
@@ -503,9 +529,10 @@
       const hours = Math.floor(totalMinutes / 60);
       const minutes = totalMinutes % 60;
 
-      const formattedStr = `${String(hours).padStart(2, '0')}j ${String(minutes).padStart(2, '0')}m`;
-      
-      return { totalMinutes, formattedStr };
+      return {
+        totalMinutes,
+        formattedStr: `${String(hours).padStart(2, '0')}j ${String(minutes).padStart(2, '0')}m`
+      };
     }
 
     function updateRcaPartOptions() {
@@ -600,13 +627,12 @@
     function processRawTicket() {
       parseAndAddTicket(document.getElementById('raw-ticket-input').value);
       closeInputModal();
-      renderTable();
     }
 
-    function openProgressModal(ticketId) {
-      const ticket = ticketList.find(t => t.id === ticketId);
+    function openProgressModal(ticketKey) {
+      const ticket = window.ticketList.find(t => t.firebaseKey === ticketKey);
       if (!ticket) return;
-      document.getElementById('edit-ticket-id').value = ticket.id;
+      document.getElementById('edit-ticket-id').value = ticket.firebaseKey;
       document.getElementById('update-status').value = ticket.status;
       document.getElementById('update-activity').value = '';
       document.getElementById('evidence-gps').value = '';
@@ -618,8 +644,8 @@
     function closeProgressModal() { document.getElementById('modal-progress').classList.add('hidden'); }
 
     function saveProgressUpdate() {
-      const ticketId = parseFloat(document.getElementById('edit-ticket-id').value);
-      const ticket = ticketList.find(t => t.id === ticketId);
+      const ticketKey = document.getElementById('edit-ticket-id').value;
+      const ticket = window.ticketList.find(t => t.firebaseKey === ticketKey);
 
       if (ticket) {
         const now = new Date();
@@ -627,48 +653,63 @@
         const dateStr = now.toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
         const prevStatus = ticket.status;
-        ticket.status = document.getElementById('update-status').value;
+        const newStatus = document.getElementById('update-status').value;
         const activity = document.getElementById('update-activity').value.trim();
 
-        if (ticket.status === 'Closed' && prevStatus !== 'Closed') {
-          ticket.closedAtTime = now.getTime();
-        } else if (ticket.status !== 'Closed') {
-          ticket.closedAtTime = null;
+        let closedAtTime = ticket.closedAtTime || null;
+        if (newStatus === 'Closed' && prevStatus !== 'Closed') {
+          closedAtTime = now.getTime();
+        } else if (newStatus !== 'Closed') {
+          closedAtTime = null;
         }
 
-        const rca1 = document.getElementById('rca-1').value;
-        const rca2 = document.getElementById('rca-2').value;
-        if (rca1) ticket.rca1 = rca1;
-        if (rca2) ticket.rca2 = rca2;
+        const rca1 = document.getElementById('rca-1').value || ticket.rca1;
+        const rca2 = document.getElementById('rca-2').value || ticket.rca2;
 
+        let stopClock = ticket.stopClock;
         const isSc = document.getElementById('enable-stopclock').checked;
+        
+        const timelyLogs = [...(ticket.timelyLogs || [])];
+
         if (isSc) {
           const scRca3 = document.getElementById('sc-rca3').value;
           const scDur = document.getElementById('sc-duration').value;
-          ticket.stopClock = `${scRca3} (${scDur})`;
-          ticket.timelyLogs.push({ time: timeStr, date: dateStr, text: `STOP CLOCK: ${scRca3} | Durasi: ${scDur}` });
+          stopClock = `${scRca3} (${scDur})`;
+          timelyLogs.push({ time: timeStr, date: dateStr, text: `STOP CLOCK: ${scRca3} | Durasi: ${scDur}` });
         }
 
         const gps = document.getElementById('evidence-gps').value.trim();
-        let logEntry = activity || `Status diupdate ke: ${ticket.status}`;
-        if (rca1 && rca2) logEntry += `\nRCA: ${rca1} -> ${rca2}`;
+        let logEntry = activity || `Status diupdate ke: ${newStatus}`;
+        if (rca1 !== '-' && rca2 !== '-') logEntry += `\nRCA: ${rca1} -> ${rca2}`;
         if (gps) logEntry += `\nEvidence Koordinat FO Cut: ${gps}`;
 
-        ticket.timelyLogs.push({ time: timeStr, date: dateStr, text: logEntry });
-        ticket.lastRemark = activity || `Status: ${ticket.status}`;
-        ticket.updatedAt = timeStr;
+        timelyLogs.push({ time: timeStr, date: dateStr, text: logEntry });
+
+        const updatedFields = {
+          status: newStatus,
+          closedAtTime: closedAtTime,
+          rca1: rca1,
+          rca2: rca2,
+          stopClock: stopClock,
+          lastRemark: activity || `Status: ${newStatus}`,
+          updatedAt: timeStr,
+          timelyLogs: timelyLogs
+        };
+
+        if (window.updateTicketInFirebase) {
+          window.updateTicketInFirebase(ticketKey, updatedFields);
+        }
       }
 
       closeProgressModal();
-      renderTable();
     }
 
-    function openTimelyReport(ticketId) {
-      const ticket = ticketList.find(t => t.id === ticketId);
+    function openTimelyReport(ticketKey) {
+      const ticket = window.ticketList.find(t => t.firebaseKey === ticketKey);
       if (!ticket) return;
 
       const ttrData = calculateTicketTTR(ticket);
-      const mainDate = ticket.timelyLogs[0] ? ticket.timelyLogs[0].date : 'N/A';
+      const mainDate = (ticket.timelyLogs && ticket.timelyLogs[0]) ? ticket.timelyLogs[0].date : 'N/A';
       
       let reportText = `Timely Report\n${mainDate}\n\n`;
       reportText += `Area/Klaster: ${ticket.areaCluster}\n`;
@@ -680,7 +721,9 @@
       if (ticket.stopClock !== '-') reportText += `Stop Clock  : ${ticket.stopClock}\n`;
       reportText += `--------------------------------------------------\nKronologi Aktivitas:\n\n`;
 
-      ticket.timelyLogs.forEach(log => reportText += `${log.time} = ${log.text}\n`);
+      if (ticket.timelyLogs) {
+        ticket.timelyLogs.forEach(log => reportText += `${log.time} = ${log.text}\n`);
+      }
 
       document.getElementById('timely-report-content').innerText = reportText;
       document.getElementById('modal-timely-report').classList.remove('hidden');
@@ -699,6 +742,8 @@
 
     function renderTable() {
       const tbody = document.getElementById('ticket-table-body');
+      if (!tbody) return;
+
       const search = document.getElementById('search-input').value.toLowerCase();
       const customerFilter = document.getElementById('filter-customer').value;
       const areaFilter = document.getElementById('filter-area').value;
@@ -706,20 +751,22 @@
 
       tbody.innerHTML = '';
 
-      let filtered = ticketList.filter(t => {
-        const matchSearch = t.ticketNumbers.toLowerCase().includes(search) || t.routeCase.toLowerCase().includes(search);
-        const matchCustomer = customerFilter ? t.customer.includes(customerFilter) : true;
+      let list = window.ticketList || [];
+
+      let filtered = list.filter(t => {
+        const matchSearch = (t.ticketNumbers || '').toLowerCase().includes(search) || (t.routeCase || '').toLowerCase().includes(search);
+        const matchCustomer = customerFilter ? (t.customer || '').includes(customerFilter) : true;
         const matchArea = areaFilter ? t.areaCluster === areaFilter : true;
         const matchStatus = statusFilter ? t.status === statusFilter : true;
         return matchSearch && matchCustomer && matchArea && matchStatus;
       });
 
       // KPI CALCULATIONS
-      const totalCount = ticketList.length;
-      const openCount = ticketList.filter(t => t.status === 'Open').length;
-      const progressCount = ticketList.filter(t => t.status === 'In Progress' || t.status === 'Work Progress' || t.status === 'Dispatch Engineer').length;
-      const pendingCount = ticketList.filter(t => t.status === 'Pending').length;
-      const closedTickets = ticketList.filter(t => t.status === 'Closed');
+      const totalCount = list.length;
+      const openCount = list.filter(t => t.status === 'Open').length;
+      const progressCount = list.filter(t => t.status === 'In Progress').length;
+      const pendingCount = list.filter(t => t.status === 'Pending').length;
+      const closedTickets = list.filter(t => t.status === 'Closed');
       const closeCount = closedTickets.length;
 
       let mttrText = "0j 0m";
@@ -739,13 +786,13 @@
       document.getElementById('stat-mttr').innerText = mttrText;
 
       if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="10" class="text-center py-10 text-slate-500">Tidak ada data trouble ticket ditemukan.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="10" class="text-center py-10 text-slate-500">Tidak ada data trouble ticket di cloud.</td></tr>`;
         return;
       }
 
       filtered.forEach((t, index) => {
         let custBadge = `<span class="bg-blue-500/10 text-blue-400 border border-blue-500/20 font-bold px-2.5 py-1 rounded-lg text-[10px] inline-flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span>XLS</span>`;
-        if (t.customer.includes('IOH')) {
+        if (t.customer && t.customer.includes('IOH')) {
           custBadge = `<span class="bg-amber-500/10 text-amber-400 border border-amber-500/20 font-bold px-2.5 py-1 rounded-lg text-[10px] inline-flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>IOH</span>`;
         }
 
@@ -789,10 +836,10 @@
           <td class="p-4 whitespace-nowrap">${statusBadge}</td>
           <td class="p-4 text-center whitespace-nowrap">
             <div class="flex items-center justify-center gap-2">
-              <button onclick="openProgressModal(${t.id})" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700/80 px-2.5 py-1.5 rounded-xl text-[11px] font-medium transition flex items-center gap-1.5 active:scale-95">
+              <button onclick="openProgressModal('${t.firebaseKey}')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700/80 px-2.5 py-1.5 rounded-xl text-[11px] font-medium transition flex items-center gap-1.5 active:scale-95">
                 <i data-feather="edit-2" class="w-3 h-3 text-emerald-400"></i> Progress
               </button>
-              <button onclick="openTimelyReport(${t.id})" class="bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 px-2.5 py-1.5 rounded-xl text-[11px] font-medium transition flex items-center gap-1.5 active:scale-95">
+              <button onclick="openTimelyReport('${t.firebaseKey}')" class="bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 px-2.5 py-1.5 rounded-xl text-[11px] font-medium transition flex items-center gap-1.5 active:scale-95">
                 <i data-feather="file-text" class="w-3 h-3 text-blue-400"></i> Report
               </button>
             </div>
