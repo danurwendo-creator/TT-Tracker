@@ -355,31 +355,6 @@
   // Initialize Firebase
   const app = initializeApp(firebaseConfig);
   const analytics = getAnalytics(app);
-    const ticketsRef = ref(db, 'tickets');
-
-    // Menerima data real-time dari Firebase
-    onValue(ticketsRef, (snapshot) => {
-      const data = snapshot.val();
-      window.ticketList = [];
-      if (data) {
-        Object.keys(data).forEach(key => {
-          window.ticketList.unshift({ firebaseKey: key, ...data[key] });
-        });
-      }
-      renderTable();
-    });
-
-    // Helper simpan tiket baru ke Firebase
-    window.saveTicketToFirebase = function(ticketObj) {
-      const newRef = push(ticketsRef);
-      set(newRef, ticketObj);
-    };
-
-    // Helper update tiket di Firebase
-    window.updateTicketInFirebase = function(key, updatedFields) {
-      const itemRef = ref(db, `tickets/${key}`);
-      update(itemRef, updatedFields);
-    };
   </script>
 
   <!-- MAIN APP SCRIPT -->
