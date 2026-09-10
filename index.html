@@ -334,26 +334,27 @@
 
   <!-- FIREBASE SDK MODULAR (V9+) -->
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, push, set, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+ // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-analytics.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
 
-    // ----------------------------------------------------
-    // GANTI KONFIGURASI DI BAWAH INI DENGAN MILIK FIREBASE ANDA
-    // ----------------------------------------------------
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyB4OYo3R5qoM2AjQQpHlanOfn2PMsXa8Qc",
-  authDomain: "tt-tracker-47eaf.firebaseapp.com",
-  projectId: "tt-tracker-47eaf",
-  storageBucket: "tt-tracker-47eaf.firebasestorage.app",
-  messagingSenderId: "387726174094",
-  appId: "1:387726174094:web:6c8168c1e889db134e66df",
-  measurementId: "G-0WTJ9VWXL4"
-};
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyB4OYo3R5qoM2AjQQpHlanOfn2PMsXa8Qc",
+    authDomain: "tt-tracker-47eaf.firebaseapp.com",
+    projectId: "tt-tracker-47eaf",
+    storageBucket: "tt-tracker-47eaf.firebasestorage.app",
+    messagingSenderId: "387726174094",
+    appId: "1:387726174094:web:6c8168c1e889db134e66df",
+    measurementId: "G-0WTJ9VWXL4"
+  };
 
-    // Inisialisasi Firebase
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
     const ticketsRef = ref(db, 'tickets');
 
     // Menerima data real-time dari Firebase
