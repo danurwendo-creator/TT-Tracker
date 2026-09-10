@@ -339,14 +339,16 @@
     import { getDatabase, ref, push, set, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
     // Configuration milik Anda
-   const firebaseConfig = {
-    apiKey: "AIzaSyAhFyv1rbboT9Ji0rhmqa5dFQtPuJL-b14",
-    authDomain: "tracker-tt.firebaseapp.com",
-    projectId: "tracker-tt",
-    storageBucket: "tracker-tt.firebasestorage.app",
-    messagingSenderId: "981495258865",
-    appId: "1:981495258865:web:13b82ebe8b7e370c30d350",
-    measurementId: "G-1Z8CH5D6TM"
+const firebaseConfig = {
+      apiKey: "AIzaSyAhFyv1rbboT9Ji0rhmqa5dFQtPuJL-b14",
+      authDomain: "tracker-tt.firebaseapp.com",
+      // Tambahkan baris databaseURL di bawah ini (sesuaikan jika wilayah server Anda berbeda):
+      databaseURL: "https://tracker-tt-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "tracker-tt",
+      storageBucket: "tracker-tt.firebasestorage.app",
+      messagingSenderId: "981495258865",
+      appId: "1:981495258865:web:13b82ebe8b7e370c30d350",
+      measurementId: "G-1Z8CH5D6TM"
   };
 
     // Initialize Firebase Services
