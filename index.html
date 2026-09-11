@@ -32,7 +32,7 @@
 <body class="bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-100 min-h-screen p-4 md:p-8 antialiased selection:bg-blue-500 selection:text-white">
 
   <!-- ================================================================= -->
-  <!-- MODAL / HALAMAN LOGIN (DI TAMPILKAN PERTAMA KALI SEBELUM AUTH) -->
+  <!-- MODAL / HALAMAN LOGIN -->
   <!-- ================================================================= -->
   <div id="login-overlay" class="fixed inset-0 bg-slate-950/90 backdrop-blur-xl z-[100] flex items-center justify-center p-4">
     <div class="glass-card rounded-3xl w-full max-w-md p-8 shadow-2xl border border-slate-700/80">
@@ -71,7 +71,7 @@
   </div>
 
   <!-- ================================================================= -->
-  <!-- DASHBOARD UTAMA (TERSEMBUNYI HINGGA HASIL AUTHENTICATION VALID) -->
+  <!-- DASHBOARD UTAMA -->
   <!-- ================================================================= -->
   <div id="dashboard-content" class="hidden">
     <!-- Header Main Bar -->
@@ -191,6 +191,8 @@
               <th class="p-4">Area / Klaster</th>
               <th class="p-4">Nomor Tiket</th>
               <th class="p-4">Detail Route / Link Case</th>
+              <th class="p-4">Ticket Open</th>
+              <th class="p-4">Ticket Close</th>
               <th class="p-4">RCA 1 / RCA 2</th>
               <th class="p-4">Stop Clock</th>
               <th class="p-4">TTR Tiket</th>
@@ -385,14 +387,13 @@
     </div>
   </div>
 
-  <!-- FIREBASE INTEGRATION (AUTH + REALTIME DATABASE TRACKER-TT) -->
+  <!-- FIREBASE INTEGRATION -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { getDatabase, ref, push, set, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-    // Configuration milik Anda
-const firebaseConfig = {
+      const firebaseConfig = {
       apiKey: "AIzaSyAhFyv1rbboT9Ji0rhmqa5dFQtPuJL-b14",
       authDomain: "tracker-tt.firebaseapp.com",
       // Tambahkan baris databaseURL di bawah ini (sesuaikan jika wilayah server Anda berbeda):
@@ -404,24 +405,20 @@ const firebaseConfig = {
       measurementId: "G-1Z8CH5D6TM"
     };
 
-    // Initialize Firebase Services
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getDatabase(app);
     const ticketsRef = ref(db, 'tickets');
 
-    // Monitoring Status Auth (Login/Logout)
     onAuthStateChanged(auth, (user) => {
       const loginOverlay = document.getElementById('login-overlay');
       const dashboardContent = document.getElementById('dashboard-content');
       
       if (user) {
-        // User Terautentikasi -> Buka Dashboard
         loginOverlay.classList.add('hidden');
         dashboardContent.classList.remove('hidden');
         document.getElementById('user-display-email').innerText = user.email;
         
-        // Load Data dari Realtime Database
         onValue(ticketsRef, (snapshot) => {
           const data = snapshot.val();
           window.ticketList = [];
@@ -433,13 +430,11 @@ const firebaseConfig = {
           renderTable();
         });
       } else {
-        // Belum Login -> Tampilkan Overlay Login
         loginOverlay.classList.remove('hidden');
         dashboardContent.classList.add('hidden');
       }
     });
 
-    // Function Handler Login
     window.handleLogin = function(e) {
       e.preventDefault();
       const email = document.getElementById('login-email').value;
@@ -455,18 +450,15 @@ const firebaseConfig = {
         });
     };
 
-    // Function Handler Logout
     window.handleLogout = function() {
       signOut(auth);
     };
 
-    // Function pendukung simpan tiket baru ke database
     window.saveTicketToFirebase = function(ticketObj) {
       const newRef = push(ticketsRef);
       set(newRef, ticketObj);
     };
 
-    // Function pendukung update tiket di database
     window.updateTicketInFirebase = function(key, updatedFields) {
       const itemRef = ref(db, `tickets/${key}`);
       update(itemRef, updatedFields);
@@ -546,6 +538,16 @@ const firebaseConfig = {
       return "OTHER / UNMAPPED";
     }
 
+    // Helper format tanggal & waktu singkat (e.g. 10/09/26 15:25)
+    function formatDateTimeString(timestamp) {
+      if (!timestamp) return '-';
+      const d = new Date(timestamp);
+      if (isNaN(d.getTime())) return timestamp; // Jika string biasa
+      const date = d.toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: '2-digit' });
+      const time = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      return `${date} ${time}`;
+    }
+
     window.ticketList = [];
 
     window.onload = () => {
@@ -603,6 +605,7 @@ const firebaseConfig = {
         updatedAt: timeStr,
         createdAtTime: createdTimestamp,
         closedAtTime: null,
+        closedAtFormatted: '-',
         timelyLogs: [
           { time: timeStr, date: dateStr, text: `Tiket dicreate [Klaster: ${areaCluster}]` }
         ]
@@ -749,10 +752,14 @@ const firebaseConfig = {
         const activity = document.getElementById('update-activity').value.trim();
 
         let closedAtTime = ticket.closedAtTime || null;
+        let closedAtFormatted = ticket.closedAtFormatted || '-';
+
         if (newStatus === 'Closed' && prevStatus !== 'Closed') {
           closedAtTime = now.getTime();
+          closedAtFormatted = formatDateTimeString(closedAtTime);
         } else if (newStatus !== 'Closed') {
           closedAtTime = null;
+          closedAtFormatted = '-';
         }
 
         const rca1 = document.getElementById('rca-1').value || ticket.rca1;
@@ -780,6 +787,7 @@ const firebaseConfig = {
         const updatedFields = {
           status: newStatus,
           closedAtTime: closedAtTime,
+          closedAtFormatted: closedAtFormatted,
           rca1: rca1,
           rca2: rca2,
           stopClock: stopClock,
@@ -807,6 +815,8 @@ const firebaseConfig = {
       reportText += `Area/Klaster: ${ticket.areaCluster}\n`;
       reportText += `Nomor Tiket : ${ticket.ticketNumbers}\n`;
       reportText += `Route Case  : ${ticket.routeCase}\n`;
+      reportText += `Ticket Open : ${formatDateTimeString(ticket.createdAtTime)}\n`;
+      reportText += `Ticket Close: ${ticket.closedAtFormatted || '-'}\n`;
       reportText += `TTR Tiket   : ${ttrData.formattedStr}\n`;
       reportText += `RCA 1       : ${ticket.rca1}\n`;
       reportText += `RCA 2       : ${ticket.rca2}\n`;
@@ -878,7 +888,7 @@ const firebaseConfig = {
       document.getElementById('stat-mttr').innerText = mttrText;
 
       if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="10" class="text-center py-10 text-slate-500">Tidak ada data trouble ticket di cloud.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="12" class="text-center py-10 text-slate-500">Tidak ada data trouble ticket di cloud.</td></tr>`;
         return;
       }
 
@@ -907,6 +917,9 @@ const firebaseConfig = {
           ttrBadgeColor = "text-rose-400 bg-rose-500/10 border-rose-500/20";
         }
 
+        const openTimeStr = formatDateTimeString(t.createdAtTime || t.detectTime);
+        const closeTimeStr = t.closedAtFormatted || '-';
+
         const tr = document.createElement('tr');
         tr.className = "hover:bg-slate-800/40 transition-colors border-b border-slate-800/50";
         tr.innerHTML = `
@@ -917,6 +930,8 @@ const firebaseConfig = {
           </td>
           <td class="p-4 font-mono font-semibold text-white max-w-[140px] break-words">${t.ticketNumbers}</td>
           <td class="p-4 max-w-[180px] truncate text-slate-300" title="${t.routeCase}">${t.routeCase}</td>
+          <td class="p-4 font-mono text-[11px] text-rose-400/90 whitespace-nowrap">${openTimeStr}</td>
+          <td class="p-4 font-mono text-[11px] text-emerald-400/90 whitespace-nowrap">${closeTimeStr}</td>
           <td class="p-4 max-w-[140px] truncate">
             <p class="font-medium text-slate-200 text-[11px] truncate" title="${t.rca1}">${t.rca1}</p>
             <p class="text-[10px] text-slate-400 truncate" title="${t.rca2}">${t.rca2}</p>
