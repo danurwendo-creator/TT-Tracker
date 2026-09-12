@@ -9,6 +9,8 @@
   <script src="https://unpkg.com/feather-icons"></script>
   <!-- EXIF JS untuk membaca Metadata GPS Foto Evidence -->
   <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
+  <!-- SheetJS / XLSX Library untuk Export Excel -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <!-- Google Fonts Inter -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
@@ -140,7 +142,7 @@
       </div>
     </div>
 
-    <!-- Filter Bar -->
+    <!-- Filter Bar & Export Action -->
     <div class="max-w-7xl mx-auto glass-card p-4 rounded-2xl mb-6 flex flex-col md:flex-row gap-4 items-center justify-between">
       <div class="flex flex-wrap gap-3 items-center w-full md:w-auto">
         <div class="relative w-full md:w-60">
@@ -174,9 +176,11 @@
         </select>
       </div>
       
-      <div class="text-[11px] text-slate-400 flex items-center gap-1.5 self-end md:self-auto">
-        <i data-feather="cloud" class="w-3.5 h-3.5 text-blue-400"></i>
-        Data tersinkronisasi otomatis via Cloud Firebase (tracker-tt).
+      <div class="flex items-center gap-3 w-full md:w-auto justify-end">
+        <!-- TOMBOL EXPORT EXCEL -->
+        <button onclick="exportToExcel()" class="bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition active:scale-95 shadow-md">
+          <i data-feather="download" class="w-4 h-4 text-emerald-400"></i> Export Excel
+        </button>
       </div>
     </div>
 
@@ -393,7 +397,7 @@
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { getDatabase, ref, push, set, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-      const firebaseConfig = {
+    const firebaseConfig = {
       apiKey: "AIzaSyAhFyv1rbboT9Ji0rhmqa5dFQtPuJL-b14",
       authDomain: "tracker-tt.firebaseapp.com",
       // Tambahkan baris databaseURL di bawah ini (sesuaikan jika wilayah server Anda berbeda):
@@ -538,11 +542,10 @@
       return "OTHER / UNMAPPED";
     }
 
-    // Helper format tanggal & waktu singkat (e.g. 10/09/26 15:25)
     function formatDateTimeString(timestamp) {
       if (!timestamp) return '-';
       const d = new Date(timestamp);
-      if (isNaN(d.getTime())) return timestamp; // Jika string biasa
+      if (isNaN(d.getTime())) return timestamp;
       const date = d.toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: '2-digit' });
       const time = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       return `${date} ${time}`;
@@ -840,6 +843,64 @@
         status.classList.remove('opacity-0');
         setTimeout(() => status.classList.add('opacity-0'), 2000);
       });
+    }
+
+    // FUNGSI EXPORT DATA KELUAR MENJADI FILE EXCEL (.XLSX)
+    function exportToExcel() {
+      const search = document.getElementById('search-input').value.toLowerCase();
+      const customerFilter = document.getElementById('filter-customer').value;
+      const areaFilter = document.getElementById('filter-area').value;
+      const statusFilter = document.getElementById('filter-status').value;
+
+      let list = window.ticketList || [];
+
+      // Memfilter data sesuai filter yang sedang aktif di UI
+      let filtered = list.filter(t => {
+        const matchSearch = (t.ticketNumbers || '').toLowerCase().includes(search) || (t.routeCase || '').toLowerCase().includes(search);
+        const matchCustomer = customerFilter ? (t.customer || '').includes(customerFilter) : true;
+        const matchArea = areaFilter ? t.areaCluster === areaFilter : true;
+        const matchStatus = statusFilter ? t.status === statusFilter : true;
+        return matchSearch && matchCustomer && matchArea && matchStatus;
+      });
+
+      if (filtered.length === 0) {
+        alert("Tidak ada data tiket untuk diexport!");
+        return;
+      }
+
+      // Pemetaan data ke format Excel
+      const excelData = filtered.map((t, index) => {
+        const ttr = calculateTicketTTR(t);
+        return {
+          "No": index + 1,
+          "Customer": t.customer || '-',
+          "Area / Klaster": t.areaCluster || '-',
+          "Nomor Tiket": t.ticketNumbers || '-',
+          "Detail Route / Link Case": t.routeCase || '-',
+          "Ticket Open": formatDateTimeString(t.createdAtTime || t.detectTime),
+          "Ticket Close": t.closedAtFormatted || '-',
+          "RCA 1": t.rca1 || '-',
+          "RCA 2": t.rca2 || '-',
+          "Stop Clock": t.stopClock || '-',
+          "TTR Tiket": ttr.formattedStr,
+          "Status": t.status || '-'
+        };
+      });
+
+      // Membuat workbook SheetJS
+      const worksheet = XLSX.utils.json_to_sheet(excelData);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Data Ticket FTTT");
+
+      // Auto-fit lebar kolom Excel
+      const max_widths = Object.keys(excelData[0]).map(key => ({
+        wch: Math.max(key.length, ...excelData.map(row => String(row[key] || '').length)) + 2
+      }));
+      worksheet['!cols'] = max_widths;
+
+      // Download File
+      const dateToday = new Date().toISOString().slice(0, 10);
+      XLSX.writeFile(workbook, `FTTT_Trouble_Tickets_${dateToday}.xlsx`);
     }
 
     function renderTable() {
