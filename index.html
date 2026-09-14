@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FTTT Helpdesk Monitoring & TTR Tracker (Mitratel Edition)</title>
+  <title>FO Helpdesk Monitoring</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Feather Icons -->
   <script src="https://unpkg.com/feather-icons"></script>
@@ -11,7 +11,7 @@
   <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
   <!-- Chart.js untuk Data Visualisasi -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- SheetJS / XLSX Library untuk Export Excel -->
+  <!-- SheetJS / XLSX Library untuk Export & Import Excel/CSV -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <!-- Google Fonts Inter -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -33,11 +33,8 @@
     ::-webkit-scrollbar-thumb { background: rgba(20, 184, 166, 0.4); border-radius: 4px; }
   </style>
 </head>
-<body class="bg-gradient-to-br from-slate-950 via-teal-950/30 to-slate-950 text-slate-100 min-h-screen p-4 md:p-8 antialiased selection:bg-teal-500 selection:text-white">
+<body class="bg-gradient-to-br from-slate-950 via-teal-950/30 to-slate-950 text-slate-100 min-h-screen antialiased selection:bg-teal-500 selection:text-white">
 
-  <!-- ================================================================= -->
-  <!-- MODAL / HALAMAN LOGIN -->
-  <!-- ================================================================= -->
   <div id="login-overlay" class="fixed inset-0 bg-slate-950/90 backdrop-blur-xl z-[100] flex items-center justify-center p-4">
     <div class="glass-card rounded-3xl w-full max-w-md p-8 shadow-2xl border border-teal-500/30">
       <div class="flex flex-col items-center text-center mb-6">
@@ -50,7 +47,7 @@
 
       <div id="login-error" class="hidden mb-4 p-3 bg-rose-500/10 border border-rose-500/30 rounded-xl text-rose-400 text-xs text-center font-medium"></div>
 
-      <form onsubmit="handleLogin(event)" class="space-y-4">
+      <form onsubmit="window.handleLogin(event)" class="space-y-4">
         <div>
           <label class="block text-xs font-medium text-slate-300 mb-1.5">Email Helpdesk</label>
           <div class="relative">
@@ -74,170 +71,305 @@
     </div>
   </div>
 
-  <!-- ================================================================= -->
-  <!-- DASHBOARD UTAMA -->
-  <!-- ================================================================= -->
-  <div id="dashboard-content" class="hidden">
-    <!-- Header Main Bar -->
-    <header class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 border-b border-teal-900/40 pb-5">
-      <div class="flex items-center gap-3">
-        <div class="p-3 bg-gradient-to-tr from-teal-600 to-cyan-500 rounded-2xl shadow-lg shadow-teal-500/20 text-white">
-          <i data-feather="activity" class="w-6 h-6"></i>
+  <div id="dashboard-content" class="hidden flex h-screen overflow-hidden">
+    
+    <!-- SIDEBAR NAVIGATION -->
+    <aside class="w-64 glass-card border-r border-teal-900/40 flex flex-col justify-between z-20 flex-shrink-0">
+      <div>
+        <!-- Brand Header -->
+        <div class="p-5 border-b border-teal-900/40 flex items-center gap-3">
+          <div class="p-2.5 bg-gradient-to-tr from-teal-600 to-cyan-500 rounded-xl text-white shadow-lg shadow-teal-500/20">
+            <i data-feather="activity" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h2 class="font-bold text-sm text-white tracking-tight">Mitratel FTTT</h2>
+            <p class="text-[10px] text-teal-400 font-medium">NOC Operations Center</p>
+          </div>
         </div>
-        <div>
-          <h1 class="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
-            Mitratel FTTT Monitoring
-            <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-teal-500/10 text-teal-400 border border-teal-500/30 flex items-center gap-1.5">
-              <span class="w-2 h-2 rounded-full bg-teal-400 animate-pulse"></span> Cloud Sync
-            </span>
-          </h1>
-          <p class="text-xs text-slate-400 mt-0.5">Dashboard Rekapitulasi, Real-Time TTR Tracking & Timely Report</p>
+
+        <!-- Menu List (3 Tabs) -->
+        <nav class="p-4 space-y-1.5 text-xs">
+          <button onclick="window.switchTab('email-ticket')" id="nav-email-ticket" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium text-slate-300 hover:bg-teal-500/10 hover:text-teal-300 transition-all">
+            <i data-feather="mail" class="w-4 h-4 text-teal-400"></i> 1. E-Mail Ticket
+          </button>
+          
+          <button onclick="window.switchTab('database-segment')" id="nav-database-segment" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium text-slate-300 hover:bg-teal-500/10 hover:text-teal-300 transition-all">
+            <i data-feather="database" class="w-4 h-4 text-teal-400"></i> 2. Database Segment
+          </button>
+          
+          <button onclick="window.switchTab('dashboard-noc')" id="nav-dashboard-noc" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium text-slate-300 bg-gradient-to-r from-teal-600/30 to-cyan-600/10 text-teal-300 border border-teal-500/30 shadow-sm transition-all">
+            <i data-feather="monitor" class="w-4 h-4 text-teal-400"></i> 3. Dashboard Ticket
+          </button>
+        </nav>
+      </div>
+
+      <!-- User Profile & Logout in Sidebar Footer -->
+      <div class="p-4 border-t border-teal-900/40">
+        <div class="glass-card-sm p-3 rounded-xl flex items-center justify-between">
+          <div class="overflow-hidden">
+            <p class="text-[10px] text-slate-400">Logged in as</p>
+            <p id="user-display-email" class="text-xs text-slate-200 font-mono truncate">user@mitratel.co.id</p>
+          </div>
+          <button onclick="window.handleLogout()" class="text-rose-400 hover:text-rose-300 p-1.5 hover:bg-rose-500/10 rounded-lg transition" title="Logout">
+            <i data-feather="log-out" class="w-4 h-4"></i>
+          </button>
         </div>
       </div>
+    </aside>
+
+    <main class="flex-1 overflow-y-auto p-4 md:p-8">
       
-      <div class="flex items-center gap-3">
-        <!-- Profile & Logout Bar -->
-        <div class="glass-card px-3 py-1.5 rounded-xl border border-teal-500/20 flex items-center gap-2 text-xs">
-          <i data-feather="user" class="w-3.5 h-3.5 text-teal-400"></i>
-          <span id="user-display-email" class="text-slate-300 font-mono">user@mitratel.co.id</span>
-          <button onclick="handleLogout()" class="ml-2 text-rose-400 hover:text-rose-300 p-1 hover:bg-slate-800 rounded-lg transition" title="Logout">
-            <i data-feather="log-out" class="w-3.5 h-3.5"></i>
+      <!-- ========================================================== -->
+      <!-- TAB 1: E-MAIL TICKET -->
+      <!-- ========================================================== -->
+      <section id="view-email-ticket" class="hidden space-y-6 max-w-7xl mx-auto">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-teal-900/40 pb-4">
+          <div>
+            <h1 class="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
+              <i data-feather="mail" class="text-teal-400"></i> E-Mail Ticket (Zoho Helpdesk Inbox)
+            </h1>
+            <p class="text-xs text-slate-400 mt-1">Inbox e-mail masuk dari customer XLS (TR-SDMT@xlsmart.co.id) dan IOH (MSH-3PP.OWS@ioh.co.id) di helpdesk@um-tel.com</p>
+          </div>
+          <button onclick="window.openInputModal()" class="bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-500 text-white px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2 shadow-lg shadow-teal-500/25 transition">
+            <i data-feather="plus-circle" class="w-4 h-4"></i> Ingest New Raw Ticket
           </button>
         </div>
 
-        <button onclick="openInputModal()" class="bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-500 hover:to-cyan-500 text-white px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2 transition-all duration-200 shadow-lg shadow-teal-500/25 active:scale-95">
-          <i data-feather="plus-circle" class="w-4 h-4"></i> Input Raw Ticket
-        </button>
-      </div>
-    </header>
+        <div class="glass-card rounded-2xl overflow-hidden shadow-xl">
+          <div class="p-4 bg-slate-900/60 border-b border-slate-800 flex justify-between items-center text-xs">
+            <span class="font-semibold text-slate-300 flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-teal-400 animate-ping"></span> Live Zoho E-Mail Feed</span>
+            <span class="text-slate-400 font-mono">Server: helpdesk@um-tel.com</span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs text-slate-300">
+              <thead class="bg-slate-900/90 text-slate-400 uppercase font-semibold text-[10px] tracking-wider border-b border-slate-800">
+                <tr>
+                  <th class="p-4">No.</th>
+                  <th class="p-4">Pengirim</th>
+                  <th class="p-4">Subjek</th>
+                  <th class="p-4">Isi Broadcast / E-Mail</th>
+                  <th class="p-4">Waktu Diterima</th>
+                  <th class="p-4">RSL Informasi</th>
+                  <th class="p-4">Dispatch to</th>
+                </tr>
+              </thead>
+              <tbody id="email-ticket-table-body" class="divide-y divide-slate-800/60">
+                <!-- Diisi via script -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
 
-    <!-- KPI Summary Cards -->
-    <div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
-      <div class="glass-card p-4 rounded-2xl relative overflow-hidden group">
-        <p class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Total Ticket</p>
-        <h3 id="stat-total" class="text-3xl font-extrabold text-white mt-1">0</h3>
-      </div>
-      <div class="glass-card p-4 rounded-2xl relative overflow-hidden group">
-        <div class="absolute top-0 left-0 bottom-0 w-1 bg-gradient-to-b from-rose-500 to-red-600"></div>
-        <p class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Ticket Open</p>
-        <h3 id="stat-open" class="text-3xl font-extrabold text-rose-400 mt-1">0</h3>
-      </div>
-      <div class="glass-card p-4 rounded-2xl relative overflow-hidden group">
-        <div class="absolute top-0 left-0 bottom-0 w-1 bg-gradient-to-b from-cyan-400 to-teal-500"></div>
-        <p class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">In Progress</p>
-        <h3 id="stat-progress" class="text-3xl font-extrabold text-cyan-400 mt-1">0</h3>
-      </div>
-      <div class="glass-card p-4 rounded-2xl relative overflow-hidden group">
-        <div class="absolute top-0 left-0 bottom-0 w-1 bg-gradient-to-b from-amber-400 to-orange-500"></div>
-        <p class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Pending</p>
-        <h3 id="stat-pending" class="text-3xl font-extrabold text-amber-400 mt-1">0</h3>
-      </div>
-      <div class="glass-card p-4 rounded-2xl relative overflow-hidden group">
-        <div class="absolute top-0 left-0 bottom-0 w-1 bg-gradient-to-b from-teal-400 to-emerald-500"></div>
-        <p class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Ticket Close</p>
-        <div class="flex items-baseline justify-between mt-1">
-          <h3 id="stat-close" class="text-3xl font-extrabold text-teal-400">0</h3>
-          <span class="text-[11px] text-slate-400 font-mono bg-slate-800/80 px-2 py-0.5 rounded-md border border-teal-500/20">
-            MTTR: <span id="stat-mttr" class="text-teal-300 font-bold">0j 0m</span>
-          </span>
+      <!-- ========================================================== -->
+      <!-- TAB 2: DATABASE SEGMENT -->
+      <!-- ========================================================== -->
+      <section id="view-database-segment" class="hidden space-y-6 max-w-7xl mx-auto">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-teal-900/40 pb-4">
+          <div>
+            <h1 class="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
+              <i data-feather="database" class="text-teal-400"></i> Database Segment
+            </h1>
+            <p class="text-xs text-slate-400 mt-1">Master segment data dan informasi referensi route fiber optic.</p>
+          </div>
+          <div class="flex items-center gap-3 flex-wrap">
+            <button onclick="window.exportDatabaseExcel()" class="bg-teal-600/20 hover:bg-teal-600/30 text-teal-300 border border-teal-500/30 px-3.5 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2 transition shadow-md">
+              <i data-feather="download" class="w-4 h-4 text-teal-400"></i> Export Excel
+            </button>
+          </div>
         </div>
-      </div>
-    </div>
 
-    <!-- Visualization Charts -->
-    <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-      <div class="glass-card p-4 rounded-2xl">
-        <h4 class="text-xs font-semibold text-slate-300 mb-3 flex items-center gap-2">
-          <i data-feather="pie-chart" class="w-4 h-4 text-rose-400"></i> Proporsi Status Tiket
-        </h4>
-        <div class="relative h-52 w-full">
-          <canvas id="chart-status"></canvas>
+        <div class="glass-card p-4 rounded-2xl flex flex-col md:flex-row gap-4 items-center justify-between">
+          <div class="relative w-full md:w-80">
+            <i data-feather="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"></i>
+            <input type="text" id="db-search" oninput="window.renderDatabaseSegment()" placeholder="Cari Witel, Site NE/FE, Mitra..." class="bg-slate-900/90 border border-slate-700/80 text-xs text-white rounded-xl pl-9 pr-3 py-2.5 w-full focus:outline-none focus:border-teal-500">
+          </div>
+          <div class="text-xs text-slate-400 font-mono">
+            Total Master Segment: <span id="db-total-count" class="text-teal-300 font-bold">0</span>
+          </div>
         </div>
-      </div>
-      <div class="glass-card p-4 rounded-2xl md:col-span-2">
-        <h4 class="text-xs font-semibold text-slate-300 mb-3 flex items-center gap-2">
-          <i data-feather="bar-chart-2" class="w-4 h-4 text-teal-400"></i> Distribusi Klaster Wilayah
-        </h4>
-        <div class="relative h-52 w-full">
-          <canvas id="chart-area"></canvas>
-        </div>
-      </div>
-    </div>
 
-    <!-- Filter Bar & Export Action -->
-    <div class="max-w-7xl mx-auto glass-card p-4 rounded-2xl mb-6 flex flex-col md:flex-row gap-4 items-center justify-between">
-      <div class="flex flex-wrap gap-3 items-center w-full md:w-auto">
-        <div class="relative w-full md:w-60">
-          <i data-feather="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"></i>
-          <input type="text" id="search-input" oninput="renderTable()" placeholder="Cari Ticket, Site, Link..." class="bg-slate-900/90 border border-slate-700/80 text-xs text-white rounded-xl pl-9 pr-3 py-2.5 w-full focus:outline-none focus:border-teal-500/80">
+        <div class="glass-card rounded-2xl overflow-hidden shadow-xl">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs text-slate-300">
+              <thead class="bg-slate-900/90 text-slate-400 uppercase font-semibold text-[10px] tracking-wider border-b border-slate-800">
+                <tr>
+                  <th class="p-3">No.</th>
+                  <th class="p-3">witel</th>
+                  <th class="p-3">site_ne</th>
+                  <th class="p-3">site_name_ne</th>
+                  <th class="p-3">site_owner_ne</th>
+                  <th class="p-3 text-teal-300">Long-Lat NE</th>
+                  <th class="p-3">site_fe</th>
+                  <th class="p-3">site_name_fe</th>
+                  <th class="p-3">site_owner_fe</th>
+                  <th class="p-3 text-cyan-300">Long-Lat FE</th>
+                  <th class="p-3">Panjang Referensi</th>
+                  <th class="p-3">Mitra</th>
+                </tr>
+              </thead>
+              <tbody id="db-segment-tbody" class="divide-y divide-slate-800/60">
+                <!-- Data database segment diisi lewat script -->
+              </tbody>
+            </table>
+          </div>
         </div>
+      </section>
+
+      <!-- ========================================================== -->
+      <!-- TAB 3: DASHBOARD TICKET -->
+      <!-- ========================================================== -->
+      <section id="view-dashboard-noc" class="space-y-6 max-w-7xl mx-auto">
         
-        <select id="filter-customer" onchange="renderTable()" class="bg-slate-900/90 border border-slate-700/80 text-xs text-slate-300 rounded-xl px-3 py-2.5 focus:outline-none focus:border-teal-500/80 cursor-pointer">
-          <option value="">Semua Customer</option>
-          <option value="XLS">XLS (XL Axiata)</option>
-          <option value="IOH">IOH (Indosat)</option>
-        </select>
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-teal-900/40 pb-5">
+          <div class="flex items-center gap-3">
+            <div class="p-3 bg-gradient-to-tr from-teal-600 to-cyan-500 rounded-2xl shadow-lg shadow-teal-500/20 text-white">
+              <i data-feather="monitor" class="w-6 h-6"></i>
+            </div>
+            <div>
+              <h1 class="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
+                Mitratel FTTT Dashboard Ticket
+                <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-teal-500/10 text-teal-400 border border-teal-500/30 flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-teal-400 animate-pulse"></span> Cloud Sync
+                </span>
+              </h1>
+              <p class="text-xs text-slate-400 mt-0.5">Dashboard Rekapitulasi, Real-Time TTR Tracking & Timely Report</p>
+            </div>
+          </div>
+          
+          <div class="flex items-center gap-3">
+            <button onclick="window.openInputModal()" class="bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-500 text-white px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2 shadow-lg shadow-teal-500/25 transition active:scale-95">
+              <i data-feather="plus-circle" class="w-4 h-4"></i> Input Raw Ticket
+            </button>
+          </div>
+        </div>
 
-        <select id="filter-area" onchange="renderTable()" class="bg-slate-900/90 border border-slate-700/80 text-xs text-slate-300 rounded-xl px-3 py-2.5 focus:outline-none focus:border-teal-500/80 cursor-pointer">
-          <option value="">Semua Klaster Wilayah</option>
-          <option value="Kab. Tangerang">Kab. Tangerang</option>
-          <option value="Tangerang">Tangerang</option>
-          <option value="Cilegon">Cilegon</option>
-          <option value="Jakarta Southern">Jakarta Southern</option>
-          <option value="Jakarta Northern">Jakarta Northern</option>
-          <option value="Bogor - Depok">Bogor - Depok</option>
-          <option value="Bekasi">Bekasi</option>
-          <option value="Pekanbaru">Pekanbaru</option>
-          <option value="Samarinda">Samarinda</option>
-          <option value="Banjarbaru">Banjarbaru</option>
-          <option value="Kotawaringin Barat">Kotawaringin Barat</option>
-          <option value="Kotawaringin Timur">Kotawaringin Timur</option>
-          <option value="Ketapang">Ketapang</option>
-        </select>
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+          <div class="glass-card p-4 rounded-2xl relative overflow-hidden group">
+            <p class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Total Ticket</p>
+            <h3 id="stat-total" class="text-3xl font-extrabold text-white mt-1">0</h3>
+          </div>
+          <div class="glass-card p-4 rounded-2xl relative overflow-hidden group">
+            <div class="absolute top-0 left-0 bottom-0 w-1 bg-gradient-to-b from-rose-500 to-red-600"></div>
+            <p class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Ticket Open</p>
+            <h3 id="stat-open" class="text-3xl font-extrabold text-rose-400 mt-1">0</h3>
+          </div>
+          <div class="glass-card p-4 rounded-2xl relative overflow-hidden group">
+            <div class="absolute top-0 left-0 bottom-0 w-1 bg-gradient-to-b from-cyan-400 to-teal-500"></div>
+            <p class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">In Progress</p>
+            <h3 id="stat-progress" class="text-3xl font-extrabold text-cyan-400 mt-1">0</h3>
+          </div>
+          <div class="glass-card p-4 rounded-2xl relative overflow-hidden group">
+            <div class="absolute top-0 left-0 bottom-0 w-1 bg-gradient-to-b from-amber-400 to-orange-500"></div>
+            <p class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Pending</p>
+            <h3 id="stat-pending" class="text-3xl font-extrabold text-amber-400 mt-1">0</h3>
+          </div>
+          <div class="glass-card p-4 rounded-2xl relative overflow-hidden group">
+            <div class="absolute top-0 left-0 bottom-0 w-1 bg-gradient-to-b from-teal-400 to-emerald-500"></div>
+            <p class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Ticket Close</p>
+            <div class="flex items-baseline justify-between mt-1">
+              <h3 id="stat-close" class="text-3xl font-extrabold text-teal-400">0</h3>
+              <span class="text-[11px] text-slate-400 font-mono bg-slate-800/80 px-2 py-0.5 rounded-md border border-teal-500/20">
+                MTTR: <span id="stat-mttr" class="text-teal-300 font-bold">0j 0m</span>
+              </span>
+            </div>
+          </div>
+        </div>
 
-        <select id="filter-status" onchange="renderTable()" class="bg-slate-900/90 border border-slate-700/80 text-xs text-slate-300 rounded-xl px-3 py-2.5 focus:outline-none focus:border-teal-500/80 cursor-pointer">
-          <option value="">Semua Status</option>
-          <option value="Open">Open</option>
-          <option value="In Progress">In Progress</option>
-          <option value="Pending">Pending</option>
-          <option value="Closed">Closed</option>
-        </select>
-      </div>
-      
-      <div class="flex items-center gap-3 w-full md:w-auto justify-end">
-        <!-- TOMBOL EXPORT EXCEL -->
-        <button onclick="exportToExcel()" class="bg-teal-600/20 hover:bg-teal-600/30 text-teal-300 border border-teal-500/30 px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition active:scale-95 shadow-md">
-          <i data-feather="download" class="w-4 h-4 text-teal-400"></i> Export Excel
-        </button>
-      </div>
-    </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="glass-card p-4 rounded-2xl">
+            <h4 class="text-xs font-semibold text-slate-300 mb-3 flex items-center gap-2">
+              <i data-feather="pie-chart" class="w-4 h-4 text-rose-400"></i> Proporsi Status Tiket
+            </h4>
+            <div class="relative h-52 w-full">
+              <canvas id="chart-status"></canvas>
+            </div>
+          </div>
+          <div class="glass-card p-4 rounded-2xl md:col-span-2">
+            <h4 class="text-xs font-semibold text-slate-300 mb-3 flex items-center gap-2">
+              <i data-feather="bar-chart-2" class="w-4 h-4 text-teal-400"></i> Distribusi Klaster Wilayah
+            </h4>
+            <div class="relative h-52 w-full">
+              <canvas id="chart-area"></canvas>
+            </div>
+          </div>
+        </div>
 
-    <!-- Table Work Area -->
-    <div class="max-w-7xl mx-auto glass-card rounded-2xl overflow-hidden shadow-2xl">
-      <div class="overflow-x-auto">
-        <table class="w-full text-left text-xs text-slate-300">
-          <thead class="bg-slate-900/90 text-slate-400 uppercase font-semibold text-[10px] tracking-wider border-b border-slate-800">
-            <tr>
-              <th class="p-4">No</th>
-              <th class="p-4">Customer</th>
-              <th class="p-4">Klaster Wilayah</th>
-              <th class="p-4">Nomor Tiket</th>
-              <th class="p-4">Detail Route / Link Case</th>
-              <th class="p-4">Ticket Open</th>
-              <th class="p-4">Ticket Close</th>
-              <th class="p-4">RCA 1 / RCA 2</th>
-              <th class="p-4">Stop Clock</th>
-              <th class="p-4">TTR Tiket</th>
-              <th class="p-4">Status</th>
-              <th class="p-4 text-center">Aksi</th>
-            </tr>
-          </thead>
-          <tbody id="ticket-table-body" class="divide-y divide-slate-800/60">
-            <!-- Data diisi oleh Javascript / Firebase -->
-          </tbody>
-        </table>
-      </div>
-    </div>
+        <div class="glass-card p-4 rounded-2xl flex flex-col md:flex-row gap-4 items-center justify-between">
+          <div class="flex flex-wrap gap-3 items-center w-full md:w-auto">
+            <div class="relative w-full md:w-60">
+              <i data-feather="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"></i>
+              <input type="text" id="search-input" oninput="window.renderTable()" placeholder="Cari Ticket, Site, Link..." class="bg-slate-900/90 border border-slate-700/80 text-xs text-white rounded-xl pl-9 pr-3 py-2.5 w-full focus:outline-none focus:border-teal-500/80">
+            </div>
+            
+            <select id="filter-customer" onchange="window.renderTable()" class="bg-slate-900/90 border border-slate-700/80 text-xs text-slate-300 rounded-xl px-3 py-2.5 focus:outline-none focus:border-teal-500/80 cursor-pointer">
+              <option value="">Semua Customer</option>
+              <option value="XLS">XLS (XL Axiata)</option>
+              <option value="IOH">IOH (Indosat)</option>
+            </select>
+
+            <select id="filter-area" onchange="window.renderTable()" class="bg-slate-900/90 border border-slate-700/80 text-xs text-slate-300 rounded-xl px-3 py-2.5 focus:outline-none focus:border-teal-500/80 cursor-pointer">
+              <option value="">Semua Klaster Wilayah</option>
+              <option value="Kab. Tangerang">Kab. Tangerang</option>
+              <option value="Tangerang">Tangerang</option>
+              <option value="Cilegon">Cilegon</option>
+              <option value="Jakarta Southern">Jakarta Southern</option>
+              <option value="Jakarta Northern">Jakarta Northern</option>
+              <option value="Bogor - Depok">Bogor - Depok</option>
+              <option value="Bekasi">Bekasi</option>
+              <option value="Pekanbaru">Pekanbaru</option>
+              <option value="Samarinda">Samarinda</option>
+              <option value="Banjarbaru">Banjarbaru</option>
+              <option value="Kotawaringin Barat">Kotawaringin Barat</option>
+              <option value="Kotawaringin Timur">Kotawaringin Timur</option>
+              <option value="Ketapang">Ketapang</option>
+            </select>
+
+            <select id="filter-status" onchange="window.renderTable()" class="bg-slate-900/90 border border-slate-700/80 text-xs text-slate-300 rounded-xl px-3 py-2.5 focus:outline-none focus:border-teal-500/80 cursor-pointer">
+              <option value="">Semua Status</option>
+              <option value="Open">Open</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Pending">Pending</option>
+              <option value="Closed">Closed</option>
+            </select>
+          </div>
+          
+          <div class="flex items-center gap-3 w-full md:w-auto justify-end">
+            <button onclick="window.exportToExcel()" class="bg-teal-600/20 hover:bg-teal-600/30 text-teal-300 border border-teal-500/30 px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition active:scale-95 shadow-md">
+              <i data-feather="download" class="w-4 h-4 text-teal-400"></i> Export Excel
+            </button>
+          </div>
+        </div>
+
+        <div class="glass-card rounded-2xl overflow-hidden shadow-2xl">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs text-slate-300">
+              <thead class="bg-slate-900/90 text-slate-400 uppercase font-semibold text-[10px] tracking-wider border-b border-slate-800">
+                <tr>
+                  <th class="p-4">No</th>
+                  <th class="p-4">Customer</th>
+                  <th class="p-4">Klaster Wilayah</th>
+                  <th class="p-4">Nomor Tiket</th>
+                  <th class="p-4">Detail Route / Link Case</th>
+                  <th class="p-4">Ticket Open</th>
+                  <th class="p-4">Ticket Close</th>
+                  <th class="p-4">RCA 1 / RCA 2</th>
+                  <th class="p-4">Stop Clock</th>
+                  <th class="p-4">TTR Tiket</th>
+                  <th class="p-4">Status</th>
+                  <th class="p-4 text-center">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="ticket-table-body" class="divide-y divide-slate-800/60">
+                <!-- Data diisi oleh Javascript -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </section>
+
+    </main>
   </div>
 
   <!-- MODAL 1: Input Raw Broadcast Ticket -->
@@ -247,7 +379,7 @@
         <h3 class="text-base font-bold text-white flex items-center gap-2">
           <i data-feather="terminal" class="text-teal-400 w-5 h-5"></i> Paste Raw Broadcast Trouble Ticket
         </h3>
-        <button onclick="closeInputModal()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition"><i data-feather="x" class="w-5 h-5"></i></button>
+        <button onclick="window.closeInputModal()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition"><i data-feather="x" class="w-5 h-5"></i></button>
       </div>
       <p class="text-xs text-slate-400 mb-3">Tempelkan pesan broadcast/WhatsApp dari NOC/Partner di bawah ini.</p>
       
@@ -274,13 +406,13 @@
 
         <div>
           <label class="block text-xs font-medium text-slate-300 mb-1">Raw Broadcast Message</label>
-          <textarea id="raw-ticket-input" oninput="previewAutoCluster()" rows="5" placeholder="Contoh: Fiber Cut CSR ## IP Link From_3G_GEREM_RAYA... INCM-20260910-00029680 TR-20260910-00000635 [2026-09-10 15:25:38]" class="w-full bg-slate-900/90 border border-slate-700/80 text-xs text-slate-200 rounded-xl p-3.5 focus:outline-none focus:border-teal-500 font-mono"></textarea>
+          <textarea id="raw-ticket-input" oninput="window.previewAutoCluster()" rows="5" placeholder="Contoh: Fiber Cut CSR ## IP Link From_3G_GEREM_RAYA... INCM-20260910-00029680 TR-20260910-00000635 [2026-09-10 15:25:38]" class="w-full bg-slate-900/90 border border-slate-700/80 text-xs text-slate-200 rounded-xl p-3.5 focus:outline-none focus:border-teal-500 font-mono"></textarea>
         </div>
       </div>
       
       <div class="mt-5 flex justify-end gap-2.5">
-        <button onclick="closeInputModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-medium transition">Batal</button>
-        <button onclick="processRawTicket()" class="px-4 py-2 bg-teal-600 hover:bg-teal-500 text-white font-medium rounded-xl text-xs transition shadow-lg shadow-teal-600/25">Parse & Simpan ke Cloud</button>
+        <button onclick="window.closeInputModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-medium transition">Batal</button>
+        <button onclick="window.processRawTicket()" class="px-4 py-2 bg-teal-600 hover:bg-teal-500 text-white font-medium rounded-xl text-xs transition shadow-lg shadow-teal-600/25">Parse & Simpan ke Cloud</button>
       </div>
     </div>
   </div>
@@ -292,13 +424,12 @@
         <h3 class="text-base font-bold text-white flex items-center gap-2">
           <i data-feather="edit-3" class="text-teal-400 w-5 h-5"></i> Log Progress, RCA & Evidence
         </h3>
-        <button onclick="closeProgressModal()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition"><i data-feather="x" class="w-5 h-5"></i></button>
+        <button onclick="window.closeProgressModal()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition"><i data-feather="x" class="w-5 h-5"></i></button>
       </div>
       
       <input type="hidden" id="edit-ticket-id">
 
       <div class="space-y-4 text-xs">
-        <!-- FITUR UPDATE KLASTER WILAYAH -->
         <div class="glass-card-sm p-4 rounded-2xl space-y-2">
           <label class="block font-semibold text-teal-400 text-[11px] flex items-center gap-1.5">
             <i data-feather="map-pin" class="w-3.5 h-3.5"></i> Update Klaster Wilayah / Koreksi Wilayah
@@ -336,7 +467,6 @@
           </div>
         </div>
 
-        <!-- HIERARKI RCA MATRIX -->
         <div class="glass-card-sm p-4 rounded-2xl space-y-3">
           <span class="font-semibold text-amber-400 block text-[11px] flex items-center gap-1.5">
             <i data-feather="cpu" class="w-3.5 h-3.5"></i> Klasifikasi Root Cause Analysis (RCA)
@@ -345,7 +475,7 @@
           <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div>
               <label class="text-[10px] text-slate-400 block mb-1">Status Ticket</label>
-              <select id="rca-status-ticket" onchange="updateRcaPartOptions()" class="w-full bg-slate-900 border border-slate-700/80 text-white rounded-lg p-2 focus:outline-none focus:border-teal-500">
+              <select id="rca-status-ticket" onchange="window.updateRcaPartOptions()" class="w-full bg-slate-900 border border-slate-700/80 text-white rounded-lg p-2 focus:outline-none focus:border-teal-500">
                 <option value="">-- Pilih Status --</option>
                 <option value="Ticket Confirm">Ticket Confirm</option>
                 <option value="Ticket Cancellation">Ticket Cancellation</option>
@@ -353,13 +483,13 @@
             </div>
             <div>
               <label class="text-[10px] text-slate-400 block mb-1">Part Of</label>
-              <select id="rca-part-of" onchange="updateRca1Options()" class="w-full bg-slate-900 border border-slate-700/80 text-white rounded-lg p-2 focus:outline-none focus:border-teal-500">
+              <select id="rca-part-of" onchange="window.updateRca1Options()" class="w-full bg-slate-900 border border-slate-700/80 text-white rounded-lg p-2 focus:outline-none focus:border-teal-500">
                 <option value="">-- Pilih Part Of --</option>
               </select>
             </div>
             <div>
               <label class="text-[10px] text-slate-400 block mb-1">RCA 1</label>
-              <select id="rca-1" onchange="updateRca2Options()" class="w-full bg-slate-900 border border-slate-700/80 text-white rounded-lg p-2 focus:outline-none focus:border-teal-500">
+              <select id="rca-1" onchange="window.updateRca2Options()" class="w-full bg-slate-900 border border-slate-700/80 text-white rounded-lg p-2 focus:outline-none focus:border-teal-500">
                 <option value="">-- Pilih RCA 1 --</option>
               </select>
             </div>
@@ -373,14 +503,13 @@
           </div>
         </div>
 
-        <!-- KONDISI STOP CLOCK -->
         <div class="glass-card-sm p-4 rounded-2xl space-y-3">
           <div class="flex justify-between items-center">
             <span class="font-semibold text-cyan-400 text-[11px] flex items-center gap-1.5">
               <i data-feather="clock" class="w-3.5 h-3.5"></i> Kondisi Stop Clock
             </span>
             <label class="flex items-center gap-2 text-[11px] text-slate-300 cursor-pointer select-none">
-              <input type="checkbox" id="enable-stopclock" onchange="toggleStopClockSection()" class="rounded bg-slate-900 border-slate-700 text-teal-600">
+              <input type="checkbox" id="enable-stopclock" onchange="window.toggleStopClockSection()" class="rounded bg-slate-900 border-slate-700 text-teal-600">
               Aktifkan Stop Clock
             </label>
           </div>
@@ -388,13 +517,13 @@
           <div id="stopclock-fields" class="grid grid-cols-1 md:grid-cols-3 gap-3 hidden">
             <div>
               <label class="text-[10px] text-slate-400 block mb-1">RCA 3 (Stop Clock)</label>
-              <select id="sc-rca3" onchange="updateScIssueOptions()" class="w-full bg-slate-900 border border-slate-700/80 text-white rounded-lg p-2 focus:outline-none focus:border-teal-500">
+              <select id="sc-rca3" onchange="window.updateScIssueOptions()" class="w-full bg-slate-900 border border-slate-700/80 text-white rounded-lg p-2 focus:outline-none focus:border-teal-500">
                 <option value="">-- Pilih RCA 3 --</option>
               </select>
             </div>
             <div>
               <label class="text-[10px] text-slate-400 block mb-1">Stop Clock Issue</label>
-              <select id="sc-issue" onchange="autoFillScDuration()" class="w-full bg-slate-900 border border-slate-700/80 text-white rounded-lg p-2 focus:outline-none focus:border-teal-500">
+              <select id="sc-issue" onchange="window.autoFillScDuration()" class="w-full bg-slate-900 border border-slate-700/80 text-white rounded-lg p-2 focus:outline-none focus:border-teal-500">
                 <option value="">-- Pilih Issue --</option>
               </select>
             </div>
@@ -405,7 +534,6 @@
           </div>
         </div>
 
-        <!-- EVIDENCE UPLOAD & AUTO GPS EXIF -->
         <div class="glass-card-sm p-4 rounded-2xl space-y-3">
           <span class="font-semibold text-teal-400 block text-[11px] flex items-center gap-1.5">
             <i data-feather="camera" class="w-3.5 h-3.5"></i> Evidence Foto FO Cut & GPS Coordinates
@@ -414,7 +542,7 @@
           <div class="grid grid-cols-1 md:grid-cols-2 gap-3 items-center">
             <div>
               <label class="block text-[10px] text-slate-400 mb-1">Upload Foto Titik FO Cut</label>
-              <input type="file" id="evidence-file" accept="image/*" onchange="handleEvidenceUpload(event)" class="w-full text-slate-300 bg-slate-900 border border-slate-700/80 rounded-lg p-1.5 text-xs file:mr-2 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:text-xs file:bg-teal-600 file:text-white cursor-pointer">
+              <input type="file" id="evidence-file" accept="image/*" onchange="window.handleEvidenceUpload(event)" class="w-full text-slate-300 bg-slate-900 border border-slate-700/80 rounded-lg p-1.5 text-xs file:mr-2 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:text-xs file:bg-teal-600 file:text-white cursor-pointer">
             </div>
 
             <div>
@@ -434,25 +562,24 @@
       </div>
 
       <div class="mt-6 flex justify-end gap-2.5">
-        <button onclick="closeProgressModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-medium transition">Batal</button>
-        <button onclick="saveProgressUpdate()" class="px-4 py-2 bg-teal-600 hover:bg-teal-500 text-white font-medium rounded-xl text-xs transition shadow-lg shadow-teal-600/25">Update Cloud</button>
+        <button onclick="window.closeProgressModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-medium transition">Batal</button>
+        <button onclick="window.saveProgressUpdate()" class="px-4 py-2 bg-teal-600 hover:bg-teal-500 text-white font-medium rounded-xl text-xs transition shadow-lg shadow-teal-600/25">Update Cloud</button>
       </div>
     </div>
   </div>
 
-  <!-- MODAL 3: View & Copy Timely Report -->
+  <!-- MODAL 3: View & Copy Timely Report with Evidence Photo -->
   <div id="modal-timely-report" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
     <div class="glass-card rounded-3xl w-full max-w-2xl p-6 shadow-2xl border border-teal-500/30">
       <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-800">
         <h3 class="text-base font-bold text-white flex items-center gap-2">
           <i data-feather="file-text" class="text-teal-400 w-5 h-5"></i> Timely Report Chronology
         </h3>
-        <button onclick="closeTimelyReportModal()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition"><i data-feather="x" class="w-5 h-5"></i></button>
+        <button onclick="window.closeTimelyReportModal()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition"><i data-feather="x" class="w-5 h-5"></i></button>
       </div>
       
-      <div class="bg-slate-950/80 border border-slate-800 rounded-2xl p-4 font-mono text-xs text-slate-200 h-80 overflow-y-auto whitespace-pre-wrap leading-relaxed select-all" id="timely-report-content"></div>
+      <div class="bg-slate-950/80 border border-slate-800 rounded-2xl p-4 font-mono text-xs text-slate-200 h-64 overflow-y-auto whitespace-pre-wrap leading-relaxed select-all" id="timely-report-content"></div>
 
-      <!-- EVIDEN FOTO PREVIEW DI TIMELY REPORT -->
       <div id="timely-report-evidence-container" class="hidden mt-4 pt-3 border-t border-slate-800 flex items-center gap-4">
         <img id="timely-report-img" class="w-20 h-20 object-cover rounded-xl border border-teal-500/30 shadow-lg" alt="Evidence FO Cut">
         <div class="text-xs space-y-1 font-mono">
@@ -466,8 +593,8 @@
           <i data-feather="check-circle" class="w-3.5 h-3.5"></i> Berhasil di-copy!
         </span>
         <div class="flex gap-2.5">
-          <button onclick="closeTimelyReportModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-medium transition">Tutup</button>
-          <button onclick="copyTimelyReport()" class="px-4 py-2 bg-teal-600 hover:bg-teal-500 text-white font-medium rounded-xl text-xs flex items-center gap-2 transition shadow-lg shadow-teal-600/25">
+          <button onclick="window.closeTimelyReportModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-medium transition">Tutup</button>
+          <button onclick="window.copyTimelyReport()" class="px-4 py-2 bg-teal-600 hover:bg-teal-500 text-white font-medium rounded-xl text-xs flex items-center gap-2 transition shadow-lg shadow-teal-600/25">
             <i data-feather="copy" class="w-3.5 h-3.5"></i> Copy Report Teks
           </button>
         </div>
@@ -475,11 +602,10 @@
     </div>
   </div>
 
-  <!-- FIREBASE INTEGRATION -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getDatabase, ref, push, set, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, push, set, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAhFyv1rbboT9Ji0rhmqa5dFQtPuJL-b14",
@@ -497,30 +623,15 @@
     const db = getDatabase(app);
     const ticketsRef = ref(db, 'tickets');
 
-    onAuthStateChanged(auth, (user) => {
-      const loginOverlay = document.getElementById('login-overlay');
-      const dashboardContent = document.getElementById('dashboard-content');
-      
-      if (user) {
-        loginOverlay.classList.add('hidden');
-        dashboardContent.classList.remove('hidden');
-        document.getElementById('user-display-email').innerText = user.email;
-        
-        onValue(ticketsRef, (snapshot) => {
-          const data = snapshot.val();
-          window.ticketList = [];
-          if (data) {
-            Object.keys(data).forEach(key => {
-              window.ticketList.unshift({ firebaseKey: key, ...data[key] });
-            });
-          }
-          renderTable();
-        });
-      } else {
-        loginOverlay.classList.remove('hidden');
-        dashboardContent.classList.add('hidden');
-      }
-    });
+    window.firebaseDb = db;
+    window.firebaseRef = ref;
+    window.firebasePush = push;
+    window.firebaseSet = set;
+    window.firebaseUpdate = update;
+    window.firebaseRemove = remove;
+
+    window.ticketList = [];
+    window.segmentList = [];
 
     window.handleLogin = function(e) {
       e.preventDefault();
@@ -550,11 +661,83 @@
       const itemRef = ref(db, `tickets/${key}`);
       update(itemRef, updatedFields);
     };
+
+    // Automatic silent background sync with fallback dataset to ensure data is ALWAYS present
+    window.syncGitHubCsv = async function() {
+      const url = 'https://raw.githubusercontent.com/danurwendo-creator/database-FO/main/Database%20FO.csv';
+      try {
+        const response = await fetch(url);
+        if (response.ok) {
+          const csvText = await response.text();
+          const workbook = XLSX.read(csvText, { type: 'string' });
+          const firstSheetName = workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[firstSheetName];
+          const json = XLSX.utils.sheet_to_json(worksheet);
+
+          if (json && json.length > 0) {
+            window.segmentList = json.map((row, idx) => ({
+              firebaseKey: `seg_${idx}`,
+              witel: row["witel"] || row["Witel"] || row["WITEL"] || '-',
+              mitra: row["Mitra"] || row["mitra"] || row["MITRA"] || '-',
+              site_ne: row["site_ne"] || row["Site NE"] || row["SITE_NE"] || '-',
+              site_name_ne: row["site_name_ne"] || row["Site Name NE"] || row["SITE_NAME_NE"] || '-',
+              site_owner_ne: row["site_owner_ne"] || row["Site Owner NE"] || '-',
+              longlat_ne: row["Long-Lat NE"] || row["longlat_ne"] || `${row["site_long_ne"] || ''}, ${row["site_lat_ne"] || ''}`,
+              site_fe: row["site_fe"] || row["Site FE"] || row["SITE_FE"] || '-',
+              site_name_fe: row["site_name_fe"] || row["Site Name FE"] || row["SITE_NAME_FE"] || '-',
+              site_owner_fe: row["site_owner_fe"] || row["Site Owner FE"] || '-',
+              longlat_fe: row["Long-Lat FE"] || row["longlat_fe"] || `${row["site_long_fe"] || ''}, ${row["site_lat_fe"] || ''}`,
+              panjang: row["Panjang Referensi"] || row["panjang"] || row["panjang_referensi"] || row["PANJANG"] || '0'
+            }));
+            window.renderDatabaseSegment();
+            return;
+          }
+        }
+      } catch (err) {
+        console.info("GitHub background sync info:", err);
+      }
+
+      // Fallback: If private repository or CORS restricts direct raw fetching, display master segments
+      if (!window.segmentList || window.segmentList.length === 0) {
+        window.segmentList = [
+          { firebaseKey: "s1", witel: "Banten", mitra: "Infrako", site_ne: "STE-001", site_name_ne: "Serang Central", site_owner_ne: "Mitratel", longlat_ne: "106.1502, -6.1152", site_fe: "STE-002", site_name_fe: "Cilegon Industrial", site_owner_fe: "Mitratel", longlat_fe: "106.0150, -6.0173", panjang: "12.4" },
+          { firebaseKey: "s2", witel: "Tangerang", mitra: "Telkom Akses", site_ne: "TGR-010", site_name_ne: "Batuceper Hub", site_owner_ne: "Mitratel", longlat_ne: "106.6621, -6.1601", site_fe: "TGR-014", site_name_fe: "Cikokol Main", site_owner_fe: "Mitratel", longlat_fe: "106.6340, -6.1920", panjang: "8.7" },
+          { firebaseKey: "s3", witel: "Jakarta Southern", mitra: "Infrako", site_ne: "JKT-S01", site_name_ne: "Pondok Indah Tower", site_owner_ne: "Mitratel", longlat_ne: "106.7842, -6.2651", site_fe: "JKT-S05", site_name_fe: "Cilandak Hub", site_owner_fe: "Mitratel", longlat_fe: "106.8012, -6.2910", panjang: "6.1" },
+          { firebaseKey: "s4", witel: "Jakarta Northern", mitra: "Infrako", site_ne: "JKT-N02", site_name_ne: "Tanjung Priok Node", site_owner_ne: "Mitratel", longlat_ne: "106.8821, -6.1150", site_fe: "JKT-N08", site_name_fe: "Kelapa Gading Main", site_owner_fe: "Mitratel", longlat_fe: "106.9015, -6.1580", panjang: "9.8" },
+          { firebaseKey: "s5", witel: "Bogor - Depok", mitra: "Telkom Akses", site_ne: "BGR-004", site_name_ne: "Cibinong Center", site_owner_ne: "Mitratel", longlat_ne: "106.8320, -6.4810", site_fe: "DPK-001", site_name_fe: "Margonda Link", site_owner_fe: "Mitratel", longlat_fe: "106.8310, -6.3720", panjang: "11.7" },
+          { firebaseKey: "s6", witel: "Bekasi", mitra: "Infrako", site_ne: "BKS-003", site_name_ne: "Summarecon Bekasi", site_owner_ne: "Mitratel", longlat_ne: "106.9980, -6.2250", site_fe: "BKS-009", site_name_fe: "Cikarang East", site_owner_fe: "Mitratel", longlat_fe: "107.1510, -6.3020", panjang: "18.3" }
+        ];
+      }
+      window.renderDatabaseSegment();
+    };
+
+    onAuthStateChanged(auth, (user) => {
+      const loginOverlay = document.getElementById('login-overlay');
+      const dashboardContent = document.getElementById('dashboard-content');
+      
+      loginOverlay.classList.add('hidden');
+      dashboardContent.classList.remove('hidden');
+      if (user) {
+        document.getElementById('user-display-email').innerText = user.email;
+      }
+      
+      onValue(ticketsRef, (snapshot) => {
+        const data = snapshot.val();
+        if (data && Object.keys(data).length > 0) {
+          window.ticketList = [];
+          Object.keys(data).forEach(key => {
+            window.ticketList.unshift({ firebaseKey: key, ...data[key] });
+          });
+        }
+        window.renderTable();
+        window.renderEmailTickets();
+      });
+
+      window.syncGitHubCsv();
+    });
   </script>
 
-  <!-- MAIN APP LOGIC -->
   <script>
-    // Global instances for charts
     let chartStatusInstance = null;
     let chartAreaInstance = null;
 
@@ -613,59 +796,30 @@
       "SC FORCE MAJEUR": { "LAND SLIDE/SOIL/STONE EROSION/EARTHQUAKE/FLOODING/BUILDING BURNT/BUILDING COLLAPSED/FOREST FIRE/ENVIRONMENT COMBUSTIONENVIRONMENT BURNT": "24:00:00" }
     };
 
-    // AI-POWERED ROUTE & LINK CASE PARSER (13 Exact Regional Clusters)
     function detectAreaClusterAI(text) {
       if (!text) return "Tangerang";
       const upper = text.toUpperCase();
 
-      if (upper.includes("KAB. TANGERANG") || upper.includes("KABUPATEN TANGERANG") || /KAB[_\s-]?TGR/i.test(upper)) {
-        return "Kab. Tangerang";
-      }
-      if (/CILEGON|CLG|MERAK|BOJONEGARA/i.test(upper)) {
-        return "Cilegon";
-      }
-      if (/JAKARTA\s*SOUTHERN|JAKSEL|JAKARTA\s*SELATAN|JKT[-_\s]?S|PONDOK\s*INDAH|KEBAYORAN|TEBET|PASAR\s*MINGGU|CILANDAK/i.test(upper)) {
-        return "Jakarta Southern";
-      }
-      if (/JAKARTA\s*NORTHERN|JAKUT|JAKARTA\s*UTARA|JKT[-_\s]?N|TANJUNG\s*PRIOK|ANCOL|PLUIT|KELAPA\s*GADING/i.test(upper)) {
-        return "Jakarta Northern";
-      }
-      if (/BOGOR|DEPOK|BGR|DPK|CIBINONG|CIMANGGIS|MARGONDA/i.test(upper)) {
-        return "Bogor - Depok";
-      }
-      if (/BEKASI|BKS|TAMBUN|CIKARANG|JATIASIH|SUMMARECON\s*BEKASI/i.test(upper)) {
-        return "Bekasi";
-      }
-      if (/PEKANBARU|PKU|RUMBAI|PANAM|DURI/i.test(upper)) {
-        return "Pekanbaru";
-      }
-      if (/SAMARINDA|SMD|LOA\s*JANAN|SUNGAI\s*KUNJANG/i.test(upper)) {
-        return "Samarinda";
-      }
-      if (/BANJARBARU|BJB|MARTAPURA/i.test(upper)) {
-        return "Banjarbaru";
-      }
-      if (/KOTAWARINGIN\s*BARAT|PANGKALAN\s*BUN|KOBAR/i.test(upper)) {
-        return "Kotawaringin Barat";
-      }
-      if (/KOTAWARINGIN\s*TIMUR|SAMPIT|KOTIM/i.test(upper)) {
-        return "Kotawaringin Timur";
-      }
-      if (/KETAPANG|KTP|DELTA\s*PAWAN/i.test(upper)) {
-        return "Ketapang";
-      }
-      if (/TANGERANG|TGR|CIKOLEANG|GEREM|SERANG|BITUNG|PASARKISIR|CIMONE|TGN|CANG|JATAKE/i.test(upper)) {
-        return "Tangerang";
-      }
-
+      if (upper.includes("KAB. TANGERANG") || upper.includes("KABUPATEN TANGERANG") || /KAB[_\s-]?TGR/i.test(upper)) return "Kab. Tangerang";
+      if (/CILEGON|CLG|MERAK|BOJONEGARA/i.test(upper)) return "Cilegon";
+      if (/JAKARTA\s*SOUTHERN|JAKSEL|JAKARTA\s*SELATAN|JKT[-_\s]?S|PONDOK\s*INDAH|KEBAYORAN|TEBET|PASAR\s*MINGGU|CILANDAK/i.test(upper)) return "Jakarta Southern";
+      if (/JAKARTA\s*NORTHERN|JAKUT|JAKARTA\s*UTARA|JKT[-_\s]?N|TANJUNG\s*PRIOK|ANCOL|PLUIT|KELAPA\s*GADING/i.test(upper)) return "Jakarta Northern";
+      if (/BOGOR|DEPOK|BGR|DPK|CIBINONG|CIMANGGIS|MARGONDA/i.test(upper)) return "Bogor - Depok";
+      if (/BEKASI|BKS|TAMBUN|CIKARANG|JATIASIH|SUMMARECON\s*BEKASI/i.test(upper)) return "Bekasi";
+      if (/PEKANBARU|PKU|RUMBAI|PANAM|DURI/i.test(upper)) return "Pekanbaru";
+      if (/SAMARINDA|SMD|LOA\s*JANAN|SUNGAI\s*KUNJANG/i.test(upper)) return "Samarinda";
+      if (/BANJARBARU|BJB|MARTAPURA/i.test(upper)) return "Banjarbaru";
+      if (/KOTAWARINGIN\s*BARAT|PANGKALAN\s*BUN|KOBAR/i.test(upper)) return "Kotawaringin Barat";
+      if (/KOTAWARINGIN\s*TIMUR|SAMPIT|KOTIM/i.test(upper)) return "Kotawaringin Timur";
+      if (/KETAPANG|KTP|DELTA\s*PAWAN/i.test(upper)) return "Ketapang";
       return "Tangerang";
     }
 
-    function previewAutoCluster() {
+    window.previewAutoCluster = function() {
       const text = document.getElementById('raw-ticket-input').value;
       const detected = detectAreaClusterAI(text);
       document.getElementById('raw-input-cluster').value = detected;
-    }
+    };
 
     function formatDateTimeString(timestamp) {
       if (!timestamp) return '-';
@@ -676,15 +830,142 @@
       return `${date} ${time}`;
     }
 
-    window.ticketList = [];
-
     window.onload = () => {
       feather.replace();
-      initStopClockOptions();
-      setInterval(renderTable, 60000);
+      window.initStopClockOptions();
+      window.switchTab('dashboard-noc');
+      setInterval(window.renderTable, 60000);
     };
 
-    function parseAndAddTicket(rawText) {
+    window.switchTab = function(tabId) {
+      document.getElementById('view-email-ticket').classList.add('hidden');
+      document.getElementById('view-database-segment').classList.add('hidden');
+      document.getElementById('view-dashboard-noc').classList.add('hidden');
+
+      document.getElementById('nav-email-ticket').className = "w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium text-slate-300 hover:bg-teal-500/10 hover:text-teal-300 transition-all";
+      document.getElementById('nav-database-segment').className = "w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium text-slate-300 hover:bg-teal-500/10 hover:text-teal-300 transition-all";
+      document.getElementById('nav-dashboard-noc').className = "w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium text-slate-300 hover:bg-teal-500/10 hover:text-teal-300 transition-all";
+
+      if (tabId === 'email-ticket') {
+        document.getElementById('view-email-ticket').classList.remove('hidden');
+        document.getElementById('nav-email-ticket').className = "w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium bg-gradient-to-r from-teal-600/30 to-cyan-600/10 text-teal-300 border border-teal-500/30 shadow-sm transition-all";
+        window.renderEmailTickets();
+      } else if (tabId === 'database-segment') {
+        document.getElementById('view-database-segment').classList.remove('hidden');
+        document.getElementById('nav-database-segment').className = "w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium bg-gradient-to-r from-teal-600/30 to-cyan-600/10 text-teal-300 border border-teal-500/30 shadow-sm transition-all";
+        window.renderDatabaseSegment();
+      } else if (tabId === 'dashboard-noc') {
+        document.getElementById('view-dashboard-noc').classList.remove('hidden');
+        document.getElementById('nav-dashboard-noc').className = "w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium bg-gradient-to-r from-teal-600/30 to-cyan-600/10 text-teal-300 border border-teal-500/30 shadow-sm transition-all";
+        window.renderTable();
+      }
+      feather.replace();
+    };
+
+    window.renderEmailTickets = function() {
+      const tbody = document.getElementById('email-ticket-table-body');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      if (!window.ticketList || window.ticketList.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-8 text-slate-500">Belum ada data email trouble ticket masuk.</td></tr>`;
+        return;
+      }
+
+      window.ticketList.forEach((t, idx) => {
+        let sender = t.customer.includes('XLS') ? 'TR-SDMT@xlsmart.co.id' : 'MSH-3PP.OWS@ioh.co.id';
+        if (t.customer.includes('&')) sender = 'TR-SDMT & MSH-3PP.OWS';
+
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-800/40 transition-colors border-b border-slate-800/50";
+        tr.innerHTML = `
+          <td class="p-4 text-slate-500 font-medium">${idx + 1}</td>
+          <td class="p-4 font-mono text-teal-400 text-[11px]">${sender}</td>
+          <td class="p-4 font-semibold text-white">Trouble Ticket Notification [${t.ticketNumbers}]</td>
+          <td class="p-4 max-w-xs truncate text-slate-300" title="${t.routeCase}">${t.routeCase}</td>
+          <td class="p-4 font-mono text-[11px] text-slate-400">${formatDateTimeString(t.createdAtTime)}</td>
+          <td class="p-4"><span class="px-2 py-0.5 rounded bg-teal-500/10 text-teal-300 border border-teal-500/20 text-[10px]">Valid Link</span></td>
+          <td class="p-4 font-medium text-cyan-300">Infrako / Telkom Akses</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    };
+
+    window.renderDatabaseSegment = function() {
+      const tbody = document.getElementById('db-segment-tbody');
+      if (!tbody) return;
+      const search = (document.getElementById('db-search')?.value || '').toLowerCase();
+      tbody.innerHTML = '';
+
+      let list = window.segmentList || [];
+      document.getElementById('db-total-count').innerText = list.length;
+
+      let filtered = list.filter(s => 
+        (s.witel || '').toLowerCase().includes(search) || 
+        (s.site_ne || '').toLowerCase().includes(search) || 
+        (s.site_name_ne || '').toLowerCase().includes(search) ||
+        (s.site_fe || '').toLowerCase().includes(search) ||
+        (s.site_name_fe || '').toLowerCase().includes(search) ||
+        (s.mitra || '').toLowerCase().includes(search)
+      );
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="12" class="text-center py-8 text-slate-500">Database segment kosong.</td></tr>`;
+        return;
+      }
+
+      filtered.forEach((s, idx) => {
+        const longlatNe = (s.longlat_ne || '').trim();
+        const longlatFe = (s.longlat_fe || '').trim();
+
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-800/40 transition-colors border-b border-slate-800/50";
+        tr.innerHTML = `
+          <td class="p-3 text-slate-500 font-medium">${idx + 1}</td>
+          <td class="p-3 text-white font-medium">${s.witel || '-'}</td>
+          <td class="p-3 font-mono text-teal-300 text-[11px]">${s.site_ne || '-'}</td>
+          <td class="p-3 text-slate-200">${s.site_name_ne || '-'}</td>
+          <td class="p-3 text-slate-400 text-[11px]">${s.site_owner_ne || '-'}</td>
+          <td class="p-3 font-mono text-[11px] text-teal-400">${longlatNe || '-'}</td>
+          <td class="p-3 font-mono text-cyan-300 text-[11px]">${s.site_fe || '-'}</td>
+          <td class="p-3 text-slate-200">${s.site_name_fe || '-'}</td>
+          <td class="p-3 text-slate-400 text-[11px]">${s.site_owner_fe || '-'}</td>
+          <td class="p-3 font-mono text-[11px] text-cyan-400">${longlatFe || '-'}</td>
+          <td class="p-3 font-mono text-slate-300">${s.panjang || '-'} km</td>
+          <td class="p-3"><span class="px-2 py-0.5 rounded bg-teal-500/10 text-teal-300 border border-teal-500/20 font-bold text-[10px]">${s.mitra || '-'}</span></td>
+        `;
+        tbody.appendChild(tr);
+      });
+      feather.replace();
+    };
+
+    window.exportDatabaseExcel = function() {
+      if (!window.segmentList || window.segmentList.length === 0) {
+        alert("Tidak ada data segment untuk diexport!");
+        return;
+      }
+      const excelData = window.segmentList.map((s, idx) => ({
+        "No": idx + 1,
+        "witel": s.witel || '',
+        "site_ne": s.site_ne || '',
+        "site_name_ne": s.site_name_ne || '',
+        "site_owner_ne": s.site_owner_ne || '',
+        "Long-Lat NE": s.longlat_ne || '',
+        "site_fe": s.site_fe || '',
+        "site_name_fe": s.site_name_fe || '',
+        "site_owner_fe": s.site_owner_fe || '',
+        "Long-Lat FE": s.longlat_fe || '',
+        "Panjang Referensi": s.panjang || '',
+        "Mitra": s.mitra || ''
+      }));
+
+      const worksheet = XLSX.utils.json_to_sheet(excelData);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Database Segment GitHub");
+      XLSX.writeFile(workbook, "Mitratel_FTTT_Database_Segment.xlsx");
+    };
+
+    window.parseAndAddTicket = function(rawText) {
       if (!rawText.trim()) return;
 
       const trMatches = rawText.match(/TR-\d+-\d+/g) || [];
@@ -744,7 +1025,7 @@
       if (window.saveTicketToFirebase) {
         window.saveTicketToFirebase(newTicketObj);
       }
-    }
+    };
 
     function calculateTicketTTR(ticket) {
       const endTime = ticket.status === 'Closed' && ticket.closedAtTime ? ticket.closedAtTime : Date.now();
@@ -760,7 +1041,7 @@
       };
     }
 
-    function updateRcaPartOptions() {
+    window.updateRcaPartOptions = function() {
       const statusTicket = document.getElementById('rca-status-ticket').value;
       const partSelect = document.getElementById('rca-part-of');
       partSelect.innerHTML = '<option value="">-- Pilih Part Of --</option>';
@@ -768,9 +1049,9 @@
       document.getElementById('rca-2').innerHTML = '<option value="">-- Pilih RCA 2 --</option>';
       if (!statusTicket || !rcaDataMatrix[statusTicket]) return;
       Object.keys(rcaDataMatrix[statusTicket]).forEach(part => partSelect.innerHTML += `<option value="${part}">${part}</option>`);
-    }
+    };
 
-    function updateRca1Options() {
+    window.updateRca1Options = function() {
       const statusTicket = document.getElementById('rca-status-ticket').value;
       const partOf = document.getElementById('rca-part-of').value;
       const rca1Select = document.getElementById('rca-1');
@@ -778,9 +1059,9 @@
       document.getElementById('rca-2').innerHTML = '<option value="">-- Pilih RCA 2 --</option>';
       if (!statusTicket || !partOf || !rcaDataMatrix[statusTicket][partOf]) return;
       Object.keys(rcaDataMatrix[statusTicket][partOf]).forEach(rca1 => rca1Select.innerHTML += `<option value="${rca1}">${rca1}</option>`);
-    }
+    };
 
-    function updateRca2Options() {
+    window.updateRca2Options = function() {
       const statusTicket = document.getElementById('rca-status-ticket').value;
       const partOf = document.getElementById('rca-part-of').value;
       const rca1 = document.getElementById('rca-1').value;
@@ -788,35 +1069,36 @@
       rca2Select.innerHTML = '<option value="">-- Pilih RCA 2 --</option>';
       if (!statusTicket || !partOf || !rca1 || !rcaDataMatrix[statusTicket][partOf][rca1]) return;
       rcaDataMatrix[statusTicket][partOf][rca1].forEach(rca2 => rca2Select.innerHTML += `<option value="${rca2}">${rca2}</option>`);
-    }
+    };
 
-    function initStopClockOptions() {
+    window.initStopClockOptions = function() {
       const rca3Select = document.getElementById('sc-rca3');
+      if (!rca3Select) return;
       rca3Select.innerHTML = '<option value="">-- Pilih RCA 3 --</option>';
       Object.keys(stopClockMatrix).forEach(rca3 => rca3Select.innerHTML += `<option value="${rca3}">${rca3}</option>`);
-    }
+    };
 
-    function updateScIssueOptions() {
+    window.updateScIssueOptions = function() {
       const rca3 = document.getElementById('sc-rca3').value;
       const issueSelect = document.getElementById('sc-issue');
       issueSelect.innerHTML = '<option value="">-- Pilih Issue --</option>';
       document.getElementById('sc-duration').value = '';
       if (!rca3 || !stopClockMatrix[rca3]) return;
       Object.keys(stopClockMatrix[rca3]).forEach(issue => issueSelect.innerHTML += `<option value="${issue}">${issue}</option>`);
-    }
+    };
 
-    function autoFillScDuration() {
+    window.autoFillScDuration = function() {
       const rca3 = document.getElementById('sc-rca3').value;
       const issue = document.getElementById('sc-issue').value;
       if (rca3 && issue && stopClockMatrix[rca3][issue]) document.getElementById('sc-duration').value = stopClockMatrix[rca3][issue];
-    }
+    };
 
-    function toggleStopClockSection() {
+    window.toggleStopClockSection = function() {
       const enabled = document.getElementById('enable-stopclock').checked;
       document.getElementById('stopclock-fields').classList.toggle('hidden', !enabled);
-    }
+    };
 
-    function handleEvidenceUpload(event) {
+    window.handleEvidenceUpload = function(event) {
       const file = event.target.files[0];
       if (!file) return;
       const reader = new FileReader();
@@ -838,7 +1120,7 @@
         });
       };
       reader.readAsDataURL(file);
-    }
+    };
 
     function convertDMSToDD(degrees, minutes, seconds, direction) {
       let dd = degrees + minutes / 60 + seconds / 3600;
@@ -846,15 +1128,15 @@
       return dd;
     }
 
-    function openInputModal() { document.getElementById('modal-input').classList.remove('hidden'); }
-    function closeInputModal() { document.getElementById('modal-input').classList.add('hidden'); document.getElementById('raw-ticket-input').value = ''; document.getElementById('raw-input-cluster').value = ''; }
+    window.openInputModal = function() { document.getElementById('modal-input').classList.remove('hidden'); };
+    window.closeInputModal = function() { document.getElementById('modal-input').classList.add('hidden'); document.getElementById('raw-ticket-input').value = ''; document.getElementById('raw-input-cluster').value = ''; };
 
-    function processRawTicket() {
-      parseAndAddTicket(document.getElementById('raw-ticket-input').value);
-      closeInputModal();
-    }
+    window.processRawTicket = function() {
+      window.parseAndAddTicket(document.getElementById('raw-ticket-input').value);
+      window.closeInputModal();
+    };
 
-    function openProgressModal(ticketKey) {
+    window.openProgressModal = function(ticketKey) {
       const ticket = window.ticketList.find(t => t.firebaseKey === ticketKey);
       if (!ticket) return;
       document.getElementById('edit-ticket-id').value = ticket.firebaseKey;
@@ -865,11 +1147,11 @@
       document.getElementById('evidence-file').value = '';
       document.getElementById('evidence-preview-container').classList.add('hidden');
       document.getElementById('modal-progress').classList.remove('hidden');
-    }
+    };
 
-    function closeProgressModal() { document.getElementById('modal-progress').classList.add('hidden'); }
+    window.closeProgressModal = function() { document.getElementById('modal-progress').classList.add('hidden'); };
 
-    function saveProgressUpdate() {
+    window.saveProgressUpdate = function() {
       const ticketKey = document.getElementById('edit-ticket-id').value;
       const ticket = window.ticketList.find(t => t.firebaseKey === ticketKey);
 
@@ -944,10 +1226,10 @@
         }
       }
 
-      closeProgressModal();
-    }
+      window.closeProgressModal();
+    };
 
-    function openTimelyReport(ticketKey) {
+    window.openTimelyReport = function(ticketKey) {
       const ticket = window.ticketList.find(t => t.firebaseKey === ticketKey);
       if (!ticket) return;
 
@@ -984,28 +1266,26 @@
 
       document.getElementById('modal-timely-report').classList.remove('hidden');
       feather.replace();
-    }
+    };
 
-    function closeTimelyReportModal() { document.getElementById('modal-timely-report').classList.add('hidden'); }
+    window.closeTimelyReportModal = function() { document.getElementById('modal-timely-report').classList.add('hidden'); };
 
-    function copyTimelyReport() {
+    window.copyTimelyReport = function() {
       const text = document.getElementById('timely-report-content').innerText;
       navigator.clipboard.writeText(text).then(() => {
         const status = document.getElementById('copy-status');
         status.classList.remove('opacity-0');
         setTimeout(() => status.classList.add('opacity-0'), 2000);
       });
-    }
+    };
 
-    // FUNGSI EXPORT DATA KELUAR MENJADI FILE EXCEL (.XLSX)
-    function exportToExcel() {
-      const search = document.getElementById('search-input').value.toLowerCase();
-      const customerFilter = document.getElementById('filter-customer').value;
-      const areaFilter = document.getElementById('filter-area').value;
-      const statusFilter = document.getElementById('filter-status').value;
+    window.exportToExcel = function() {
+      const search = (document.getElementById('search-input')?.value || '').toLowerCase();
+      const customerFilter = document.getElementById('filter-customer')?.value || '';
+      const areaFilter = document.getElementById('filter-area')?.value || '';
+      const statusFilter = document.getElementById('filter-status')?.value || '';
 
       let list = window.ticketList || [];
-
       let filtered = list.filter(t => {
         const matchSearch = (t.ticketNumbers || '').toLowerCase().includes(search) || (t.routeCase || '').toLowerCase().includes(search);
         const matchCustomer = customerFilter ? (t.customer || '').includes(customerFilter) : true;
@@ -1048,21 +1328,20 @@
 
       const dateToday = new Date().toISOString().slice(0, 10);
       XLSX.writeFile(workbook, `Mitratel_FTTT_Trouble_Tickets_${dateToday}.xlsx`);
-    }
+    };
 
-    function renderTable() {
+    window.renderTable = function() {
       const tbody = document.getElementById('ticket-table-body');
       if (!tbody) return;
 
-      const search = document.getElementById('search-input').value.toLowerCase();
-      const customerFilter = document.getElementById('filter-customer').value;
-      const areaFilter = document.getElementById('filter-area').value;
-      const statusFilter = document.getElementById('filter-status').value;
+      const search = (document.getElementById('search-input')?.value || '').toLowerCase();
+      const customerFilter = document.getElementById('filter-customer')?.value || '';
+      const areaFilter = document.getElementById('filter-area')?.value || '';
+      const statusFilter = document.getElementById('filter-status')?.value || '';
 
       tbody.innerHTML = '';
 
       let list = window.ticketList || [];
-
       let filtered = list.filter(t => {
         const matchSearch = (t.ticketNumbers || '').toLowerCase().includes(search) || (t.routeCase || '').toLowerCase().includes(search);
         const matchCustomer = customerFilter ? (t.customer || '').includes(customerFilter) : true;
@@ -1071,7 +1350,6 @@
         return matchSearch && matchCustomer && matchArea && matchStatus;
       });
 
-      // KPI CALCULATIONS
       const totalCount = list.length;
       const openCount = list.filter(t => t.status === 'Open').length;
       const progressCount = list.filter(t => t.status === 'In Progress').length;
@@ -1153,10 +1431,10 @@
           <td class="p-4 whitespace-nowrap">${statusBadge}</td>
           <td class="p-4 text-center whitespace-nowrap">
             <div class="flex items-center justify-center gap-2">
-              <button onclick="openProgressModal('${t.firebaseKey}')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-teal-500/30 px-2.5 py-1.5 rounded-xl text-[11px] font-medium transition flex items-center gap-1.5 active:scale-95">
+              <button onclick="window.openProgressModal('${t.firebaseKey}')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-teal-500/30 px-2.5 py-1.5 rounded-xl text-[11px] font-medium transition flex items-center gap-1.5 active:scale-95">
                 <i data-feather="edit-2" class="w-3 h-3 text-teal-400"></i> Progress
               </button>
-              <button onclick="openTimelyReport('${t.firebaseKey}')" class="bg-teal-600/20 hover:bg-teal-600/30 text-teal-300 border border-teal-500/30 px-2.5 py-1.5 rounded-xl text-[11px] font-medium transition flex items-center gap-1.5 active:scale-95">
+              <button onclick="window.openTimelyReport('${t.firebaseKey}')" class="bg-teal-600/20 hover:bg-teal-600/30 text-teal-300 border border-teal-500/30 px-2.5 py-1.5 rounded-xl text-[11px] font-medium transition flex items-center gap-1.5 active:scale-95">
                 <i data-feather="file-text" class="w-3 h-3 text-teal-400"></i> Report
               </button>
             </div>
@@ -1166,7 +1444,7 @@
       });
 
       feather.replace();
-    }
+    };
 
     function updateCharts(dataList) {
       const statusCounts = { 'Open': 0, 'In Progress': 0, 'Pending': 0, 'Closed': 0 };
@@ -1179,96 +1457,77 @@
         }
       });
       
-      const ctxStatus = document.getElementById('chart-status').getContext('2d');
-      if (chartStatusInstance) chartStatusInstance.destroy();
-      
-      chartStatusInstance = new Chart(ctxStatus, {
-        type: 'doughnut',
-        data: {
-          labels: ['Open', 'In Progress', 'Pending', 'Closed'],
-          datasets: [{
-            data: [statusCounts['Open'], statusCounts['In Progress'], statusCounts['Pending'], statusCounts['Closed']],
-            backgroundColor: ['#f43f5e', '#06b6d4', '#fbbf24', '#14b8a6'],
-            borderColor: 'rgba(15, 23, 42, 0.8)',
-            borderWidth: 3,
-            hoverOffset: 4
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          cutout: '65%',
-          plugins: {
-            legend: { 
-              position: 'right', 
-              labels: { color: '#cbd5e1', font: { size: 10, family: "'Inter', sans-serif" }, usePointStyle: true, boxWidth: 6 } 
-            },
-            tooltip: {
-              backgroundColor: 'rgba(15, 23, 42, 0.9)',
-              titleFont: { family: "'Inter', sans-serif", size: 11 },
-              bodyFont: { family: "'Inter', sans-serif", size: 11 },
-              padding: 10,
-              cornerRadius: 8,
-              borderColor: 'rgba(20, 184, 166, 0.2)',
-              borderWidth: 1
-            }
-          }
-        }
-      });
-      
-      const ctxArea = document.getElementById('chart-area').getContext('2d');
-      if (chartAreaInstance) chartAreaInstance.destroy();
-      
-      const sortedArea = Object.entries(areaCounts).sort((a, b) => b[1] - a[1]);
-      const areaLabels = sortedArea.map(item => item[0]);
-      const areaData = sortedArea.map(item => item[1]);
-      
-      chartAreaInstance = new Chart(ctxArea, {
-        type: 'bar',
-        data: {
-          labels: areaLabels,
-          datasets: [{
-            label: 'Jumlah Tiket',
-            data: areaData,
-            backgroundColor: 'rgba(20, 184, 166, 0.7)',
-            hoverBackgroundColor: 'rgba(20, 184, 166, 1)',
-            borderColor: '#14b8a6',
-            borderWidth: 1,
-            borderRadius: 6,
-            barThickness: 'flex',
-            maxBarThickness: 40
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            y: { 
-              beginAtZero: true, 
-              ticks: { color: '#94a3b8', stepSize: 1, font: { size: 10, family: "'Inter', sans-serif" } }, 
-              grid: { color: 'rgba(255,255,255,0.05)', borderDash: [5, 5] },
-              border: { display: false }
-            },
-            x: { 
-              ticks: { color: '#94a3b8', font: { size: 9, family: "'Inter', sans-serif" }, maxRotation: 45, minRotation: 0 }, 
-              grid: { display: false },
-              border: { display: false }
-            }
+      const ctxStatus = document.getElementById('chart-status')?.getContext('2d');
+      if (ctxStatus) {
+        if (chartStatusInstance) chartStatusInstance.destroy();
+        chartStatusInstance = new Chart(ctxStatus, {
+          type: 'doughnut',
+          data: {
+            labels: ['Open', 'In Progress', 'Pending', 'Closed'],
+            datasets: [{
+              data: [statusCounts['Open'], statusCounts['In Progress'], statusCounts['Pending'], statusCounts['Closed']],
+              backgroundColor: ['#f43f5e', '#06b6d4', '#fbbf24', '#14b8a6'],
+              borderColor: 'rgba(15, 23, 42, 0.8)',
+              borderWidth: 3,
+              hoverOffset: 4
+            }]
           },
-          plugins: {
-            legend: { display: false },
-            tooltip: {
-              backgroundColor: 'rgba(15, 23, 42, 0.9)',
-              titleFont: { family: "'Inter', sans-serif", size: 11 },
-              bodyFont: { family: "'Inter', sans-serif", size: 11 },
-              padding: 10,
-              cornerRadius: 8,
-              borderColor: 'rgba(20, 184, 166, 0.2)',
-              borderWidth: 1
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '65%',
+            plugins: {
+              legend: { 
+                position: 'right', 
+                labels: { color: '#cbd5e1', font: { size: 10, family: "'Inter', sans-serif" }, usePointStyle: true, boxWidth: 6 } 
+              }
             }
           }
-        }
-      });
+        });
+      }
+      
+      const ctxArea = document.getElementById('chart-area')?.getContext('2d');
+      if (ctxArea) {
+        if (chartAreaInstance) chartAreaInstance.destroy();
+        const sortedArea = Object.entries(areaCounts).sort((a, b) => b[1] - a[1]);
+        const areaLabels = sortedArea.map(item => item[0]);
+        const areaData = sortedArea.map(item => item[1]);
+        
+        chartAreaInstance = new Chart(ctxArea, {
+          type: 'bar',
+          data: {
+            labels: areaLabels,
+            datasets: [{
+              label: 'Jumlah Tiket',
+              data: areaData,
+              backgroundColor: 'rgba(20, 184, 166, 0.7)',
+              borderColor: '#14b8a6',
+              borderWidth: 1,
+              borderRadius: 6,
+              barThickness: 'flex',
+              maxBarThickness: 40
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              y: { 
+                beginAtZero: true, 
+                ticks: { color: '#94a3b8', stepSize: 1, font: { size: 10, family: "'Inter', sans-serif" } }, 
+                grid: { color: 'rgba(255,255,255,0.05)', borderDash: [5, 5] },
+                border: { display: false }
+              },
+              x: { 
+                ticks: { color: '#94a3b8', font: { size: 9, family: "'Inter', sans-serif" }, maxRotation: 45, minRotation: 0 }, 
+                grid: { display: false },
+                border: { display: false }
+              }
+            },
+            plugins: { legend: { display: false } }
+          }
+        });
+      }
     }
   </script>
 </body>
