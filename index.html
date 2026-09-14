@@ -724,10 +724,14 @@
       const loginOverlay = document.getElementById('login-overlay');
       const dashboardContent = document.getElementById('dashboard-content');
       
-      loginOverlay.classList.add('hidden');
-      dashboardContent.classList.remove('hidden');
       if (user) {
-        document.getElementById('user-display-email').innerText = user.email;
+        loginOverlay.classList.add('hidden');
+        dashboardContent.classList.remove('hidden');
+        // Dinamis menampilkan email akun yang aktif login
+        document.getElementById('user-display-email').innerText = user.email || 'user@mitratel.co.id';
+      } else {
+        loginOverlay.classList.remove('hidden');
+        dashboardContent.classList.add('hidden');
       }
       
       onValue(ticketsRef, (snapshot) => {
