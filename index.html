@@ -17,20 +17,28 @@
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       border: 1px solid rgba(20, 184, 166, 0.15);
+      will-change: transform, opacity;
+      transform: translateZ(0);
     }
     .glass-card-sm {
       background: rgba(15, 23, 42, 0.7);
       backdrop-filter: blur(8px);
       border: 1px solid rgba(20, 184, 166, 0.1);
+      will-change: transform;
+      transform: translateZ(0);
     }
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
     ::-webkit-scrollbar-thumb { background: rgba(20, 184, 166, 0.4); border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: rgba(20, 184, 166, 0.7); }
-    .sidebar-transition { transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
+    .sidebar-transition { transition: width 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+    .smooth-scroll { scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
+    .fast-render { contain: content; }
   </style>
 </head>
 <body class="bg-gradient-to-br from-slate-950 via-teal-950/30 to-slate-950 text-slate-100 min-h-screen w-screen antialiased selection:bg-teal-500 selection:text-white overflow-x-hidden">
+
+  <div id="toast-container" class="fixed bottom-5 right-5 z-[200] space-y-2 pointer-events-none"></div>
 
   <div id="login-overlay" class="fixed inset-0 bg-slate-950/95 backdrop-blur-xl z-[100] flex items-center justify-center p-4">
     <div class="glass-card rounded-3xl w-full max-w-md p-8 shadow-2xl border border-teal-500/30">
@@ -70,7 +78,6 @@
 
   <div id="dashboard-content" class="hidden flex h-screen w-screen overflow-hidden relative">
     
-    <!-- SIDEBAR NAVIGATION -->
     <aside id="sidebar-nav" class="w-64 glass-card border-r border-teal-900/40 flex flex-col justify-between z-25 flex-shrink-0 sidebar-transition">
       <div>
         <div class="p-4 border-b border-teal-900/40 flex items-center justify-between">
@@ -121,8 +128,7 @@
 
     <main class="flex-1 h-screen overflow-hidden p-4 md:p-6 flex flex-col relative bg-slate-950/60">
       
-      <!-- VIEW 1: DASHBOARD NOC -->
-      <section id="view-dashboard-noc" class="flex-1 flex flex-col min-h-0 space-y-4 max-w-7xl w-full mx-auto">
+      <section id="view-dashboard-noc" class="flex-1 flex flex-col min-h-0 space-y-4 max-w-7xl w-full mx-auto overflow-y-auto pr-1">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-teal-900/40 pb-4 flex-shrink-0">
           <div class="flex items-center gap-3">
             <div class="p-2.5 bg-gradient-to-tr from-teal-600 to-cyan-500 rounded-2xl shadow-lg shadow-teal-500/20 text-white">
@@ -144,6 +150,7 @@
           </button>
         </div>
 
+        <!-- METRIK TICKETS NOC -->
         <div class="grid grid-cols-2 md:grid-cols-5 gap-3 flex-shrink-0">
           <div class="glass-card p-3 rounded-2xl relative overflow-hidden group">
             <p class="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Total Ticket</p>
@@ -176,6 +183,7 @@
           </div>
         </div>
 
+        <!-- CHARTS SECTION -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-3 flex-shrink-0">
           <div class="glass-card p-3 rounded-2xl">
             <h4 class="text-xs font-semibold text-slate-300 mb-2 flex items-center gap-2">
@@ -195,6 +203,7 @@
           </div>
         </div>
 
+        <!-- FILTER BAR -->
         <div class="glass-card p-3 rounded-2xl flex flex-col md:flex-row gap-3 items-center justify-between flex-shrink-0">
           <div class="flex flex-wrap gap-2 items-center w-full md:w-auto">
             <div class="relative w-full md:w-56">
@@ -264,52 +273,124 @@
         </div>
       </section>
 
-      <!-- VIEW 2: EMAIL TICKET -->
-      <section id="view-email-ticket" class="hidden flex-1 flex flex-col min-h-0 space-y-4 max-w-7xl w-full mx-auto">
+      <section id="view-email-ticket" class="hidden flex-1 flex flex-col min-h-0 space-y-4 max-w-7xl w-full mx-auto overflow-y-auto pr-1">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-teal-900/40 pb-4 flex-shrink-0">
           <div>
             <h1 class="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
-              <i data-feather="mail" class="text-teal-400"></i> E-Mail Ticket (Inbox Helpdesk)
+              <i data-feather="mail" class="text-teal-400"></i> E-Mail Ticket Inbox (<span class="text-teal-300 font-mono text-lg">hdfomtel@gmail.com</span>)
             </h1>
-            <p class="text-xs text-slate-400 mt-1">Inbox e-mail masuk khusus subject berinisiasi <span class="text-teal-300 font-mono">[TR@OWS] (New) Create TR</span> atau IOH Trouble Ticket. Klik tombol [+] untuk melihat seluruh isi lengkap (full body) e-mail.</p>
+            <p class="text-xs text-slate-400 mt-1">Monitoring telemetri inbox email customer XLSMART & IOH terintegrasi langsung dari Zoho ke Gmail dan Firebase.</p>
           </div>
-          <div class="text-xs font-mono text-teal-400 bg-teal-500/10 border border-teal-500/30 px-3 py-1.5 rounded-xl flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full bg-teal-400 animate-pulse"></span> Online Realtime Sync Active
+          <div class="flex items-center gap-2.5">
+            <div id="email-sync-status" class="text-xs font-mono text-teal-400 bg-teal-500/10 border border-teal-500/30 px-3 py-1.5 rounded-xl flex items-center gap-2 shadow-sm">
+              <span class="w-2 h-2 rounded-full bg-teal-400 animate-pulse"></span> Gmail Listener Active
+            </div>
+            <button onclick="window.syncGoogleSheetCsv(true)" class="bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 border border-slate-700 px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition">
+              <i data-feather="refresh-cw" class="w-3.5 h-3.5 text-teal-400"></i> Refresh Feed
+            </button>
           </div>
         </div>
 
-        <div class="glass-card rounded-2xl overflow-hidden shadow-xl flex-1 flex flex-col min-h-0">
-          <div class="p-3 bg-slate-900/60 border-b border-slate-800 flex justify-between items-center text-xs flex-shrink-0">
-            <span class="font-semibold text-slate-300 flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-teal-400 animate-ping"></span> Live Email Telemetry Stream (Filtered: XLSmart & IOH New Tickets)</span>
+        <!-- METRIK TELEMETRI INBOX GMAIL (3 METRIK) -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 flex-shrink-0">
+          <div class="glass-card p-3.5 rounded-2xl border border-teal-500/20">
+            <div class="flex items-center justify-between">
+              <p class="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Total Mail Inbox</p>
+              <i data-feather="inbox" class="w-4 h-4 text-teal-400"></i>
+            </div>
+            <h3 id="stat-email-total" class="text-2xl font-extrabold text-white mt-1">67</h3>
+            <p class="text-[10px] text-slate-400 mt-0.5">Akun: <span class="text-teal-300 font-mono">hdfomtel@gmail.com</span></p>
           </div>
+
+          <div class="glass-card p-3.5 rounded-2xl border border-teal-500/20">
+            <div class="flex items-center justify-between">
+              <p class="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Email XLSMART [TR@OWS]</p>
+              <span class="w-2 h-2 rounded-full bg-teal-400"></span>
+            </div>
+            <h3 id="stat-email-xls" class="text-2xl font-extrabold text-teal-400 mt-1">54</h3>
+            <p class="text-[10px] text-slate-400 mt-0.5">Pengirim TR-SDMT / OWS</p>
+          </div>
+
+          <div class="glass-card p-3.5 rounded-2xl border border-teal-500/20">
+            <div class="flex items-center justify-between">
+              <p class="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Email IOH [DATACOM/INC]</p>
+              <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+            </div>
+            <h3 id="stat-email-ioh" class="text-2xl font-extrabold text-cyan-400 mt-1">13</h3>
+            <p class="text-[10px] text-slate-400 mt-0.5">Pengirim MSH 3PP / IOH</p>
+          </div>
+        </div>
+
+        <!-- TABEL EMAIL INBOX FEED SESUAI GAMBAR DUA -->
+        <div class="glass-card rounded-2xl overflow-hidden shadow-xl flex-1 flex flex-col min-h-0 border border-teal-500/20">
+          <div class="p-3 bg-slate-900/80 border-b border-slate-800 flex flex-col md:flex-row justify-between items-start md:items-center gap-3 text-xs flex-shrink-0">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-teal-400 animate-pulse"></span> 
+              <span class="font-bold text-white tracking-tight">Live Email Telemetry Stream (Filtered: XLSmart & IOH New Tickets)</span>
+              <span id="email-count-badge" class="bg-teal-500/20 text-teal-300 border border-teal-500/30 px-2 py-0.5 rounded font-mono text-[10px]">67 Emails</span>
+            </div>
+            
+            <div class="flex items-center gap-2 w-full md:w-auto">
+              <select id="filter-email-quick" onchange="window.renderEmailTickets()" class="bg-slate-950 border border-slate-700 text-xs text-slate-200 rounded-xl px-2.5 py-1.5 focus:outline-none focus:border-teal-500">
+                <option value="">Semua Category (All)</option>
+                <option value="XLSMART">XLSMART [TR@OWS]</option>
+                <option value="IOH">IOH [DATACOM/INC]</option>
+              </select>
+            </div>
+          </div>
+
           <div class="flex-1 overflow-auto">
             <table class="w-full text-left text-xs text-slate-300 whitespace-nowrap">
-              <thead class="bg-slate-900/90 text-slate-400 uppercase font-semibold text-[10px] tracking-wider border-b border-slate-800 sticky top-0 z-10">
+              <thead class="bg-slate-900/95 text-slate-400 uppercase font-semibold text-[10px] tracking-wider border-b border-slate-800 sticky top-0 z-10 select-none">
                 <tr>
                   <th class="p-3 w-10 text-center">+</th>
-                  <th class="p-3">No.</th>
-                  <th class="p-3">Sender</th>
-                  <th class="p-3">Subject & No. Ticket</th>
-                  <th class="p-3">Body E-Mail</th>
-                  <th class="p-3">Time Received</th>
+                  <th class="p-3 w-12 text-center cursor-pointer hover:text-teal-300 transition-colors" onclick="window.sortEmailTickets('no')" title="Urutkan No.">
+                    <div class="flex items-center justify-center gap-1">
+                      <span>NO.</span>
+                      <span id="sort-icon-no" class="text-[9px] text-slate-500">↕</span>
+                    </div>
+                  </th>
+                  <th class="p-3 cursor-pointer hover:text-teal-300 transition-colors" onclick="window.sortEmailTickets('sender')" title="Urutkan Sender">
+                    <div class="flex items-center gap-1">
+                      <span>SENDER</span>
+                      <span id="sort-icon-sender" class="text-[9px] text-slate-500">↕</span>
+                    </div>
+                  </th>
+                  <th class="p-3 cursor-pointer hover:text-teal-300 transition-colors" onclick="window.sortEmailTickets('subject')" title="Urutkan Subject">
+                    <div class="flex items-center gap-1">
+                      <span>SUBJECT & NO. TICKET</span>
+                      <span id="sort-icon-subject" class="text-[9px] text-slate-500">↕</span>
+                    </div>
+                  </th>
+                  <th class="p-3 cursor-pointer hover:text-teal-300 transition-colors" onclick="window.sortEmailTickets('body')" title="Urutkan Body Email">
+                    <div class="flex items-center gap-1">
+                      <span>BODY E-MAIL</span>
+                      <span id="sort-icon-body" class="text-[9px] text-slate-500">↕</span>
+                    </div>
+                  </th>
+                  <th class="p-3 cursor-pointer hover:text-teal-300 transition-colors" onclick="window.sortEmailTickets('date')" title="Urutkan Waktu (Newest / Oldest)">
+                    <div class="flex items-center gap-1">
+                      <span>TIME RECEIVED</span>
+                      <span id="sort-icon-date" class="text-[9px] text-teal-400 font-bold">▼</span>
+                    </div>
+                  </th>
                 </tr>
-                <tr class="bg-slate-950/80 border-b border-slate-800">
+                <tr class="bg-slate-950/90 border-b border-slate-800">
                   <th class="p-2"></th>
                   <th class="p-2"></th>
-                  <th class="p-2"><input type="text" id="filter-email-sender" oninput="window.renderEmailTickets()" placeholder="Search SENDER" class="w-full bg-slate-900 border border-slate-700 text-[11px] text-white rounded px-2 py-1 focus:outline-none focus:border-teal-500"></th>
-                  <th class="p-2"><input type="text" id="filter-email-subject" oninput="window.renderEmailTickets()" placeholder="Search Subject" class="w-full bg-slate-900 border border-slate-700 text-[11px] text-white rounded px-2 py-1 focus:outline-none focus:border-teal-500"></th>
-                  <th class="p-2"><input type="text" id="filter-email-body" oninput="window.renderEmailTickets()" placeholder="Search Body E-Mail" class="w-full bg-slate-900 border border-slate-700 text-[11px] text-white rounded px-2 py-1 focus:outline-none focus:border-teal-500"></th>
-                  <th class="p-2"><input type="text" id="filter-email-date" oninput="window.renderEmailTickets()" placeholder="Search Time" class="w-full bg-slate-900 border border-slate-700 text-[11px] text-white rounded px-2 py-1 focus:outline-none focus:border-teal-500"></th>
+                  <th class="p-2"><input type="text" id="filter-email-sender" oninput="window.debouncedRenderEmailTickets()" placeholder="Search SENDER" class="w-full bg-slate-900 border border-slate-700 text-[11px] text-white rounded px-2.5 py-1 focus:outline-none focus:border-teal-500"></th>
+                  <th class="p-2"><input type="text" id="filter-email-subject" oninput="window.debouncedRenderEmailTickets()" placeholder="Search Subject" class="w-full bg-slate-900 border border-slate-700 text-[11px] text-white rounded px-2.5 py-1 focus:outline-none focus:border-teal-500"></th>
+                  <th class="p-2"><input type="text" id="filter-email-body" oninput="window.debouncedRenderEmailTickets()" placeholder="Search Body E-Mail" class="w-full bg-slate-900 border border-slate-700 text-[11px] text-white rounded px-2.5 py-1 focus:outline-none focus:border-teal-500"></th>
+                  <th class="p-2"><input type="text" id="filter-email-date" oninput="window.debouncedRenderEmailTickets()" placeholder="Search Time" class="w-full bg-slate-900 border border-slate-700 text-[11px] text-white rounded px-2.5 py-1 focus:outline-none focus:border-teal-500"></th>
                 </tr>
               </thead>
-              <tbody id="email-ticket-table-body" class="divide-y divide-slate-800/60"></tbody>
+              <tbody id="email-ticket-table-body" class="divide-y divide-slate-800/60 fast-render"></tbody>
             </table>
           </div>
         </div>
       </section>
 
-      <!-- VIEW 3: DATABASE SEGMENT -->
-      <section id="view-database-segment" class="hidden flex-1 flex flex-col min-h-0 space-y-4 max-w-7xl w-full mx-auto">
+      <section id="view-database-segment" class="hidden flex-1 flex flex-col min-h-0 space-y-4 max-w-7xl w-full mx-auto overflow-y-auto pr-1">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-teal-900/40 pb-4 flex-shrink-0">
           <div>
             <h1 class="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
@@ -364,7 +445,6 @@
     </main>
   </div>
 
-  <!-- MODALS -->
   <div id="modal-input" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
     <div class="glass-card rounded-3xl w-full max-w-xl p-6 shadow-2xl border border-teal-500/30">
       <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-800">
@@ -612,6 +692,7 @@
     const auth = getAuth(app);
     const db = getDatabase(app);
     const ticketsRef = ref(db, 'tickets');
+    const emailTicketsRef = ref(db, 'email-tickets');
 
     window.firebaseDb = db;
     window.firebaseRef = ref;
@@ -620,52 +701,7 @@
     window.firebaseUpdate = update;
 
     window.ticketList = [];
-    
-    // Updated inbox items supporting both XLSmart & IOH new trouble tickets
-    window.emailInboxList = [
-      {
-        id: 'email_default_1',
-        sender: 'TR-SDMT@xlsmart.co.id',
-        subject: '[TR@OWS] (New) Create TR [TR-20260915-00000712] - UMT-Leased Fiber-260913359 : Fiber Cut CSR ## IP Link From_SF-ZJKT2_6660-Kp Pasar Sore Kelor...',
-        body: `Dear PT. ULTRA MANDIRI TELEKOMUNIKASI,
-We inform to you that there is a new request of Trouble Report, details are below. If exists, please find attachment.
-
-Title                  : Fiber Cut CSR ## IP Link From_SF-ZJKT2_6660-Kp Pasar Sore Kelor_MA-BTTGR8575-01H 3472336G_3G_LAKSANA_PAKUHAJI_MA-JK3472336G-01H via UMT CID:undefined
-Ticket No.             : TR-20260915-00000712
-ERN                    : UMT-Leased Fiber-260913359
-Site ID / Name         : ZJKT2_6660 / SF_NR_EX_KP. PASAR SORE KELOR [FDD4TR-3 TAG-2]_SUPERHREV_COLLECTOR_SBBD
-Severity / Priority    : Major
-Product Type           : Leased Fiber
-Product Group          : Trans Access
-Category               : Access
-CID                    : undefined
-Span ID                : N/A
-Ring ID                : N/A
-Report By              : FMT
-Requestor Email        : muh.ibnu.azhari@h-partners.com
-Requestor Phone        : 6287891052463
-RTS                    : PS - Edi Setia Gunawan
-RTS Phone              : 087771617162
-ROH                    : Rais Aripin
-ROH Phone              : 0818283612
-RSL Result             : --------------------------------------------------
-MA-BTTGR8575-01H (SF-ZJKT2_6660-Kp Pasar Sore Kelor)`,
-        receivedDateTime: '2026-09-15 15:01:00'
-      },
-      {
-        id: 'email_default_2',
-        sender: 'helpdesk.ioh@indosat.com',
-        subject: 'INC-20260915-009824 : Fiber Cut Link From_JAKARTA_SOUTHERN_01',
-        body: `Dear Partner,
-New Incident Ticket Created.
-Ticket No.             : INC-20260915-009824
-Site Name              : JAKARTA SOUTHERN 01 / JAKSEL_CORE
-Severity               : Critical
-Description            : Fiber optic cable cut due to road excavation.`,
-        receivedDateTime: '2026-09-15 16:20:10'
-      }
-    ];
-
+    window.emailInboxList = [];
     window.segmentList = [];
 
     window.handleLogin = function(e) {
@@ -801,6 +837,7 @@ Description            : Fiber optic cable cut due to road excavation.`,
         dashboardContent.classList.add('hidden');
       }
       
+      /* Real-time listener untuk Tickets NOC Dashboard */
       onValue(ticketsRef, (snapshot) => {
         const data = snapshot.val();
         if (data && Object.keys(data).length > 0) {
@@ -813,11 +850,120 @@ Description            : Fiber optic cable cut due to road excavation.`,
         }
         if (typeof window.renderTable === 'function') window.renderTable();
       }, (error) => {
-        console.error("Firebase read error:", error);
+        console.error("Firebase read error (tickets):", error);
+      });
+
+      /* Real-time listener untuk Email Tickets dari Google Apps Script / Gmail Listener */
+      onValue(emailTicketsRef, (snapshot) => {
+        const data = snapshot.val();
+        const syncStatusEl = document.getElementById('email-sync-status');
+        
+        if (syncStatusEl) {
+          syncStatusEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-teal-400 animate-pulse"></span> Gmail Live Sync Active`;
+          syncStatusEl.className = "text-xs font-mono text-teal-400 bg-teal-500/10 border border-teal-500/30 px-3 py-1.5 rounded-xl flex items-center gap-2";
+        }
+
+        if (data) {
+          let rawList = [];
+          if (Array.isArray(data)) {
+            rawList = data.filter(Boolean).map((item, idx) => ({ id: `email_${idx}`, ...item }));
+          } else if (typeof data === 'object') {
+            rawList = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+          }
+
+          window.emailInboxList = rawList.map(item => {
+            let formattedDate = item.timestamp || item.receivedDateTime || item.date || '-';
+            if (item.timestamp || item.created_at) {
+              try {
+                const d = new Date(item.timestamp || item.created_at);
+                if (!isNaN(d.getTime())) {
+                  formattedDate = d.toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' }) + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                }
+              } catch(e){}
+            }
+
+            let category = item.category || 'OTHER';
+            const strCheck = ((item.subject || '') + ' ' + (item.body || '') + ' ' + (item.sender || '')).toUpperCase();
+            if (category === 'OTHER' || !category) {
+              if (strCheck.includes('XLSMART') || strCheck.includes('XL SMART') || strCheck.includes('TR@OWS') || strCheck.includes('TR-SDMT')) {
+                category = 'XLSMART';
+              } else if (strCheck.includes('IOH') || strCheck.includes('INDOSAT') || strCheck.includes('INC') || strCheck.includes('DATACOM') || strCheck.includes('MSH 3PP')) {
+                category = 'IOH';
+              }
+            }
+
+            return {
+              id: item.id || item.firebaseKey || Math.random().toString(),
+              sender: item.sender || item.from || 'TR-SDMT',
+              subject: item.subject || 'No Subject',
+              body: item.body || item.text || '',
+              category: category,
+              status: item.status || 'NEW',
+              receivedDateTime: formattedDate
+            };
+          }).reverse();
+        } else {
+          /* Fallback Sample Email Data hdfomtel@gmail.com */
+          window.emailInboxList = [
+            {
+              id: "em_1",
+              sender: "MSH 3PP",
+              subject: "[FLP_3rd_UMT][Open - Major] DOWN - 23BJM005S_KAYU_TANGI_MT(17BJM002)<>23MRB023_TRANSKALIMANTAN_CM(173048) - DATACOM-INC-20260915-00027214",
+              body: "Dear Partner, Kindly need your help for troubleshooting DOWN link 23BJM005S_KAYU_TANGI_MT <> 23MRB023_TRANSKALIMANTAN_CM. Ticket INC: DATACOM-INC-20260915-00027214. Down time: [2026-09-15 20:35:00]",
+              category: "IOH",
+              receivedDateTime: "15/09/2026 20:35:00"
+            },
+            {
+              id: "em_2",
+              sender: "TR-SDMT",
+              subject: "[TR@OWS] (Open) MS Partner Checking Final Answer [TR-20260915-00000376] UMT-Leased Fiber-260913006 : Fiber Cut CSR ## IP Link From_Klungkung_PAG-BASRP1083-03H <TO> Keramas",
+              body: "Fiber Cut CSR ## IP Link From_Klungkung_PAG-BASRP1083-03H <TO> Keramas INCM-20260915-00029680 TR-20260915-00000376 [2026-09-15 20:34:00]",
+              category: "XLSMART",
+              receivedDateTime: "15/09/2026 20:34:00"
+            },
+            {
+              id: "em_3",
+              sender: "TR-SDMT",
+              subject: "[TR@OWS] (Open) MS Partner Checking Final Answer [TR-20260915-00000549] UMT-Leased Fiber-260913180 : Fiber Cut CSR ## IP Link From_LIMBUNGAN_MA-RIPBRO375-01H <TO> LIMBUNGAN PEKANBARU",
+              body: "Fiber Cut CSR ## IP Link From_LIMBUNGAN_MA-RIPBRO375-01H <TO> LIMBUNGAN PEKANBARU INCM-20260915-00029801 TR-20260915-00000549 [2026-09-15 20:33:00]",
+              category: "XLSMART",
+              receivedDateTime: "15/09/2026 20:33:00"
+            },
+            {
+              id: "em_4",
+              sender: "TR-SDMT",
+              subject: "[TR@OWS] (New) Create TR [TR-20260915-00000955] - UMT-Leased Fiber-260913602 : Fiber Cut CSR ## IP Link From_Puspitek Serpong_PAG-JK1468-04H <TO> Serpong Rumpin_MA-JKA242-01H",
+              body: "Fiber Cut CSR ## IP Link From_Puspitek Serpong_PAG-JK1468-04H <TO> Serpong Rumpin_MA-JKA242-01H INCM-20260915-00029955 TR-20260915-00000955 [2026-09-15 20:18:00]",
+              category: "XLSMART",
+              receivedDateTime: "15/09/2026 20:18:00"
+            },
+            {
+              id: "em_5",
+              sender: "tocxljabo1",
+              subject: "Fiber Cut FTTS ## Link From Sukamanah Bekasi_MA-JK4968-01H <> JAW-JB-CKR-0128_Karanganyar_Karang_Bahagia VIA UMT",
+              body: "Dear Rekan UMT Mohon dibantu case site dibawah ini: Title Fiber Cut FTTS ## Link From Sukamanah Bekasi_MA-JK4968-01H <> JAW-JB-CKR-0128_Karanganyar_Karang_Bahagia VIA UMT INCM-20260915-00029100 TR-20260915-00000850 [2026-09-15 19:07:00]",
+              category: "XLSMART",
+              receivedDateTime: "15/09/2026 19:07:00"
+            }
+          ];
+        }
+
+        const countBadge = document.getElementById('email-count-badge');
+        if (countBadge) countBadge.innerText = `${window.emailInboxList.length} Emails`;
+
+        const xlsCount = window.emailInboxList.filter(e => e.category === 'XLSMART').length;
+        const iohCount = window.emailInboxList.filter(e => e.category === 'IOH').length;
+        
+        if (document.getElementById('stat-email-total')) document.getElementById('stat-email-total').innerText = window.emailInboxList.length;
+        if (document.getElementById('stat-email-xls')) document.getElementById('stat-email-xls').innerText = xlsCount;
+        if (document.getElementById('stat-email-ioh')) document.getElementById('stat-email-ioh').innerText = iohCount;
+
+        if (typeof window.renderEmailTickets === 'function') window.renderEmailTickets();
+      }, (error) => {
+        console.error("Firebase email-tickets read error:", error);
       });
 
       window.syncGoogleSheetCsv();
-      if (typeof window.renderEmailTickets === 'function') window.renderEmailTickets();
     });
   </script>
 
@@ -826,6 +972,44 @@ Description            : Fiber optic cable cut due to road excavation.`,
     let chartAreaInstance = null;
     let isSidebarOpen = true;
     let searchDebounceTimer = null;
+    let emailSearchDebounceTimer = null;
+
+    window.emailSortColumn = 'date';
+    window.emailSortDirection = 'desc';
+
+    window.sortEmailTickets = function(col) {
+      if (window.emailSortColumn === col) {
+        window.emailSortDirection = window.emailSortDirection === 'asc' ? 'desc' : 'asc';
+      } else {
+        window.emailSortColumn = col;
+        window.emailSortDirection = (col === 'date' || col === 'no') ? 'desc' : 'asc';
+      }
+      window.renderEmailTickets();
+    };
+
+    window.debouncedRenderEmailTickets = function() {
+      clearTimeout(emailSearchDebounceTimer);
+      emailSearchDebounceTimer = setTimeout(() => {
+        window.renderEmailTickets();
+      }, 100);
+    };
+
+    window.showToast = function(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      if (!container) return;
+      
+      const toast = document.createElement('div');
+      const bg = type === 'success' ? 'from-teal-600 to-cyan-600 border-teal-400/40' : 'from-rose-600 to-red-600 border-rose-400/40';
+      toast.className = `bg-gradient-to-r ${bg} text-white px-4 py-3 rounded-2xl shadow-2xl border font-medium text-xs flex items-center gap-2.5 pointer-events-auto animate-bounce transition-all`;
+      toast.innerHTML = `<i data-feather="${type === 'success' ? 'check-circle' : 'alert-circle'}" class="w-4 h-4"></i> ${message}`;
+      
+      container.appendChild(toast);
+      feather.replace({ words: true });
+      
+      setTimeout(() => {
+        toast.remove();
+      }, 3500);
+    };
 
     window.toggleSidebar = function() {
       const sidebar = document.getElementById('sidebar-nav');
@@ -970,74 +1154,116 @@ Description            : Fiber optic cable cut due to road excavation.`,
     window.renderEmailTickets = function() {
       const tbody = document.getElementById('email-ticket-table-body');
       if (!tbody) return;
-      tbody.innerHTML = '';
 
       const sSender = (document.getElementById('filter-email-sender')?.value || '').toLowerCase();
       const sSubject = (document.getElementById('filter-email-subject')?.value || '').toLowerCase();
       const sBody = (document.getElementById('filter-email-body')?.value || '').toLowerCase();
       const sDate = (document.getElementById('filter-email-date')?.value || '').toLowerCase();
+      const catQuick = document.getElementById('filter-email-quick')?.value || '';
 
-      // Support both XLSmart ([TR@OWS] New Create TR) and IOH (INC) new trouble tickets
-      let list = (window.emailInboxList || []).filter(item => {
-        const subj = (item.subject || '').toUpperCase();
-        const isXls = subj.includes("[TR@OWS]") && subj.includes("CREATE TR");
-        const isIoh = subj.includes("INC") && !subj.includes("RE:") && !subj.includes("FWD:");
-        return isXls || isIoh;
-      });
+      let list = window.emailInboxList || [];
 
       let filtered = list.filter(item => {
-        return (item.sender || '').toLowerCase().includes(sSender) &&
-               (item.subject || '').toLowerCase().includes(sSubject) &&
-               (item.body || '').toLowerCase().includes(sBody) &&
-               (item.receivedDateTime || '').toLowerCase().includes(sDate);
+        const matchCat = catQuick ? item.category === catQuick : true;
+        return matchCat &&
+               (!sSender || (item.sender || '').toLowerCase().includes(sSender)) &&
+               (!sSubject || (item.subject || '').toLowerCase().includes(sSubject)) &&
+               (!sBody || (item.body || '').toLowerCase().includes(sBody)) &&
+               (!sDate || (item.receivedDateTime || '').toLowerCase().includes(sDate));
+      });
+
+      filtered.sort((a, b) => {
+        let valA, valB;
+        if (window.emailSortColumn === 'sender') {
+          valA = (a.sender || '').toLowerCase();
+          valB = (b.sender || '').toLowerCase();
+        } else if (window.emailSortColumn === 'subject') {
+          valA = (a.subject || '').toLowerCase();
+          valB = (b.subject || '').toLowerCase();
+        } else if (window.emailSortColumn === 'body') {
+          valA = (a.body || '').toLowerCase();
+          valB = (b.body || '').toLowerCase();
+        } else if (window.emailSortColumn === 'no') {
+          valA = a.id || '';
+          valB = b.id || '';
+        } else {
+          valA = a.receivedDateTime || '';
+          valB = b.receivedDateTime || '';
+        }
+
+        if (valA < valB) return window.emailSortDirection === 'asc' ? -1 : 1;
+        if (valA > valB) return window.emailSortDirection === 'asc' ? 1 : -1;
+        return 0;
+      });
+
+      // Update sort icons in table headers
+      ['no', 'sender', 'subject', 'body', 'date'].forEach(col => {
+        const iconEl = document.getElementById(`sort-icon-${col}`);
+        if (!iconEl) return;
+        if (window.emailSortColumn === col) {
+          iconEl.innerText = window.emailSortDirection === 'asc' ? '▲' : '▼';
+          iconEl.className = 'text-[9px] text-teal-400 font-bold';
+        } else {
+          iconEl.innerText = '↕';
+          iconEl.className = 'text-[9px] text-slate-500 opacity-60';
+        }
       });
 
       if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-8 text-slate-500">Tidak ada e-mail inisiasi baru dari XLSmart maupun IOH di inbox helpdesk.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-10 text-slate-500">Tidak ada email tiket yang cocok dengan filter pencarian.</td></tr>`;
         return;
       }
 
+      let rowsHtml = '';
       filtered.forEach((item, idx) => {
         const detailId = `email_detail_${item.id}`;
 
-        const tr = document.createElement('tr');
-        tr.className = "hover:bg-slate-800/40 transition-colors border-b border-slate-800/50";
-        tr.innerHTML = `
-          <td class="p-3 text-center">
-            <button onclick="window.toggleEmailDetail('${item.id}')" class="w-6 h-6 rounded-full bg-teal-500/20 text-teal-400 hover:bg-teal-500 hover:text-white transition flex items-center justify-center mx-auto text-xs font-bold font-mono" id="btn_toggle_${item.id}">
-              +
-            </button>
-          </td>
-          <td class="p-3 text-slate-500 font-medium">${idx + 1}</td>
-          <td class="p-3 font-mono text-teal-400 text-[11px]">${item.sender}</td>
-          <td class="p-3 font-semibold text-white max-w-xs truncate" title="${item.subject}">${item.subject}</td>
-          <td class="p-3 max-w-sm truncate text-slate-300 font-mono text-[11px]" title="${item.body}">${item.body}</td>
-          <td class="p-3 font-mono text-[11px] text-slate-400">${item.receivedDateTime}</td>
-        `;
-        tbody.appendChild(tr);
+        let formattedSubject = item.subject;
+        if (formattedSubject.includes('[TR@OWS] (New)')) {
+          formattedSubject = `<span class="text-rose-400 font-bold">[TR@OWS] (New)</span> ` + formattedSubject.replace('[TR@OWS] (New)', '');
+        } else if (formattedSubject.includes('[TR@OWS] (Open)')) {
+          formattedSubject = `<span class="text-cyan-400 font-bold">[TR@OWS] (Open)</span> ` + formattedSubject.replace('[TR@OWS] (Open)', '');
+        } else if (formattedSubject.includes('DATACOM-INC')) {
+          formattedSubject = `<span class="text-amber-400 font-bold">[DATACOM-INC]</span> ` + formattedSubject;
+        }
 
-        const detailTr = document.createElement('tr');
-        detailTr.id = detailId;
-        detailTr.className = "hidden bg-slate-900/90 border-b border-teal-500/30";
-        
-        detailTr.innerHTML = `
-          <td colspan="6" class="p-5">
-            <div class="glass-card p-5 rounded-2xl space-y-4 border border-teal-500/30">
-              <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 border-b border-slate-800 pb-3">
-                <div>
-                  <h4 class="text-xs font-bold text-teal-400 font-mono uppercase tracking-wider">SELURUH ISI E-MAIL DARI CUSTOMER (FULL BODY)</h4>
-                  <p class="text-[11px] text-slate-400 mt-0.5">Subject: <span class="text-white">${item.subject}</span></p>
+        const safeFullText = (item.subject + " " + item.body).replace(/\\/g, "\\\\").replace(/'/g, "\\'").replace(/\n/g, "\\n").replace(/\r/g, "");
+
+        rowsHtml += `
+          <tr class="hover:bg-slate-800/50 transition-colors border-b border-slate-800/50">
+            <td class="p-3 text-center">
+              <button onclick="window.toggleEmailDetail('${item.id}')" class="w-6 h-6 rounded-full bg-teal-500/20 text-teal-400 hover:bg-teal-500 hover:text-white transition flex items-center justify-center mx-auto text-xs font-bold font-mono" id="btn_toggle_${item.id}">
+                +
+              </button>
+            </td>
+            <td class="p-3 text-center text-slate-500 font-medium">${idx + 1}</td>
+            <td class="p-3 font-mono text-teal-300 text-[11px] max-w-[130px] truncate" title="${item.sender}">${item.sender}</td>
+            <td class="p-3 font-medium text-white max-w-xs truncate" title="${item.subject}">${formattedSubject}</td>
+            <td class="p-3 max-w-md truncate text-slate-300 font-mono text-[11px]" title="${item.body}">${item.body}</td>
+            <td class="p-3 font-mono text-[11px] text-slate-400">${item.receivedDateTime}</td>
+          </tr>
+          <tr id="${detailId}" class="hidden bg-slate-900/90 border-b border-teal-500/30">
+            <td colspan="6" class="p-5">
+              <div class="glass-card p-5 rounded-2xl space-y-4 border border-teal-500/30">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 border-b border-slate-800 pb-3">
+                  <div>
+                    <h4 class="text-xs font-bold text-teal-400 font-mono uppercase tracking-wider">DETAIL ISI EMAIL (hdfomtel@gmail.com)</h4>
+                    <p class="text-[11px] text-slate-300 mt-0.5">Subject: <span class="text-white font-semibold">${item.subject}</span></p>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <span class="text-[11px] text-slate-300 font-mono bg-slate-950 px-3 py-1 rounded-lg border border-slate-800">Received: ${item.receivedDateTime}</span>
+                    <button onclick="window.autoImportEmailToTicket('${safeFullText}')" class="bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-500 text-white px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-lg shadow-teal-500/20 transition active:scale-95">
+                      <i data-feather="zap" class="w-3.5 h-3.5 text-amber-300"></i> Auto-Import ke Dashboard
+                    </button>
+                  </div>
                 </div>
-                <span class="text-[11px] text-slate-300 font-mono bg-slate-950 px-3 py-1 rounded-lg border border-slate-800">Received: ${item.receivedDateTime}</span>
+                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 font-mono text-xs text-slate-200 whitespace-pre-wrap leading-relaxed select-all max-h-96 overflow-y-auto font-normal">${item.body}</div>
               </div>
-              <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 font-mono text-xs text-slate-200 whitespace-pre-wrap leading-relaxed select-all max-h-96 overflow-y-auto">
-${item.body}
-              </div>
-            </div>
-          </td>
+            </td>
+          </tr>
         `;
-        tbody.appendChild(detailTr);
       });
+      tbody.innerHTML = rowsHtml;
       feather.replace();
     };
 
@@ -1053,6 +1279,12 @@ ${item.body}
         btn.innerText = '+';
         btn.className = "w-6 h-6 rounded-full bg-teal-500/20 text-teal-400 hover:bg-teal-500 hover:text-white transition flex items-center justify-center mx-auto text-xs font-bold font-mono";
       }
+    };
+
+    window.autoImportEmailToTicket = function(fullText) {
+      if (!fullText) return;
+      window.parseAndAddTicket(fullText);
+      window.showToast("Tiket dari Email Berhasil Di-Import ke Dashboard!", "success");
     };
 
     window.debouncedRenderDatabaseSegment = function() {
@@ -1128,7 +1360,7 @@ ${item.body}
 
     window.exportDatabaseExcel = function() {
       if (!window.segmentList || window.segmentList.length === 0) {
-        alert("Tidak ada data segment untuk diexport!");
+        window.showToast("Tidak ada data segment untuk diexport!", "error");
         return;
       }
       const excelData = window.segmentList.map((s, idx) => {
@@ -1485,7 +1717,7 @@ ${item.body}
       });
 
       if (filtered.length === 0) {
-        alert("Tidak ada data tiket untuk diexport!");
+        window.showToast("Tidak ada data tiket untuk diexport!", "error");
         return;
       }
 
@@ -1658,74 +1890,86 @@ ${item.body}
       
       const ctxStatus = document.getElementById('chart-status')?.getContext('2d');
       if (ctxStatus) {
-        if (chartStatusInstance) chartStatusInstance.destroy();
-        chartStatusInstance = new Chart(ctxStatus, {
-          type: 'doughnut',
-          data: {
-            labels: ['Open', 'In Progress', 'Pending', 'Closed'],
-            datasets: [{
-              data: [statusCounts['Open'], statusCounts['In Progress'], statusCounts['Pending'], statusCounts['Closed']],
-              backgroundColor: ['#f43f5e', '#06b6d4', '#fbbf24', '#14b8a6'],
-              borderColor: 'rgba(15, 23, 42, 0.8)',
-              borderWidth: 2,
-              hoverOffset: 4
-            }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            cutout: '65%',
-            plugins: {
-              legend: { 
-                position: 'right', 
-                labels: { color: '#cbd5e1', font: { size: 9, family: "'Inter', sans-serif" }, usePointStyle: true, boxWidth: 6 } 
+        const newData = [statusCounts['Open'], statusCounts['In Progress'], statusCounts['Pending'], statusCounts['Closed']];
+        if (chartStatusInstance) {
+          chartStatusInstance.data.datasets[0].data = newData;
+          chartStatusInstance.update('none');
+        } else {
+          chartStatusInstance = new Chart(ctxStatus, {
+            type: 'doughnut',
+            data: {
+              labels: ['Open', 'In Progress', 'Pending', 'Closed'],
+              datasets: [{
+                data: newData,
+                backgroundColor: ['#f43f5e', '#06b6d4', '#fbbf24', '#14b8a6'],
+                borderColor: 'rgba(15, 23, 42, 0.8)',
+                borderWidth: 2,
+                hoverOffset: 4
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              animation: { duration: 250 },
+              cutout: '65%',
+              plugins: {
+                legend: { 
+                  position: 'right', 
+                  labels: { color: '#cbd5e1', font: { size: 9, family: "'Inter', sans-serif" }, usePointStyle: true, boxWidth: 6 } 
+                }
               }
             }
-          }
-        });
+          });
+        }
       }
       
       const ctxArea = document.getElementById('chart-area')?.getContext('2d');
       if (ctxArea) {
-        if (chartAreaInstance) chartAreaInstance.destroy();
         const sortedArea = Object.entries(areaCounts).sort((a, b) => b[1] - a[1]);
         const areaLabels = sortedArea.map(item => item[0]);
         const areaData = sortedArea.map(item => item[1]);
         
-        chartAreaInstance = new Chart(ctxArea, {
-          type: 'bar',
-          data: {
-            labels: areaLabels,
-            datasets: [{
-              label: 'Jumlah Tiket',
-              data: areaData,
-              backgroundColor: 'rgba(20, 184, 166, 0.7)',
-              borderColor: '#14b8a6',
-              borderWidth: 1,
-              borderRadius: 4,
-              barThickness: 'flex',
-              maxBarThickness: 35
-            }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-              y: { 
-                beginAtZero: true, 
-                ticks: { color: '#94a3b8', stepSize: 1, font: { size: 9, family: "'Inter', sans-serif" } }, 
-                grid: { color: 'rgba(255,255,255,0.05)', borderDash: [5, 5] },
-                border: { display: false }
-              },
-              x: { 
-                ticks: { color: '#94a3b8', font: { size: 8, family: "'Inter', sans-serif" }, maxRotation: 45, minRotation: 0 }, 
-                grid: { display: false },
-                border: { display: false }
-              }
+        if (chartAreaInstance) {
+          chartAreaInstance.data.labels = areaLabels;
+          chartAreaInstance.data.datasets[0].data = areaData;
+          chartAreaInstance.update('none');
+        } else {
+          chartAreaInstance = new Chart(ctxArea, {
+            type: 'bar',
+            data: {
+              labels: areaLabels,
+              datasets: [{
+                label: 'Jumlah Tiket',
+                data: areaData,
+                backgroundColor: 'rgba(20, 184, 166, 0.7)',
+                borderColor: '#14b8a6',
+                borderWidth: 1,
+                borderRadius: 4,
+                barThickness: 'flex',
+                maxBarThickness: 35
+              }]
             },
-            plugins: { legend: { display: false } }
-          }
-        });
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              animation: { duration: 250 },
+              scales: {
+                y: { 
+                  beginAtZero: true, 
+                  ticks: { color: '#94a3b8', stepSize: 1, font: { size: 9, family: "'Inter', sans-serif" } }, 
+                  grid: { color: 'rgba(255,255,255,0.05)', borderDash: [5, 5] },
+                  border: { display: false }
+                },
+                x: { 
+                  ticks: { color: '#94a3b8', font: { size: 8, family: "'Inter', sans-serif" }, maxRotation: 45, minRotation: 0 }, 
+                  grid: { display: false },
+                  border: { display: false }
+                }
+              },
+              plugins: { legend: { display: false } }
+            }
+          });
+        }
       }
     }
   </script>
