@@ -70,7 +70,7 @@
 
   <div id="dashboard-content" class="hidden flex h-screen w-screen overflow-hidden relative">
     
-    <!-- SIDEBAR NAVIGATION: Exactly 3 Menus -->
+    <!-- SIDEBAR NAVIGATION -->
     <aside id="sidebar-nav" class="w-64 glass-card border-r border-teal-900/40 flex flex-col justify-between z-25 flex-shrink-0 sidebar-transition">
       <div>
         <div class="p-4 border-b border-teal-900/40 flex items-center justify-between">
@@ -121,8 +121,8 @@
 
     <main class="flex-1 h-screen overflow-hidden p-4 md:p-6 flex flex-col relative bg-slate-950/60">
       
+      <!-- VIEW 1: DASHBOARD NOC -->
       <section id="view-dashboard-noc" class="flex-1 flex flex-col min-h-0 space-y-4 max-w-7xl w-full mx-auto">
-        
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-teal-900/40 pb-4 flex-shrink-0">
           <div class="flex items-center gap-3">
             <div class="p-2.5 bg-gradient-to-tr from-teal-600 to-cyan-500 rounded-2xl shadow-lg shadow-teal-500/20 text-white">
@@ -262,26 +262,25 @@
             </table>
           </div>
         </div>
-
       </section>
 
+      <!-- VIEW 2: EMAIL TICKET -->
       <section id="view-email-ticket" class="hidden flex-1 flex flex-col min-h-0 space-y-4 max-w-7xl w-full mx-auto">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-teal-900/40 pb-4 flex-shrink-0">
           <div>
             <h1 class="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
               <i data-feather="mail" class="text-teal-400"></i> E-Mail Ticket (Inbox Helpdesk)
             </h1>
-            <p class="text-xs text-slate-400 mt-1">Inbox e-mail masuk khusus subject berinisiasi <span class="text-teal-300 font-mono">[TR@OWS] (New) Create TR</span> dari TR-SDMT@xlsmart.co.id. Klik tombol [+] untuk melihat seluruh isi lengkap (full body) e-mail.</p>
+            <p class="text-xs text-slate-400 mt-1">Inbox e-mail masuk khusus subject berinisiasi <span class="text-teal-300 font-mono">[TR@OWS] (New) Create TR</span> atau IOH Trouble Ticket. Klik tombol [+] untuk melihat seluruh isi lengkap (full body) e-mail.</p>
           </div>
-          <button onclick="window.openIngestEmailModal()" class="bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-500 text-white px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2 shadow-lg shadow-teal-500/25 transition">
-            <i data-feather="plus-circle" class="w-4 h-4"></i> Ingest New Raw Email
-          </button>
+          <div class="text-xs font-mono text-teal-400 bg-teal-500/10 border border-teal-500/30 px-3 py-1.5 rounded-xl flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-teal-400 animate-pulse"></span> Online Realtime Sync Active
+          </div>
         </div>
 
         <div class="glass-card rounded-2xl overflow-hidden shadow-xl flex-1 flex flex-col min-h-0">
           <div class="p-3 bg-slate-900/60 border-b border-slate-800 flex justify-between items-center text-xs flex-shrink-0">
-            <span class="font-semibold text-slate-300 flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-teal-400 animate-ping"></span> Live Email Telemetry Stream (Filtered: [TR@OWS] (New) Create TR)</span>
-            <span class="text-slate-400 font-mono">Server: helpdesk@um-tel.com</span>
+            <span class="font-semibold text-slate-300 flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-teal-400 animate-ping"></span> Live Email Telemetry Stream (Filtered: XLSmart & IOH New Tickets)</span>
           </div>
           <div class="flex-1 overflow-auto">
             <table class="w-full text-left text-xs text-slate-300 whitespace-nowrap">
@@ -309,13 +308,14 @@
         </div>
       </section>
 
+      <!-- VIEW 3: DATABASE SEGMENT -->
       <section id="view-database-segment" class="hidden flex-1 flex flex-col min-h-0 space-y-4 max-w-7xl w-full mx-auto">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-teal-900/40 pb-4 flex-shrink-0">
           <div>
             <h1 class="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
               <i data-feather="database" class="text-teal-400"></i> Database Segment (Google Spreadsheet)
             </h1>
-            <p class="text-xs text-slate-400 mt-1">Sinkronisasi data master segmen jaringan fiber optik langsung dari Google Spreadsheet.</p>
+            <p class="text-xs text-slate-400 mt-1">Sinkronisasi data master segmen jaringan fiber optik langsung dari Google Spreadsheet dengan pembersihan otomatis format koordinat.</p>
           </div>
           <div class="flex items-center gap-2">
             <button onclick="window.syncGoogleSheetCsv(true)" class="bg-teal-600/20 hover:bg-teal-600/30 text-teal-300 border border-teal-500/30 px-3.5 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2 transition shadow-md">
@@ -364,6 +364,7 @@
     </main>
   </div>
 
+  <!-- MODALS -->
   <div id="modal-input" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
     <div class="glass-card rounded-3xl w-full max-w-xl p-6 shadow-2xl border border-teal-500/30">
       <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-800">
@@ -591,34 +592,6 @@
     </div>
   </div>
 
-  <div id="modal-ingest-email" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
-    <div class="glass-card rounded-3xl w-full max-w-xl p-6 shadow-2xl border border-teal-500/30">
-      <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-800">
-        <h3 class="text-base font-bold text-white flex items-center gap-2">
-          <i data-feather="mail" class="text-teal-400 w-5 h-5"></i> Ingest & Filter Raw Email
-        </h3>
-        <button onclick="window.closeIngestEmailModal()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition"><i data-feather="x" class="w-5 h-5"></i></button>
-      </div>
-      <p class="text-xs text-slate-400 mb-3">Tempelkan teks email mentah. Hanya e-mail dengan subject berinisiasi <span class="text-teal-300 font-mono">[TR@OWS] (New) Create TR</span> yang akan dimasukkan ke Inbox.</p>
-      
-      <div class="space-y-3">
-        <div>
-          <label class="block text-xs font-medium text-slate-300 mb-1">Sender Email</label>
-          <input type="text" id="ingest-email-sender" value="TR-SDMT@xlsmart.co.id" class="w-full bg-slate-900/90 border border-slate-700/80 text-xs text-white rounded-xl p-3 focus:outline-none focus:border-teal-500 font-mono">
-        </div>
-        <div>
-          <label class="block text-xs font-medium text-slate-300 mb-1">Raw Email Content / Paste Here</label>
-          <textarea id="ingest-email-raw" rows="6" placeholder="[TR@OWS] (New) Create TR [TR-20260915-00000712] ... Dear PT. ULTRA MANDIRI TELEKOMUNIKASI..." class="w-full bg-slate-900/90 border border-slate-700/80 text-xs text-slate-200 rounded-xl p-3 focus:outline-none focus:border-teal-500 font-mono"></textarea>
-        </div>
-      </div>
-      
-      <div class="mt-5 flex justify-end gap-2.5">
-        <button onclick="window.closeIngestEmailModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-medium transition">Batal</button>
-        <button onclick="window.processIngestEmail()" class="px-4 py-2 bg-teal-600 hover:bg-teal-500 text-white font-medium rounded-xl text-xs transition shadow-lg shadow-teal-600/25">Validasi & Masukkan ke Inbox</button>
-      </div>
-    </div>
-  </div>
-
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -648,7 +621,7 @@
 
     window.ticketList = [];
     
-    // Multiple realistic inbox items with STRICT FILTER: Only emails starting/containing "[TR@OWS] (New) Create TR"
+    // Updated inbox items supporting both XLSmart & IOH new trouble tickets
     window.emailInboxList = [
       {
         id: 'email_default_1',
@@ -681,28 +654,14 @@ MA-BTTGR8575-01H (SF-ZJKT2_6660-Kp Pasar Sore Kelor)`,
       },
       {
         id: 'email_default_2',
-        sender: 'TR-SDMT@xlsmart.co.id',
-        subject: '[TR@OWS] (New) Create TR [TR-20260915-00000845] - UMT-Leased Fiber-260914102 : Fiber Cut ## IP Link From_CILEGON_LINK_02...',
-        body: `Dear PT. ULTRA MANDIRI TELEKOMUNIKASI,
-We inform to you that there is a new request of Trouble Report, details are below. If exists, please find attachment.
-
-Title                  : Fiber Cut ## IP Link From_CILEGON_LINK_02_BOJONEGARA
-Ticket No.             : TR-20260915-00000845
-ERN                    : UMT-Leased Fiber-260914102
-Site ID / Name         : CLG_0120 / BOJONEGARA INDUSTRIAL PARK
-Severity / Priority    : Critical
-Product Type           : Leased Fiber
-Product Group          : Trans Access
-Category               : Access
-Report By              : NOC
-Requestor Email        : helpdesk.cilegon@xlsmart.co.id
-Requestor Phone        : 6281299887766
-RTS                    : PS - Ahmad Fauzi
-RTS Phone              : 081234567890
-ROH                    : Budi Santoso
-ROH Phone              : 081987654321
-RSL Result             : --------------------------------------------------
-CLG_0120 (BOJONEGARA INDUSTRIAL PARK)`,
+        sender: 'helpdesk.ioh@indosat.com',
+        subject: 'INC-20260915-009824 : Fiber Cut Link From_JAKARTA_SOUTHERN_01',
+        body: `Dear Partner,
+New Incident Ticket Created.
+Ticket No.             : INC-20260915-009824
+Site Name              : JAKARTA SOUTHERN 01 / JAKSEL_CORE
+Severity               : Critical
+Description            : Fiber optic cable cut due to road excavation.`,
         receivedDateTime: '2026-09-15 16:20:10'
       }
     ];
@@ -1018,10 +977,12 @@ CLG_0120 (BOJONEGARA INDUSTRIAL PARK)`,
       const sBody = (document.getElementById('filter-email-body')?.value || '').toLowerCase();
       const sDate = (document.getElementById('filter-email-date')?.value || '').toLowerCase();
 
-      // STRICT FILTER: Only grab emails whose subject begins/contains "[TR@OWS] (New) Create TR"
+      // Support both XLSmart ([TR@OWS] New Create TR) and IOH (INC) new trouble tickets
       let list = (window.emailInboxList || []).filter(item => {
         const subj = (item.subject || '').toUpperCase();
-        return subj.includes("[TR@OWS]") && subj.includes("CREATE TR");
+        const isXls = subj.includes("[TR@OWS]") && subj.includes("CREATE TR");
+        const isIoh = subj.includes("INC") && !subj.includes("RE:") && !subj.includes("FWD:");
+        return isXls || isIoh;
       });
 
       let filtered = list.filter(item => {
@@ -1032,7 +993,7 @@ CLG_0120 (BOJONEGARA INDUSTRIAL PARK)`,
       });
 
       if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-8 text-slate-500">Tidak ada e-mail dengan inisiasi subject "[TR@OWS] (New) Create TR" di inbox helpdesk.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-8 text-slate-500">Tidak ada e-mail inisiasi baru dari XLSmart maupun IOH di inbox helpdesk.</td></tr>`;
         return;
       }
 
@@ -1055,7 +1016,6 @@ CLG_0120 (BOJONEGARA INDUSTRIAL PARK)`,
         `;
         tbody.appendChild(tr);
 
-        // Expanded full body row
         const detailTr = document.createElement('tr');
         detailTr.id = detailId;
         detailTr.className = "hidden bg-slate-900/90 border-b border-teal-500/30";
@@ -1093,45 +1053,6 @@ ${item.body}
         btn.innerText = '+';
         btn.className = "w-6 h-6 rounded-full bg-teal-500/20 text-teal-400 hover:bg-teal-500 hover:text-white transition flex items-center justify-center mx-auto text-xs font-bold font-mono";
       }
-    };
-
-    window.openIngestEmailModal = function() {
-      document.getElementById('modal-ingest-email').classList.remove('hidden');
-    };
-
-    window.closeIngestEmailModal = function() {
-      document.getElementById('modal-ingest-email').classList.add('hidden');
-      document.getElementById('ingest-email-raw').value = '';
-    };
-
-    window.processIngestEmail = function() {
-      const raw = document.getElementById('ingest-email-raw').value.trim();
-      const sender = document.getElementById('ingest-email-sender').value.trim() || 'TR-SDMT@xlsmart.co.id';
-      if (!raw) return;
-
-      let cleanedSubject = raw.split('\n')[0] || 'Trouble Report Notification';
-      
-      // Strict validation: Must contain "[TR@OWS]" and "CREATE TR"
-      const upperSubj = cleanedSubject.toUpperCase();
-      if (!upperSubj.includes("[TR@OWS]") || !upperSubj.includes("CREATE TR")) {
-        alert("E-mail ditolak! Hanya e-mail dengan inisiasi subject '[TR@OWS] (New) Create TR' yang dapat dimasukkan ke Inbox.");
-        return;
-      }
-
-      let now = new Date();
-      let timeFormatted = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
-
-      const newItem = {
-        id: 'email_' + Date.now(),
-        sender: sender,
-        subject: cleanedSubject,
-        body: raw,
-        receivedDateTime: timeFormatted
-      };
-
-      window.emailInboxList.unshift(newItem);
-      window.closeIngestEmailModal();
-      window.renderEmailTickets();
     };
 
     window.debouncedRenderDatabaseSegment = function() {
