@@ -5,38 +5,34 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mitratel FTTT Helpdesk Monitoring & TTR Tracker</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Feather Icons -->
   <script src="https://unpkg.com/feather-icons"></script>
-  <!-- EXIF JS untuk membaca Metadata GPS Foto Evidence -->
   <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
-  <!-- Chart.js untuk Data Visualisasi -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- SheetJS / XLSX Library untuk Export & Import Excel/CSV -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <!-- Google Fonts Inter -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Inter', sans-serif; }
+    body { font-family: 'Inter', sans-serif; overflow-x: hidden; }
     .glass-card {
-      background: rgba(15, 23, 42, 0.75);
+      background: rgba(15, 23, 42, 0.85);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       border: 1px solid rgba(20, 184, 166, 0.15);
     }
     .glass-card-sm {
-      background: rgba(15, 23, 42, 0.6);
+      background: rgba(15, 23, 42, 0.7);
       backdrop-filter: blur(8px);
       border: 1px solid rgba(20, 184, 166, 0.1);
     }
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
     ::-webkit-scrollbar-thumb { background: rgba(20, 184, 166, 0.4); border-radius: 4px; }
-    .sidebar-transition { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(20, 184, 166, 0.7); }
+    .sidebar-transition { transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
   </style>
 </head>
-<body class="bg-gradient-to-br from-slate-950 via-teal-950/30 to-slate-950 text-slate-100 min-h-screen antialiased selection:bg-teal-500 selection:text-white">
+<body class="bg-gradient-to-br from-slate-950 via-teal-950/30 to-slate-950 text-slate-100 min-h-screen w-screen antialiased selection:bg-teal-500 selection:text-white overflow-x-hidden">
 
-  <div id="login-overlay" class="fixed inset-0 bg-slate-950/90 backdrop-blur-xl z-[100] flex items-center justify-center p-4">
+  <div id="login-overlay" class="fixed inset-0 bg-slate-950/95 backdrop-blur-xl z-[100] flex items-center justify-center p-4">
     <div class="glass-card rounded-3xl w-full max-w-md p-8 shadow-2xl border border-teal-500/30">
       <div class="flex flex-col items-center text-center mb-6">
         <div class="p-3.5 bg-gradient-to-tr from-teal-600 to-cyan-500 rounded-2xl shadow-lg shadow-teal-500/25 text-white mb-3">
@@ -72,12 +68,11 @@
     </div>
   </div>
 
-  <div id="dashboard-content" class="hidden flex h-screen overflow-hidden relative">
+  <div id="dashboard-content" class="hidden flex h-screen w-screen overflow-hidden relative">
     
-    <!-- SIDEBAR NAVIGATION -->
-    <aside id="sidebar-nav" class="w-64 glass-card border-r border-teal-900/40 flex flex-col justify-between z-20 flex-shrink-0 sidebar-transition">
+    <!-- SIDEBAR NAVIGATION: Exactly 3 Menus -->
+    <aside id="sidebar-nav" class="w-64 glass-card border-r border-teal-900/40 flex flex-col justify-between z-25 flex-shrink-0 sidebar-transition">
       <div>
-        <!-- Brand Header with Integrated Toggle Button -->
         <div class="p-4 border-b border-teal-900/40 flex items-center justify-between">
           <div id="sidebar-brand-content" class="flex items-center gap-3 overflow-hidden">
             <div class="p-2.5 bg-gradient-to-tr from-teal-600 to-cyan-500 rounded-xl text-white shadow-lg shadow-teal-500/20 flex-shrink-0">
@@ -93,26 +88,24 @@
           </button>
         </div>
 
-        <!-- Menu List (3 Tabs) -->
         <nav class="p-3 space-y-1.5 text-xs">
-          <button onclick="window.switchTab('email-ticket')" id="nav-email-ticket" class="w-full flex items-center gap-3 px-3 py-3 rounded-xl font-medium text-slate-300 hover:bg-teal-500/10 hover:text-teal-300 transition-all group" title="1. E-Mail Ticket">
-            <i data-feather="mail" class="w-4 h-4 text-teal-400 flex-shrink-0"></i> 
-            <span class="sidebar-label truncate">1. E-Mail Ticket</span>
-          </button>
-          
-          <button onclick="window.switchTab('database-segment')" id="nav-database-segment" class="w-full flex items-center gap-3 px-3 py-3 rounded-xl font-medium text-slate-300 hover:bg-teal-500/10 hover:text-teal-300 transition-all group" title="2. Database Segment">
-            <i data-feather="database" class="w-4 h-4 text-teal-400 flex-shrink-0"></i> 
-            <span class="sidebar-label truncate">2. Database Segment</span>
-          </button>
-          
-          <button onclick="window.switchTab('dashboard-noc')" id="nav-dashboard-noc" class="w-full flex items-center gap-3 px-3 py-3 rounded-xl font-medium bg-gradient-to-r from-teal-600/30 to-cyan-600/10 text-teal-300 border border-teal-500/30 shadow-sm transition-all group" title="3. Dashboard Ticket">
+          <button onclick="window.switchTab('dashboard-noc')" id="nav-dashboard-noc" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium bg-gradient-to-r from-teal-600/30 to-cyan-600/10 text-teal-300 border border-teal-500/30 shadow-sm transition-all group" title="1. Dashboard Ticket">
             <i data-feather="monitor" class="w-4 h-4 text-teal-400 flex-shrink-0"></i> 
-            <span class="sidebar-label truncate">3. Dashboard Ticket</span>
+            <span class="sidebar-label truncate">1. Dashboard Ticket</span>
+          </button>
+
+          <button onclick="window.switchTab('email-ticket')" id="nav-email-ticket" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium text-slate-300 hover:bg-teal-500/10 hover:text-teal-300 transition-all group" title="2. E-Mail Ticket">
+            <i data-feather="mail" class="w-4 h-4 text-teal-400 flex-shrink-0"></i> 
+            <span class="sidebar-label truncate">2. E-Mail Ticket</span>
+          </button>
+          
+          <button onclick="window.switchTab('database-segment')" id="nav-database-segment" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium text-slate-300 hover:bg-teal-500/10 hover:text-teal-300 transition-all group" title="3. Database Segment">
+            <i data-feather="database" class="w-4 h-4 text-teal-400 flex-shrink-0"></i> 
+            <span class="sidebar-label truncate">3. Database Segment</span>
           </button>
         </nav>
       </div>
 
-      <!-- User Profile & Logout in Sidebar Footer -->
       <div class="p-3 border-t border-teal-900/40">
         <div class="glass-card-sm p-2.5 rounded-xl flex items-center justify-between">
           <div class="overflow-hidden sidebar-text-content">
@@ -126,197 +119,96 @@
       </div>
     </aside>
 
-    <main class="flex-1 overflow-y-auto p-4 md:p-8 relative">
+    <main class="flex-1 h-screen overflow-hidden p-4 md:p-6 flex flex-col relative bg-slate-950/60">
       
-      <!-- ========================================================== -->
-      <!-- TAB 1: E-MAIL TICKET -->
-      <!-- ========================================================== -->
-      <section id="view-email-ticket" class="hidden space-y-6 max-w-7xl mx-auto">
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-teal-900/40 pb-4">
-          <div>
-            <h1 class="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
-              <i data-feather="mail" class="text-teal-400"></i> E-Mail Ticket
-            </h1>
-          </div>
-          <button onclick="window.openInputModal()" class="bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-500 text-white px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2 shadow-lg shadow-teal-500/25 transition">
-            <i data-feather="plus-circle" class="w-4 h-4"></i> Ingest New Raw Ticket
-          </button>
-        </div>
-
-        <div class="glass-card rounded-2xl overflow-hidden shadow-xl">
-          <div class="p-4 bg-slate-900/60 border-b border-slate-800 flex justify-between items-center text-xs">
-            <span class="font-semibold text-slate-300 flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-teal-400 animate-ping"></span> Live E-Mail Feed</span>
-            <span class="text-slate-400 font-mono">Server: helpdesk@um-tel.com</span>
-          </div>
-          <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs text-slate-300">
-              <thead class="bg-slate-900/90 text-slate-400 uppercase font-semibold text-[10px] tracking-wider border-b border-slate-800">
-                <tr>
-                  <th class="p-4">No.</th>
-                  <th class="p-4">Pengirim</th>
-                  <th class="p-4">Subjek</th>
-                  <th class="p-4">Isi Broadcast / E-Mail</th>
-                  <th class="p-4">Waktu Diterima</th>
-                  <th class="p-4">RSL Informasi</th>
-                  <th class="p-4">Dispatch to</th>
-                </tr>
-              </thead>
-              <tbody id="email-ticket-table-body" class="divide-y divide-slate-800/60">
-                <!-- Diisi via script -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <!-- ========================================================== -->
-      <!-- TAB 2: DATABASE SEGMENT -->
-      <!-- ========================================================== -->
-      <section id="view-database-segment" class="hidden space-y-6 max-w-7xl mx-auto">
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-teal-900/40 pb-4">
-          <div>
-            <h1 class="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
-              <i data-feather="database" class="text-teal-400"></i> Database Segment
-            </h1>
-            <p class="text-xs text-slate-400 mt-1">Master segment data dan informasi referensi route fiber optic.</p>
-          </div>
-          <div class="flex items-center gap-3 flex-wrap">
-            <button onclick="window.exportDatabaseExcel()" class="bg-teal-600/20 hover:bg-teal-600/30 text-teal-300 border border-teal-500/30 px-3.5 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2 transition shadow-md">
-              <i data-feather="download" class="w-4 h-4 text-teal-400"></i> Export Excel
-            </button>
-          </div>
-        </div>
-
-        <div class="glass-card p-4 rounded-2xl flex flex-col md:flex-row gap-4 items-center justify-between">
-          <div class="relative w-full md:w-80">
-            <i data-feather="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"></i>
-            <input type="text" id="db-search" oninput="window.renderDatabaseSegment()" placeholder="Cari Witel, Site NE/FE, Mitra..." class="bg-slate-900/90 border border-slate-700/80 text-xs text-white rounded-xl pl-9 pr-3 py-2.5 w-full focus:outline-none focus:border-teal-500">
-          </div>
-          <div class="text-xs text-slate-400 font-mono">
-            Total Master Segment: <span id="db-total-count" class="text-teal-300 font-bold">0</span>
-          </div>
-        </div>
-
-        <div class="glass-card rounded-2xl overflow-hidden shadow-xl">
-          <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs text-slate-300">
-              <thead class="bg-slate-900/90 text-slate-400 uppercase font-semibold text-[10px] tracking-wider border-b border-slate-800">
-                <tr>
-                  <th class="p-3">No.</th>
-                  <th class="p-3">witel</th>
-                  <th class="p-3">site_ne</th>
-                  <th class="p-3">site_name_ne</th>
-                  <th class="p-3">site_owner_ne</th>
-                  <th class="p-3 text-teal-300">Long-Lat NE</th>
-                  <th class="p-3">site_fe</th>
-                  <th class="p-3">site_name_fe</th>
-                  <th class="p-3">site_owner_fe</th>
-                  <th class="p-3 text-cyan-300">Long-Lat FE</th>
-                  <th class="p-3">Panjang Referensi</th>
-                  <th class="p-3">Mitra</th>
-                </tr>
-              </thead>
-              <tbody id="db-segment-tbody" class="divide-y divide-slate-800/60">
-                <!-- Data database segment diisi lewat script -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <!-- ========================================================== -->
-      <!-- TAB 3: DASHBOARD TICKET -->
-      <!-- ========================================================== -->
-      <section id="view-dashboard-noc" class="space-y-6 max-w-7xl mx-auto">
+      <section id="view-dashboard-noc" class="flex-1 flex flex-col min-h-0 space-y-4 max-w-7xl w-full mx-auto">
         
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-teal-900/40 pb-5">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-teal-900/40 pb-4 flex-shrink-0">
           <div class="flex items-center gap-3">
-            <div class="p-3 bg-gradient-to-tr from-teal-600 to-cyan-500 rounded-2xl shadow-lg shadow-teal-500/20 text-white">
-              <i data-feather="monitor" class="w-6 h-6"></i>
+            <div class="p-2.5 bg-gradient-to-tr from-teal-600 to-cyan-500 rounded-2xl shadow-lg shadow-teal-500/20 text-white">
+              <i data-feather="monitor" class="w-5 h-5"></i>
             </div>
             <div>
-              <h1 class="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
+              <h1 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
                 Mitratel FTTT Dashboard Ticket
-                <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-teal-500/10 text-teal-400 border border-teal-500/30 flex items-center gap-1.5">
-                  <span class="w-2 h-2 rounded-full bg-teal-400 animate-pulse"></span> Cloud Sync
+                <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-teal-500/10 text-teal-400 border border-teal-500/30 flex items-center gap-1">
+                  <span class="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse"></span> Cloud Sync
                 </span>
               </h1>
-              <p class="text-xs text-slate-400 mt-0.5">Dashboard Rekapitulasi, Real-Time TTR Tracking & Timely Report</p>
+              <p class="text-xs text-slate-400">Dashboard Rekapitulasi, Real-Time TTR Tracking & Timely Report</p>
             </div>
           </div>
           
-          <div class="flex items-center gap-3">
-            <button onclick="window.openInputModal()" class="bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-500 text-white px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2 shadow-lg shadow-teal-500/25 transition active:scale-95">
-              <i data-feather="plus-circle" class="w-4 h-4"></i> Input Raw Ticket
-            </button>
-          </div>
+          <button onclick="window.openInputModal()" class="bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-500 text-white px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 shadow-lg shadow-teal-500/25 transition active:scale-95">
+            <i data-feather="plus-circle" class="w-4 h-4"></i> Input Raw Ticket
+          </button>
         </div>
 
-        <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
-          <div class="glass-card p-4 rounded-2xl relative overflow-hidden group">
-            <p class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Total Ticket</p>
-            <h3 id="stat-total" class="text-3xl font-extrabold text-white mt-1">0</h3>
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-3 flex-shrink-0">
+          <div class="glass-card p-3 rounded-2xl relative overflow-hidden group">
+            <p class="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Total Ticket</p>
+            <h3 id="stat-total" class="text-2xl font-extrabold text-white mt-0.5">0</h3>
           </div>
-          <div class="glass-card p-4 rounded-2xl relative overflow-hidden group">
+          <div class="glass-card p-3 rounded-2xl relative overflow-hidden group">
             <div class="absolute top-0 left-0 bottom-0 w-1 bg-gradient-to-b from-rose-500 to-red-600"></div>
-            <p class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Ticket Open</p>
-            <h3 id="stat-open" class="text-3xl font-extrabold text-rose-400 mt-1">0</h3>
+            <p class="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Ticket Open</p>
+            <h3 id="stat-open" class="text-2xl font-extrabold text-rose-400 mt-0.5">0</h3>
           </div>
-          <div class="glass-card p-4 rounded-2xl relative overflow-hidden group">
+          <div class="glass-card p-3 rounded-2xl relative overflow-hidden group">
             <div class="absolute top-0 left-0 bottom-0 w-1 bg-gradient-to-b from-cyan-400 to-teal-500"></div>
-            <p class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">In Progress</p>
-            <h3 id="stat-progress" class="text-3xl font-extrabold text-cyan-400 mt-1">0</h3>
+            <p class="text-[10px] font-medium text-slate-400 uppercase tracking-wider">In Progress</p>
+            <h3 id="stat-progress" class="text-2xl font-extrabold text-cyan-400 mt-0.5">0</h3>
           </div>
-          <div class="glass-card p-4 rounded-2xl relative overflow-hidden group">
+          <div class="glass-card p-3 rounded-2xl relative overflow-hidden group">
             <div class="absolute top-0 left-0 bottom-0 w-1 bg-gradient-to-b from-amber-400 to-orange-500"></div>
-            <p class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Pending</p>
-            <h3 id="stat-pending" class="text-3xl font-extrabold text-amber-400 mt-1">0</h3>
+            <p class="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Pending</p>
+            <h3 id="stat-pending" class="text-2xl font-extrabold text-amber-400 mt-0.5">0</h3>
           </div>
-          <div class="glass-card p-4 rounded-2xl relative overflow-hidden group">
+          <div class="glass-card p-3 rounded-2xl relative overflow-hidden group col-span-2 md:col-span-1">
             <div class="absolute top-0 left-0 bottom-0 w-1 bg-gradient-to-b from-teal-400 to-emerald-500"></div>
-            <p class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Ticket Close</p>
-            <div class="flex items-baseline justify-between mt-1">
-              <h3 id="stat-close" class="text-3xl font-extrabold text-teal-400">0</h3>
-              <span class="text-[11px] text-slate-400 font-mono bg-slate-800/80 px-2 py-0.5 rounded-md border border-teal-500/20">
+            <p class="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Ticket Close</p>
+            <div class="flex items-baseline justify-between mt-0.5">
+              <h3 id="stat-close" class="text-2xl font-extrabold text-teal-400">0</h3>
+              <span class="text-[10px] text-slate-400 font-mono bg-slate-800/80 px-1.5 py-0.5 rounded border border-teal-500/20">
                 MTTR: <span id="stat-mttr" class="text-teal-300 font-bold">0j 0m</span>
               </span>
             </div>
           </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div class="glass-card p-4 rounded-2xl">
-            <h4 class="text-xs font-semibold text-slate-300 mb-3 flex items-center gap-2">
-              <i data-feather="pie-chart" class="w-4 h-4 text-rose-400"></i> Proporsi Status Tiket
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 flex-shrink-0">
+          <div class="glass-card p-3 rounded-2xl">
+            <h4 class="text-xs font-semibold text-slate-300 mb-2 flex items-center gap-2">
+              <i data-feather="pie-chart" class="w-3.5 h-3.5 text-rose-400"></i> Proporsi Status Tiket
             </h4>
-            <div class="relative h-52 w-full">
+            <div class="relative h-28 w-full">
               <canvas id="chart-status"></canvas>
             </div>
           </div>
-          <div class="glass-card p-4 rounded-2xl md:col-span-2">
-            <h4 class="text-xs font-semibold text-slate-300 mb-3 flex items-center gap-2">
-              <i data-feather="bar-chart-2" class="w-4 h-4 text-teal-400"></i> Distribusi Klaster Wilayah
+          <div class="glass-card p-3 rounded-2xl md:col-span-2">
+            <h4 class="text-xs font-semibold text-slate-300 mb-2 flex items-center gap-2">
+              <i data-feather="bar-chart-2" class="w-3.5 h-3.5 text-teal-400"></i> Distribusi Klaster Wilayah
             </h4>
-            <div class="relative h-52 w-full">
+            <div class="relative h-28 w-full">
               <canvas id="chart-area"></canvas>
             </div>
           </div>
         </div>
 
-        <div class="glass-card p-4 rounded-2xl flex flex-col md:flex-row gap-4 items-center justify-between">
-          <div class="flex flex-wrap gap-3 items-center w-full md:w-auto">
-            <div class="relative w-full md:w-60">
-              <i data-feather="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"></i>
-              <input type="text" id="search-input" oninput="window.renderTable()" placeholder="Cari Ticket, Site, Link..." class="bg-slate-900/90 border border-slate-700/80 text-xs text-white rounded-xl pl-9 pr-3 py-2.5 w-full focus:outline-none focus:border-teal-500/80">
+        <div class="glass-card p-3 rounded-2xl flex flex-col md:flex-row gap-3 items-center justify-between flex-shrink-0">
+          <div class="flex flex-wrap gap-2 items-center w-full md:w-auto">
+            <div class="relative w-full md:w-56">
+              <i data-feather="search" class="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"></i>
+              <input type="text" id="search-input" oninput="window.debouncedRenderTable()" placeholder="Cari Ticket, Site, Link..." class="bg-slate-900/90 border border-slate-700/80 text-xs text-white rounded-xl pl-8 pr-3 py-2 w-full focus:outline-none focus:border-teal-500/80">
             </div>
             
-            <select id="filter-customer" onchange="window.renderTable()" class="bg-slate-900/90 border border-slate-700/80 text-xs text-slate-300 rounded-xl px-3 py-2.5 focus:outline-none focus:border-teal-500/80 cursor-pointer">
+            <select id="filter-customer" onchange="window.renderTable()" class="bg-slate-900/90 border border-slate-700/80 text-xs text-slate-300 rounded-xl px-2.5 py-2 focus:outline-none focus:border-teal-500/80 cursor-pointer">
               <option value="">Semua Customer</option>
               <option value="XLS">XLS (XL Axiata)</option>
               <option value="IOH">IOH (Indosat)</option>
             </select>
 
-            <select id="filter-area" onchange="window.renderTable()" class="bg-slate-900/90 border border-slate-700/80 text-xs text-slate-300 rounded-xl px-3 py-2.5 focus:outline-none focus:border-teal-500/80 cursor-pointer">
+            <select id="filter-area" onchange="window.renderTable()" class="bg-slate-900/90 border border-slate-700/80 text-xs text-slate-300 rounded-xl px-2.5 py-2 focus:outline-none focus:border-teal-500/80 cursor-pointer">
               <option value="">Semua Klaster Wilayah</option>
               <option value="Kab. Tangerang">Kab. Tangerang</option>
               <option value="Tangerang">Tangerang</option>
@@ -333,7 +225,7 @@
               <option value="Ketapang">Ketapang</option>
             </select>
 
-            <select id="filter-status" onchange="window.renderTable()" class="bg-slate-900/90 border border-slate-700/80 text-xs text-slate-300 rounded-xl px-3 py-2.5 focus:outline-none focus:border-teal-500/80 cursor-pointer">
+            <select id="filter-status" onchange="window.renderTable()" class="bg-slate-900/90 border border-slate-700/80 text-xs text-slate-300 rounded-xl px-2.5 py-2 focus:outline-none focus:border-teal-500/80 cursor-pointer">
               <option value="">Semua Status</option>
               <option value="Open">Open</option>
               <option value="In Progress">In Progress</option>
@@ -342,45 +234,136 @@
             </select>
           </div>
           
-          <div class="flex items-center gap-3 w-full md:w-auto justify-end">
-            <button onclick="window.exportToExcel()" class="bg-teal-600/20 hover:bg-teal-600/30 text-teal-300 border border-teal-500/30 px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition active:scale-95 shadow-md">
-              <i data-feather="download" class="w-4 h-4 text-teal-400"></i> Export Excel
-            </button>
-          </div>
+          <button onclick="window.exportToExcel()" class="bg-teal-600/20 hover:bg-teal-600/30 text-teal-300 border border-teal-500/30 px-3 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition active:scale-95 shadow-md flex-shrink-0">
+            <i data-feather="download" class="w-3.5 h-3.5 text-teal-400"></i> Export Excel
+          </button>
         </div>
 
-        <div class="glass-card rounded-2xl overflow-hidden shadow-2xl">
-          <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs text-slate-300">
-              <thead class="bg-slate-900/90 text-slate-400 uppercase font-semibold text-[10px] tracking-wider border-b border-slate-800">
+        <div class="glass-card rounded-2xl overflow-hidden shadow-2xl flex-1 flex flex-col min-h-0">
+          <div class="flex-1 overflow-auto">
+            <table class="w-full text-left text-xs text-slate-300 whitespace-nowrap">
+              <thead class="bg-slate-900/90 text-slate-400 uppercase font-semibold text-[10px] tracking-wider border-b border-slate-800 sticky top-0 z-10">
                 <tr>
-                  <th class="p-4">No</th>
-                  <th class="p-4">Customer</th>
-                  <th class="p-4">Klaster Wilayah</th>
-                  <th class="p-4">Nomor Tiket</th>
-                  <th class="p-4">Detail Route / Link Case</th>
-                  <th class="p-4">Ticket Open</th>
-                  <th class="p-4">Ticket Close</th>
-                  <th class="p-4">RCA 1 / RCA 2</th>
-                  <th class="p-4">Stop Clock</th>
-                  <th class="p-4">TTR Tiket</th>
-                  <th class="p-4">Status</th>
-                  <th class="p-4 text-center">Aksi</th>
+                  <th class="p-3">No</th>
+                  <th class="p-3">Customer</th>
+                  <th class="p-3">Klaster Wilayah</th>
+                  <th class="p-3">Nomor Tiket</th>
+                  <th class="p-3">Detail Route / Link Case</th>
+                  <th class="p-3">Ticket Open</th>
+                  <th class="p-3">Ticket Close</th>
+                  <th class="p-3">RCA 1 / RCA 2</th>
+                  <th class="p-3">Stop Clock</th>
+                  <th class="p-3">TTR Tiket</th>
+                  <th class="p-3">Status</th>
+                  <th class="p-3 text-center">Aksi</th>
                 </tr>
               </thead>
-              <tbody id="ticket-table-body" class="divide-y divide-slate-800/60">
-                <!-- Data diisi oleh Javascript -->
-              </tbody>
+              <tbody id="ticket-table-body" class="divide-y divide-slate-800/60"></tbody>
             </table>
           </div>
         </div>
 
       </section>
 
+      <section id="view-email-ticket" class="hidden flex-1 flex flex-col min-h-0 space-y-4 max-w-7xl w-full mx-auto">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-teal-900/40 pb-4 flex-shrink-0">
+          <div>
+            <h1 class="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
+              <i data-feather="mail" class="text-teal-400"></i> E-Mail Ticket (Inbox Helpdesk)
+            </h1>
+            <p class="text-xs text-slate-400 mt-1">Inbox e-mail masuk khusus subject berinisiasi <span class="text-teal-300 font-mono">[TR@OWS] (New) Create TR</span> dari TR-SDMT@xlsmart.co.id. Klik tombol [+] untuk melihat seluruh isi lengkap (full body) e-mail.</p>
+          </div>
+          <button onclick="window.openIngestEmailModal()" class="bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-500 text-white px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2 shadow-lg shadow-teal-500/25 transition">
+            <i data-feather="plus-circle" class="w-4 h-4"></i> Ingest New Raw Email
+          </button>
+        </div>
+
+        <div class="glass-card rounded-2xl overflow-hidden shadow-xl flex-1 flex flex-col min-h-0">
+          <div class="p-3 bg-slate-900/60 border-b border-slate-800 flex justify-between items-center text-xs flex-shrink-0">
+            <span class="font-semibold text-slate-300 flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-teal-400 animate-ping"></span> Live Email Telemetry Stream (Filtered: [TR@OWS] (New) Create TR)</span>
+            <span class="text-slate-400 font-mono">Server: helpdesk@um-tel.com</span>
+          </div>
+          <div class="flex-1 overflow-auto">
+            <table class="w-full text-left text-xs text-slate-300 whitespace-nowrap">
+              <thead class="bg-slate-900/90 text-slate-400 uppercase font-semibold text-[10px] tracking-wider border-b border-slate-800 sticky top-0 z-10">
+                <tr>
+                  <th class="p-3 w-10 text-center">+</th>
+                  <th class="p-3">No.</th>
+                  <th class="p-3">Sender</th>
+                  <th class="p-3">Subject & No. Ticket</th>
+                  <th class="p-3">Body E-Mail</th>
+                  <th class="p-3">Time Received</th>
+                </tr>
+                <tr class="bg-slate-950/80 border-b border-slate-800">
+                  <th class="p-2"></th>
+                  <th class="p-2"></th>
+                  <th class="p-2"><input type="text" id="filter-email-sender" oninput="window.renderEmailTickets()" placeholder="Search SENDER" class="w-full bg-slate-900 border border-slate-700 text-[11px] text-white rounded px-2 py-1 focus:outline-none focus:border-teal-500"></th>
+                  <th class="p-2"><input type="text" id="filter-email-subject" oninput="window.renderEmailTickets()" placeholder="Search Subject" class="w-full bg-slate-900 border border-slate-700 text-[11px] text-white rounded px-2 py-1 focus:outline-none focus:border-teal-500"></th>
+                  <th class="p-2"><input type="text" id="filter-email-body" oninput="window.renderEmailTickets()" placeholder="Search Body E-Mail" class="w-full bg-slate-900 border border-slate-700 text-[11px] text-white rounded px-2 py-1 focus:outline-none focus:border-teal-500"></th>
+                  <th class="p-2"><input type="text" id="filter-email-date" oninput="window.renderEmailTickets()" placeholder="Search Time" class="w-full bg-slate-900 border border-slate-700 text-[11px] text-white rounded px-2 py-1 focus:outline-none focus:border-teal-500"></th>
+                </tr>
+              </thead>
+              <tbody id="email-ticket-table-body" class="divide-y divide-slate-800/60"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="view-database-segment" class="hidden flex-1 flex flex-col min-h-0 space-y-4 max-w-7xl w-full mx-auto">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-teal-900/40 pb-4 flex-shrink-0">
+          <div>
+            <h1 class="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
+              <i data-feather="database" class="text-teal-400"></i> Database Segment (Google Spreadsheet)
+            </h1>
+            <p class="text-xs text-slate-400 mt-1">Sinkronisasi data master segmen jaringan fiber optik langsung dari Google Spreadsheet.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="window.syncGoogleSheetCsv(true)" class="bg-teal-600/20 hover:bg-teal-600/30 text-teal-300 border border-teal-500/30 px-3.5 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2 transition shadow-md">
+              <i data-feather="refresh-cw" class="w-4 h-4 text-teal-400"></i> Sync Spreadsheet
+            </button>
+            <button onclick="window.exportDatabaseExcel()" class="bg-teal-600/20 hover:bg-teal-600/30 text-teal-300 border border-teal-500/30 px-3.5 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2 transition shadow-md">
+              <i data-feather="download" class="w-4 h-4 text-teal-400"></i> Export Excel
+            </button>
+          </div>
+        </div>
+
+        <div class="glass-card p-3 rounded-2xl flex flex-col md:flex-row gap-4 items-center justify-between flex-shrink-0">
+          <div class="relative w-full md:w-80">
+            <i data-feather="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"></i>
+            <input type="text" id="db-search" oninput="window.debouncedRenderDatabaseSegment()" placeholder="Cari Area, Site NE/FE..." class="bg-slate-900/90 border border-slate-700/80 text-xs text-white rounded-xl pl-9 pr-3 py-2 w-full focus:outline-none focus:border-teal-500">
+          </div>
+          <div id="db-status-badge" class="text-xs text-teal-400 font-mono flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-teal-400 animate-ping"></span> Total Master Segment: <span id="db-total-count" class="text-white font-bold">0</span>
+          </div>
+        </div>
+
+        <div class="glass-card rounded-2xl overflow-hidden shadow-xl flex-1 flex flex-col min-h-0">
+          <div class="flex-1 overflow-auto">
+            <table class="w-full text-left text-xs text-slate-300 whitespace-nowrap">
+              <thead class="bg-slate-900/90 text-slate-400 uppercase font-semibold text-[10px] tracking-wider border-b border-slate-800 sticky top-0 z-10">
+                <tr>
+                  <th class="p-3">No.</th>
+                  <th class="p-3">Area</th>
+                  <th class="p-3">ID Site NE</th>
+                  <th class="p-3">Site Name NE</th>
+                  <th class="p-3">Site Owner NE</th>
+                  <th class="p-3 text-teal-300">Koordinat NE</th>
+                  <th class="p-3">ID Site FE</th>
+                  <th class="p-3">Site Name FE</th>
+                  <th class="p-3">Site Owner FE</th>
+                  <th class="p-3 text-cyan-300">Koordinat FE</th>
+                  <th class="p-3">Panjang (Km)</th>
+                </tr>
+              </thead>
+              <tbody id="db-segment-tbody" class="divide-y divide-slate-800/60"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
     </main>
   </div>
 
-  <!-- MODAL 1: Input Raw Broadcast Ticket -->
   <div id="modal-input" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
     <div class="glass-card rounded-3xl w-full max-w-xl p-6 shadow-2xl border border-teal-500/30">
       <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-800">
@@ -425,7 +408,6 @@
     </div>
   </div>
 
-  <!-- MODAL 2: Update Progress, RCA, Stop Clock & Evidence Upload -->
   <div id="modal-progress" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center p-4 z-50 overflow-y-auto">
     <div class="glass-card rounded-3xl w-full max-w-2xl p-6 shadow-2xl border border-teal-500/30 my-8">
       <div class="flex justify-between items-center mb-5 border-b border-slate-800 pb-3">
@@ -544,7 +526,7 @@
 
         <div class="glass-card-sm p-4 rounded-2xl space-y-3">
           <span class="font-semibold text-teal-400 block text-[11px] flex items-center gap-1.5">
-            <i data-feather="camera" class="w-3.5 h-3.5"></i> Evidence Foto FO Cut & GPS Coordinates
+            <i data-feather="camera" class="w-3.5 h-3.5"></i> Evidence Foto FO Cut & Koordinat
           </span>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-3 items-center">
@@ -554,8 +536,8 @@
             </div>
 
             <div>
-              <label class="block text-[10px] text-slate-400 mb-1">Koordinat GPS Hasil Foto / Manual</label>
-              <input type="text" id="evidence-gps" placeholder="-6.8912, 107.6102" class="w-full bg-slate-900 border border-slate-700/80 text-white rounded-lg p-2 font-mono text-xs focus:outline-none focus:border-teal-500">
+              <label class="block text-[10px] text-slate-400 mb-1">Koordinat (lat,long)</label>
+              <input type="text" id="evidence-gps" placeholder="-6.2454487,106.9004475" class="w-full bg-slate-900 border border-slate-700/80 text-white rounded-lg p-2 font-mono text-xs focus:outline-none focus:border-teal-500">
             </div>
           </div>
 
@@ -576,7 +558,6 @@
     </div>
   </div>
 
-  <!-- MODAL 3: View & Copy Timely Report with Evidence Photo -->
   <div id="modal-timely-report" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
     <div class="glass-card rounded-3xl w-full max-w-2xl p-6 shadow-2xl border border-teal-500/30">
       <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-800">
@@ -610,10 +591,38 @@
     </div>
   </div>
 
+  <div id="modal-ingest-email" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
+    <div class="glass-card rounded-3xl w-full max-w-xl p-6 shadow-2xl border border-teal-500/30">
+      <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-800">
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          <i data-feather="mail" class="text-teal-400 w-5 h-5"></i> Ingest & Filter Raw Email
+        </h3>
+        <button onclick="window.closeIngestEmailModal()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition"><i data-feather="x" class="w-5 h-5"></i></button>
+      </div>
+      <p class="text-xs text-slate-400 mb-3">Tempelkan teks email mentah. Hanya e-mail dengan subject berinisiasi <span class="text-teal-300 font-mono">[TR@OWS] (New) Create TR</span> yang akan dimasukkan ke Inbox.</p>
+      
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Sender Email</label>
+          <input type="text" id="ingest-email-sender" value="TR-SDMT@xlsmart.co.id" class="w-full bg-slate-900/90 border border-slate-700/80 text-xs text-white rounded-xl p-3 focus:outline-none focus:border-teal-500 font-mono">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Raw Email Content / Paste Here</label>
+          <textarea id="ingest-email-raw" rows="6" placeholder="[TR@OWS] (New) Create TR [TR-20260915-00000712] ... Dear PT. ULTRA MANDIRI TELEKOMUNIKASI..." class="w-full bg-slate-900/90 border border-slate-700/80 text-xs text-slate-200 rounded-xl p-3 focus:outline-none focus:border-teal-500 font-mono"></textarea>
+        </div>
+      </div>
+      
+      <div class="mt-5 flex justify-end gap-2.5">
+        <button onclick="window.closeIngestEmailModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-medium transition">Batal</button>
+        <button onclick="window.processIngestEmail()" class="px-4 py-2 bg-teal-600 hover:bg-teal-500 text-white font-medium rounded-xl text-xs transition shadow-lg shadow-teal-600/25">Validasi & Masukkan ke Inbox</button>
+      </div>
+    </div>
+  </div>
+
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getDatabase, ref, push, set, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, push, set, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAhFyv1rbboT9Ji0rhmqa5dFQtPuJL-b14",
@@ -636,9 +645,68 @@
     window.firebasePush = push;
     window.firebaseSet = set;
     window.firebaseUpdate = update;
-    window.firebaseRemove = remove;
 
     window.ticketList = [];
+    
+    // Multiple realistic inbox items with STRICT FILTER: Only emails starting/containing "[TR@OWS] (New) Create TR"
+    window.emailInboxList = [
+      {
+        id: 'email_default_1',
+        sender: 'TR-SDMT@xlsmart.co.id',
+        subject: '[TR@OWS] (New) Create TR [TR-20260915-00000712] - UMT-Leased Fiber-260913359 : Fiber Cut CSR ## IP Link From_SF-ZJKT2_6660-Kp Pasar Sore Kelor...',
+        body: `Dear PT. ULTRA MANDIRI TELEKOMUNIKASI,
+We inform to you that there is a new request of Trouble Report, details are below. If exists, please find attachment.
+
+Title                  : Fiber Cut CSR ## IP Link From_SF-ZJKT2_6660-Kp Pasar Sore Kelor_MA-BTTGR8575-01H 3472336G_3G_LAKSANA_PAKUHAJI_MA-JK3472336G-01H via UMT CID:undefined
+Ticket No.             : TR-20260915-00000712
+ERN                    : UMT-Leased Fiber-260913359
+Site ID / Name         : ZJKT2_6660 / SF_NR_EX_KP. PASAR SORE KELOR [FDD4TR-3 TAG-2]_SUPERHREV_COLLECTOR_SBBD
+Severity / Priority    : Major
+Product Type           : Leased Fiber
+Product Group          : Trans Access
+Category               : Access
+CID                    : undefined
+Span ID                : N/A
+Ring ID                : N/A
+Report By              : FMT
+Requestor Email        : muh.ibnu.azhari@h-partners.com
+Requestor Phone        : 6287891052463
+RTS                    : PS - Edi Setia Gunawan
+RTS Phone              : 087771617162
+ROH                    : Rais Aripin
+ROH Phone              : 0818283612
+RSL Result             : --------------------------------------------------
+MA-BTTGR8575-01H (SF-ZJKT2_6660-Kp Pasar Sore Kelor)`,
+        receivedDateTime: '2026-09-15 15:01:00'
+      },
+      {
+        id: 'email_default_2',
+        sender: 'TR-SDMT@xlsmart.co.id',
+        subject: '[TR@OWS] (New) Create TR [TR-20260915-00000845] - UMT-Leased Fiber-260914102 : Fiber Cut ## IP Link From_CILEGON_LINK_02...',
+        body: `Dear PT. ULTRA MANDIRI TELEKOMUNIKASI,
+We inform to you that there is a new request of Trouble Report, details are below. If exists, please find attachment.
+
+Title                  : Fiber Cut ## IP Link From_CILEGON_LINK_02_BOJONEGARA
+Ticket No.             : TR-20260915-00000845
+ERN                    : UMT-Leased Fiber-260914102
+Site ID / Name         : CLG_0120 / BOJONEGARA INDUSTRIAL PARK
+Severity / Priority    : Critical
+Product Type           : Leased Fiber
+Product Group          : Trans Access
+Category               : Access
+Report By              : NOC
+Requestor Email        : helpdesk.cilegon@xlsmart.co.id
+Requestor Phone        : 6281299887766
+RTS                    : PS - Ahmad Fauzi
+RTS Phone              : 081234567890
+ROH                    : Budi Santoso
+ROH Phone              : 081987654321
+RSL Result             : --------------------------------------------------
+CLG_0120 (BOJONEGARA INDUSTRIAL PARK)`,
+        receivedDateTime: '2026-09-15 16:20:10'
+      }
+    ];
+
     window.segmentList = [];
 
     window.handleLogin = function(e) {
@@ -670,53 +738,95 @@
       update(itemRef, updatedFields);
     };
 
-    // Automatic silent background sync with your exact GitHub CSV link and foolproof fallback dataset
-    window.syncGitHubCsv = async function() {
-      const url = 'https://raw.githubusercontent.com/danurwendo-creator/database-FO/main/Database%20FO.csv';
-      try {
-        const response = await fetch(url);
-        if (response.ok) {
-          const csvText = await response.text();
-          const workbook = XLSX.read(csvText, { type: 'string' });
+    function cleanAndFormatCoordExact(latRaw, lonRaw) {
+      function cleanVal(v) {
+        if (v === undefined || v === null) return null;
+        let s = String(v).trim().replace(/^["']|["']$/g, '').trim();
+        if (!s || s === '-' || s === 'undefined' || s === 'null') return null;
+        s = s.replace(/,/g, '.');
+        let parsed = parseFloat(s);
+        if (isNaN(parsed)) return null;
+        return s;
+      }
+
+      let latStr = cleanVal(latRaw);
+      let lonStr = cleanVal(lonRaw);
+
+      if (latStr !== null && lonStr !== null) {
+        let displayStr = `${latStr}, ${lonStr}`;
+        let mapUrl = `https://www.google.com/maps/search/?api=1&query=${latStr},${lonStr}`;
+        return { display: displayStr, url: mapUrl, lat: parseFloat(latStr), lon: parseFloat(lonStr) };
+      }
+      return { display: '-', url: '#', lat: null, lon: null };
+    }
+
+    window.parseCoordObj = cleanAndFormatCoordExact;
+
+    window.syncGoogleSheetCsv = async function(force = false) {
+      const statusEl = document.getElementById('db-status-badge');
+      if (statusEl) statusEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span> Mengunduh dan memproses data dari Google Spreadsheet...`;
+
+      const rawUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS80V5Lijol1MsoDq0P75g44YEkhcedXXxcfXfJDRr2OWlT3GcaFvSMo4yrVHRXQA/pub?output=csv';
+      const proxies = [
+        `https://api.allorigins.win/raw?url=${encodeURIComponent(rawUrl)}`,
+        `https://corsproxy.io/?${encodeURIComponent(rawUrl)}`,
+        `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(rawUrl)}`
+      ];
+
+      let csvText = null;
+      for (let pUrl of proxies) {
+        try {
+          const res = await fetch(pUrl);
+          if (res.ok) {
+            csvText = await res.text();
+            if (csvText && csvText.length > 50) break;
+          }
+        } catch(e) {
+          console.warn("Proxy attempt failed:", pUrl);
+        }
+      }
+
+      if (csvText) {
+        try {
+          const workbook = XLSX.read(csvText, { type: 'string', raw: true });
           const firstSheetName = workbook.SheetNames[0];
           const worksheet = workbook.Sheets[firstSheetName];
-          const json = XLSX.utils.sheet_to_json(worksheet);
+          const json = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
 
           if (json && json.length > 0) {
-            window.segmentList = json.map((row, idx) => ({
-              firebaseKey: `seg_${idx}`,
-              witel: row["witel"] || row["Witel"] || row["WITEL"] || '-',
-              mitra: row["Mitra"] || row["mitra"] || row["MITRA"] || '-',
-              site_ne: row["site_ne"] || row["Site NE"] || row["SITE_NE"] || '-',
-              site_name_ne: row["site_name_ne"] || row["Site Name NE"] || row["SITE_NAME_NE"] || '-',
-              site_owner_ne: row["site_owner_ne"] || row["Site Owner NE"] || '-',
-              longlat_ne: row["Long-Lat NE"] || row["longlat_ne"] || `${row["site_long_ne"] || ''}, ${row["site_lat_ne"] || ''}`,
-              site_fe: row["site_fe"] || row["Site FE"] || row["SITE_FE"] || '-',
-              site_name_fe: row["site_name_fe"] || row["Site Name FE"] || row["SITE_NAME_FE"] || '-',
-              site_owner_fe: row["site_owner_fe"] || row["Site Owner FE"] || '-',
-              longlat_fe: row["Long-Lat FE"] || row["longlat_fe"] || `${row["site_long_fe"] || ''}, ${row["site_lat_fe"] || ''}`,
-              panjang: row["Panjang Referensi"] || row["panjang"] || row["panjang_referensi"] || row["PANJANG"] || '0'
-            }));
-            window.renderDatabaseSegment();
+            window.segmentList = json.map((row, idx) => {
+              return {
+                firebaseKey: `seg_${idx}`,
+                no: row["no"] || row["No"] || row["NO"] || (idx + 1),
+                witel: row["witel"] || row["Witel"] || row["WITEL"] || row["Area"] || row["area"] || '-',
+                site_ne: row["site_ne"] || row["Site NE"] || row["SITE_NE"] || row["ID Site NE"] || '-',
+                site_name_ne: row["site_name_ne"] || row["Site Name NE"] || row["SITE_NAME_NE"] || '-',
+                site_owner_ne: row["site_owner_ne"] || row["Site Owner NE"] || row["SITE_OWNER_NE"] || '-',
+                lat_ne: row["site_lat_ne"] || row["Site Lat NE"] || '',
+                lon_ne: row["site_long_ne"] || row["Site Long NE"] || '',
+                site_fe: row["site_fe"] || row["Site FE"] || row["SITE_FE"] || row["ID Site FE"] || '-',
+                site_name_fe: row["site_name_fe"] || row["Site Name FE"] || row["SITE_NAME_FE"] || '-',
+                site_owner_fe: row["site_owner_fe"] || row["Site Owner FE"] || row["SITE_OWNER_FE"] || '-',
+                lat_fe: row["site_lat_fe"] || row["Site Lat FE"] || '',
+                lon_fe: row["site_long_fe"] || row["Site Long FE"] || '',
+                panjang: row["Panjang Referensi"] || row["panjang"] || row["Panjang (Km)"] || '0'
+              };
+            });
+
+            if (statusEl) statusEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-teal-400"></span> Total Master Segment: <span id="db-total-count" class="text-white font-bold">${window.segmentList.length}</span>`;
+            if (typeof window.renderDatabaseSegment === 'function') window.renderDatabaseSegment();
             return;
           }
+        } catch (err) {
+          console.error("Parse error:", err);
         }
-      } catch (err) {
-        console.info("GitHub background sync info:", err);
       }
 
-      // Fallback: Ensures data is always fully populated even if private repository or CORS blocks direct raw fetching
-      if (!window.segmentList || window.segmentList.length === 0) {
-        window.segmentList = [
-          { firebaseKey: "s1", witel: "Banten", mitra: "Infrako", site_ne: "STE-001", site_name_ne: "Serang Central", site_owner_ne: "Mitratel", longlat_ne: "106.1502, -6.1152", site_fe: "STE-002", site_name_fe: "Cilegon Industrial", site_owner_fe: "Mitratel", longlat_fe: "106.0150, -6.0173", panjang: "12.4" },
-          { firebaseKey: "s2", witel: "Tangerang", mitra: "Telkom Akses", site_ne: "TGR-010", site_name_ne: "Batuceper Hub", site_owner_ne: "Mitratel", longlat_ne: "106.6621, -6.1601", site_fe: "TGR-014", site_name_fe: "Cikokol Main", site_owner_fe: "Mitratel", longlat_fe: "106.6340, -6.1920", panjang: "8.7" },
-          { firebaseKey: "s3", witel: "Jakarta Southern", mitra: "Infrako", site_ne: "JKT-S01", site_name_ne: "Pondok Indah Tower", site_owner_ne: "Mitratel", longlat_ne: "106.7842, -6.2651", site_fe: "JKT-S05", site_name_fe: "Cilandak Hub", site_owner_fe: "Mitratel", longlat_fe: "106.8012, -6.2910", panjang: "6.1" },
-          { firebaseKey: "s4", witel: "Jakarta Northern", mitra: "Infrako", site_ne: "JKT-N02", site_name_ne: "Tanjung Priok Node", site_owner_ne: "Mitratel", longlat_ne: "106.8821, -6.1150", site_fe: "JKT-N08", site_name_fe: "Kelapa Gading Main", site_owner_fe: "Mitratel", longlat_fe: "106.9015, -6.1580", panjang: "9.8" },
-          { firebaseKey: "s5", witel: "Bogor - Depok", mitra: "Telkom Akses", site_ne: "BGR-004", site_name_ne: "Cibinong Center", site_owner_ne: "Mitratel", longlat_ne: "106.8320, -6.4810", site_fe: "DPK-001", site_name_fe: "Margonda Link", site_owner_fe: "Mitratel", longlat_fe: "106.8310, -6.3720", panjang: "11.7" },
-          { firebaseKey: "s6", witel: "Bekasi", mitra: "Infrako", site_ne: "BKS-003", site_name_ne: "Summarecon Bekasi", site_owner_ne: "Mitratel", longlat_ne: "106.9980, -6.2250", site_fe: "BKS-009", site_name_fe: "Cikarang East", site_owner_fe: "Mitratel", longlat_fe: "107.1510, -6.3020", panjang: "18.3" }
-        ];
-      }
-      window.renderDatabaseSegment();
+      window.segmentList = [
+        { firebaseKey: "s1", no: "1", witel: "Pekanbaru", site_ne: "SUM-RI-PBR-0908", site_name_ne: "Cinta Raja KOTA PEKANBARU", site_owner_ne: "PT PROFESIONAL TELEKOMUNIKASI INDONESIA", lat_ne: "0,504027778", lon_ne: "101,5238889", site_fe: "SUM-RI-PBR-0943", site_name_fe: "TENAYAN JAYA RELOCATION", site_owner_fe: "PT PROFESIONAL TELEKOMUNIKASI INDONESIA", lat_fe: "0,485716667", lon_ne: "101,5278917", panjang: "4.779" }
+      ];
+      if (statusEl) statusEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-teal-400"></span> Total Master Segment (Fallback): <span id="db-total-count" class="text-white font-bold">${window.segmentList.length}</span>`;
+      if (typeof window.renderDatabaseSegment === 'function') window.renderDatabaseSegment();
     };
 
     onAuthStateChanged(auth, (user) => {
@@ -726,7 +836,6 @@
       if (user) {
         loginOverlay.classList.add('hidden');
         dashboardContent.classList.remove('hidden');
-        // Dinamis menampilkan email akun yang aktif login
         document.getElementById('user-display-email').innerText = user.email || 'user@mitratel.co.id';
       } else {
         loginOverlay.classList.remove('hidden');
@@ -740,12 +849,16 @@
           Object.keys(data).forEach(key => {
             window.ticketList.unshift({ firebaseKey: key, ...data[key] });
           });
+        } else {
+          window.ticketList = [];
         }
-        window.renderTable();
-        window.renderEmailTickets();
+        if (typeof window.renderTable === 'function') window.renderTable();
+      }, (error) => {
+        console.error("Firebase read error:", error);
       });
 
-      window.syncGitHubCsv();
+      window.syncGoogleSheetCsv();
+      if (typeof window.renderEmailTickets === 'function') window.renderEmailTickets();
     });
   </script>
 
@@ -753,6 +866,7 @@
     let chartStatusInstance = null;
     let chartAreaInstance = null;
     let isSidebarOpen = true;
+    let searchDebounceTimer = null;
 
     window.toggleSidebar = function() {
       const sidebar = document.getElementById('sidebar-nav');
@@ -761,13 +875,13 @@
       const textContents = sidebar.querySelectorAll('.sidebar-text-content');
 
       if (isSidebarOpen) {
-        sidebar.classList.remove('w-16');
+        sidebar.classList.remove('w-20');
         sidebar.classList.add('w-64');
         labels.forEach(el => el.classList.remove('hidden'));
         textContents.forEach(el => el.classList.remove('hidden'));
       } else {
         sidebar.classList.remove('w-64');
-        sidebar.classList.add('w-16');
+        sidebar.classList.add('w-20');
         labels.forEach(el => el.classList.add('hidden'));
         textContents.forEach(el => el.classList.add('hidden'));
       }
@@ -870,15 +984,19 @@
     };
 
     window.switchTab = function(tabId) {
+      document.getElementById('view-dashboard-noc').classList.add('hidden');
       document.getElementById('view-email-ticket').classList.add('hidden');
       document.getElementById('view-database-segment').classList.add('hidden');
-      document.getElementById('view-dashboard-noc').classList.add('hidden');
 
+      document.getElementById('nav-dashboard-noc').className = "w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium text-slate-300 hover:bg-teal-500/10 hover:text-teal-300 transition-all";
       document.getElementById('nav-email-ticket').className = "w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium text-slate-300 hover:bg-teal-500/10 hover:text-teal-300 transition-all";
       document.getElementById('nav-database-segment').className = "w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium text-slate-300 hover:bg-teal-500/10 hover:text-teal-300 transition-all";
-      document.getElementById('nav-dashboard-noc').className = "w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium text-slate-300 hover:bg-teal-500/10 hover:text-teal-300 transition-all";
 
-      if (tabId === 'email-ticket') {
+      if (tabId === 'dashboard-noc') {
+        document.getElementById('view-dashboard-noc').classList.remove('hidden');
+        document.getElementById('nav-dashboard-noc').className = "w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium bg-gradient-to-r from-teal-600/30 to-cyan-600/10 text-teal-300 border border-teal-500/30 shadow-sm transition-all";
+        window.renderTable();
+      } else if (tabId === 'email-ticket') {
         document.getElementById('view-email-ticket').classList.remove('hidden');
         document.getElementById('nav-email-ticket').className = "w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium bg-gradient-to-r from-teal-600/30 to-cyan-600/10 text-teal-300 border border-teal-500/30 shadow-sm transition-all";
         window.renderEmailTickets();
@@ -886,10 +1004,6 @@
         document.getElementById('view-database-segment').classList.remove('hidden');
         document.getElementById('nav-database-segment').className = "w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium bg-gradient-to-r from-teal-600/30 to-cyan-600/10 text-teal-300 border border-teal-500/30 shadow-sm transition-all";
         window.renderDatabaseSegment();
-      } else if (tabId === 'dashboard-noc') {
-        document.getElementById('view-dashboard-noc').classList.remove('hidden');
-        document.getElementById('nav-dashboard-noc').className = "w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium bg-gradient-to-r from-teal-600/30 to-cyan-600/10 text-teal-300 border border-teal-500/30 shadow-sm transition-all";
-        window.renderTable();
       }
       feather.replace();
     };
@@ -899,75 +1013,195 @@
       if (!tbody) return;
       tbody.innerHTML = '';
 
-      if (!window.ticketList || window.ticketList.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-8 text-slate-500">Belum ada data email trouble ticket masuk.</td></tr>`;
+      const sSender = (document.getElementById('filter-email-sender')?.value || '').toLowerCase();
+      const sSubject = (document.getElementById('filter-email-subject')?.value || '').toLowerCase();
+      const sBody = (document.getElementById('filter-email-body')?.value || '').toLowerCase();
+      const sDate = (document.getElementById('filter-email-date')?.value || '').toLowerCase();
+
+      // STRICT FILTER: Only grab emails whose subject begins/contains "[TR@OWS] (New) Create TR"
+      let list = (window.emailInboxList || []).filter(item => {
+        const subj = (item.subject || '').toUpperCase();
+        return subj.includes("[TR@OWS]") && subj.includes("CREATE TR");
+      });
+
+      let filtered = list.filter(item => {
+        return (item.sender || '').toLowerCase().includes(sSender) &&
+               (item.subject || '').toLowerCase().includes(sSubject) &&
+               (item.body || '').toLowerCase().includes(sBody) &&
+               (item.receivedDateTime || '').toLowerCase().includes(sDate);
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-8 text-slate-500">Tidak ada e-mail dengan inisiasi subject "[TR@OWS] (New) Create TR" di inbox helpdesk.</td></tr>`;
         return;
       }
 
-      window.ticketList.forEach((t, idx) => {
-        let sender = t.customer.includes('XLS') ? 'TR-SDMT@xlsmart.co.id' : 'MSH-3PP.OWS@ioh.co.id';
-        if (t.customer.includes('&')) sender = 'TR-SDMT & MSH-3PP.OWS';
+      filtered.forEach((item, idx) => {
+        const detailId = `email_detail_${item.id}`;
 
         const tr = document.createElement('tr');
         tr.className = "hover:bg-slate-800/40 transition-colors border-b border-slate-800/50";
         tr.innerHTML = `
-          <td class="p-4 text-slate-500 font-medium">${idx + 1}</td>
-          <td class="p-4 font-mono text-teal-400 text-[11px]">${sender}</td>
-          <td class="p-4 font-semibold text-white">Trouble Ticket Notification [${t.ticketNumbers}]</td>
-          <td class="p-4 max-w-xs truncate text-slate-300" title="${t.routeCase}">${t.routeCase}</td>
-          <td class="p-4 font-mono text-[11px] text-slate-400">${formatDateTimeString(t.createdAtTime)}</td>
-          <td class="p-4"><span class="px-2 py-0.5 rounded bg-teal-500/10 text-teal-300 border border-teal-500/20 text-[10px]">Valid Link</span></td>
-          <td class="p-4 font-medium text-cyan-300">Infrako / Telkom Akses</td>
+          <td class="p-3 text-center">
+            <button onclick="window.toggleEmailDetail('${item.id}')" class="w-6 h-6 rounded-full bg-teal-500/20 text-teal-400 hover:bg-teal-500 hover:text-white transition flex items-center justify-center mx-auto text-xs font-bold font-mono" id="btn_toggle_${item.id}">
+              +
+            </button>
+          </td>
+          <td class="p-3 text-slate-500 font-medium">${idx + 1}</td>
+          <td class="p-3 font-mono text-teal-400 text-[11px]">${item.sender}</td>
+          <td class="p-3 font-semibold text-white max-w-xs truncate" title="${item.subject}">${item.subject}</td>
+          <td class="p-3 max-w-sm truncate text-slate-300 font-mono text-[11px]" title="${item.body}">${item.body}</td>
+          <td class="p-3 font-mono text-[11px] text-slate-400">${item.receivedDateTime}</td>
         `;
         tbody.appendChild(tr);
+
+        // Expanded full body row
+        const detailTr = document.createElement('tr');
+        detailTr.id = detailId;
+        detailTr.className = "hidden bg-slate-900/90 border-b border-teal-500/30";
+        
+        detailTr.innerHTML = `
+          <td colspan="6" class="p-5">
+            <div class="glass-card p-5 rounded-2xl space-y-4 border border-teal-500/30">
+              <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 border-b border-slate-800 pb-3">
+                <div>
+                  <h4 class="text-xs font-bold text-teal-400 font-mono uppercase tracking-wider">SELURUH ISI E-MAIL DARI CUSTOMER (FULL BODY)</h4>
+                  <p class="text-[11px] text-slate-400 mt-0.5">Subject: <span class="text-white">${item.subject}</span></p>
+                </div>
+                <span class="text-[11px] text-slate-300 font-mono bg-slate-950 px-3 py-1 rounded-lg border border-slate-800">Received: ${item.receivedDateTime}</span>
+              </div>
+              <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 font-mono text-xs text-slate-200 whitespace-pre-wrap leading-relaxed select-all max-h-96 overflow-y-auto">
+${item.body}
+              </div>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(detailTr);
       });
+      feather.replace();
+    };
+
+    window.toggleEmailDetail = function(id) {
+      const detailRow = document.getElementById(`email_detail_${id}`);
+      const btn = document.getElementById(`btn_toggle_${id}`);
+      if (detailRow.classList.contains('hidden')) {
+        detailRow.classList.remove('hidden');
+        btn.innerText = '-';
+        btn.className = "w-6 h-6 rounded-full bg-rose-500/20 text-rose-400 hover:bg-rose-500 hover:text-white transition flex items-center justify-center mx-auto text-xs font-bold font-mono";
+      } else {
+        detailRow.classList.add('hidden');
+        btn.innerText = '+';
+        btn.className = "w-6 h-6 rounded-full bg-teal-500/20 text-teal-400 hover:bg-teal-500 hover:text-white transition flex items-center justify-center mx-auto text-xs font-bold font-mono";
+      }
+    };
+
+    window.openIngestEmailModal = function() {
+      document.getElementById('modal-ingest-email').classList.remove('hidden');
+    };
+
+    window.closeIngestEmailModal = function() {
+      document.getElementById('modal-ingest-email').classList.add('hidden');
+      document.getElementById('ingest-email-raw').value = '';
+    };
+
+    window.processIngestEmail = function() {
+      const raw = document.getElementById('ingest-email-raw').value.trim();
+      const sender = document.getElementById('ingest-email-sender').value.trim() || 'TR-SDMT@xlsmart.co.id';
+      if (!raw) return;
+
+      let cleanedSubject = raw.split('\n')[0] || 'Trouble Report Notification';
+      
+      // Strict validation: Must contain "[TR@OWS]" and "CREATE TR"
+      const upperSubj = cleanedSubject.toUpperCase();
+      if (!upperSubj.includes("[TR@OWS]") || !upperSubj.includes("CREATE TR")) {
+        alert("E-mail ditolak! Hanya e-mail dengan inisiasi subject '[TR@OWS] (New) Create TR' yang dapat dimasukkan ke Inbox.");
+        return;
+      }
+
+      let now = new Date();
+      let timeFormatted = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
+
+      const newItem = {
+        id: 'email_' + Date.now(),
+        sender: sender,
+        subject: cleanedSubject,
+        body: raw,
+        receivedDateTime: timeFormatted
+      };
+
+      window.emailInboxList.unshift(newItem);
+      window.closeIngestEmailModal();
+      window.renderEmailTickets();
+    };
+
+    window.debouncedRenderDatabaseSegment = function() {
+      clearTimeout(searchDebounceTimer);
+      searchDebounceTimer = setTimeout(() => {
+        window.renderDatabaseSegment();
+      }, 150);
     };
 
     window.renderDatabaseSegment = function() {
       const tbody = document.getElementById('db-segment-tbody');
       if (!tbody) return;
-      const search = (document.getElementById('db-search')?.value || '').toLowerCase();
+      const search = (document.getElementById('db-search')?.value || '').toLowerCase().trim();
       tbody.innerHTML = '';
 
       let list = window.segmentList || [];
-      document.getElementById('db-total-count').innerText = list.length;
+      const totalCountEl = document.getElementById('db-total-count');
+      if (totalCountEl) totalCountEl.innerText = list.length;
 
-      let filtered = list.filter(s => 
-        (s.witel || '').toLowerCase().includes(search) || 
-        (s.site_ne || '').toLowerCase().includes(search) || 
-        (s.site_name_ne || '').toLowerCase().includes(search) ||
-        (s.site_fe || '').toLowerCase().includes(search) ||
-        (s.site_name_fe || '').toLowerCase().includes(search) ||
-        (s.mitra || '').toLowerCase().includes(search)
-      );
+      let filtered = list.filter(s => {
+        if (!search) return true;
+        const area = String(s.witel || '').toLowerCase();
+        const siteNe = String(s.site_ne || '').toLowerCase();
+        const siteNameNe = String(s.site_name_ne || '').toLowerCase();
+        const siteFe = String(s.site_fe || '').toLowerCase();
+        const siteNameFe = String(s.site_name_fe || '').toLowerCase();
+        
+        return area.includes(search) || 
+               siteNe.includes(search) || 
+               siteNameNe.includes(search) ||
+               siteFe.includes(search) ||
+               siteNameFe.includes(search);
+      });
 
       if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="12" class="text-center py-8 text-slate-500">Database segment kosong.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="11" class="text-center py-8 text-slate-500">Tidak ada data segment yang cocok dengan kata kunci "${search}".</td></tr>`;
         return;
       }
 
-      filtered.forEach((s, idx) => {
-        const longlatNe = (s.longlat_ne || '').trim();
-        const longlatFe = (s.longlat_fe || '').trim();
+      let htmlContent = "";
 
-        const tr = document.createElement('tr');
-        tr.className = "hover:bg-slate-800/40 transition-colors border-b border-slate-800/50";
-        tr.innerHTML = `
-          <td class="p-3 text-slate-500 font-medium">${idx + 1}</td>
-          <td class="p-3 text-white font-medium">${s.witel || '-'}</td>
-          <td class="p-3 font-mono text-teal-300 text-[11px]">${s.site_ne || '-'}</td>
-          <td class="p-3 text-slate-200">${s.site_name_ne || '-'}</td>
-          <td class="p-3 text-slate-400 text-[11px]">${s.site_owner_ne || '-'}</td>
-          <td class="p-3 font-mono text-[11px] text-teal-400">${longlatNe || '-'}</td>
-          <td class="p-3 font-mono text-cyan-300 text-[11px]">${s.site_fe || '-'}</td>
-          <td class="p-3 text-slate-200">${s.site_name_fe || '-'}</td>
-          <td class="p-3 text-slate-400 text-[11px]">${s.site_owner_fe || '-'}</td>
-          <td class="p-3 font-mono text-[11px] text-cyan-400">${longlatFe || '-'}</td>
-          <td class="p-3 font-mono text-slate-300">${s.panjang || '-'} km</td>
-          <td class="p-3"><span class="px-2 py-0.5 rounded bg-teal-500/10 text-teal-300 border border-teal-500/20 font-bold text-[10px]">${s.mitra || '-'}</span></td>
+      filtered.forEach((s, idx) => {
+        const neCoord = window.parseCoordObj(s.lat_ne, s.lon_ne);
+        const feCoord = window.parseCoordObj(s.lat_fe, s.lon_fe);
+
+        htmlContent += `
+          <tr class="hover:bg-slate-800/40 transition-colors border-b border-slate-800/50">
+            <td class="p-3 text-slate-500 font-medium">${s.no || (idx + 1)}</td>
+            <td class="p-3 text-white font-medium">${s.witel || '-'}</td>
+            <td class="p-3 font-mono text-teal-300 text-[11px]">${s.site_ne || '-'}</td>
+            <td class="p-3 text-slate-200">${s.site_name_ne || '-'}</td>
+            <td class="p-3 text-slate-400 text-[11px]">${s.site_owner_ne || '-'}</td>
+            <td class="p-3 font-mono text-[11px]">
+              <a href="${neCoord.url}" target="_blank" class="text-teal-400 hover:text-teal-300 underline underline-offset-2 flex items-center gap-1" title="Buka di Google Maps">
+                <i data-feather="external-link" class="w-3 h-3 flex-shrink-0"></i> ${neCoord.display}
+              </a>
+            </td>
+            <td class="p-3 font-mono text-cyan-300 text-[11px]">${s.site_fe || '-'}</td>
+            <td class="p-3 text-slate-200">${s.site_name_fe || '-'}</td>
+            <td class="p-3 text-slate-400 text-[11px]">${s.site_owner_fe || '-'}</td>
+            <td class="p-3 font-mono text-[11px]">
+              <a href="${feCoord.url}" target="_blank" class="text-cyan-400 hover:text-cyan-300 underline underline-offset-2 flex items-center gap-1" title="Buka di Google Maps">
+                <i data-feather="external-link" class="w-3 h-3 flex-shrink-0"></i> ${feCoord.display}
+              </a>
+            </td>
+            <td class="p-3 font-mono text-slate-300">${s.panjang || '-'}</td>
+          </tr>
         `;
-        tbody.appendChild(tr);
       });
+      tbody.innerHTML = htmlContent;
       feather.replace();
     };
 
@@ -976,24 +1210,27 @@
         alert("Tidak ada data segment untuk diexport!");
         return;
       }
-      const excelData = window.segmentList.map((s, idx) => ({
-        "No": idx + 1,
-        "witel": s.witel || '',
-        "site_ne": s.site_ne || '',
-        "site_name_ne": s.site_name_ne || '',
-        "site_owner_ne": s.site_owner_ne || '',
-        "Long-Lat NE": s.longlat_ne || '',
-        "site_fe": s.site_fe || '',
-        "site_name_fe": s.site_name_fe || '',
-        "site_owner_fe": s.site_owner_fe || '',
-        "Long-Lat FE": s.longlat_fe || '',
-        "Panjang Referensi": s.panjang || '',
-        "Mitra": s.mitra || ''
-      }));
+      const excelData = window.segmentList.map((s, idx) => {
+        const neC = window.parseCoordObj(s.lat_ne, s.lon_ne);
+        const feC = window.parseCoordObj(s.lat_fe, s.lon_fe);
+        return {
+          "No.": s.no || (idx + 1),
+          "Area": s.witel || '',
+          "ID Site NE": s.site_ne || '',
+          "Site Name NE": s.site_name_ne || '',
+          "Site Owner NE": s.site_owner_ne || '',
+          "Koordinat NE": neC.display,
+          "ID Site FE": s.site_fe || '',
+          "Site Name FE": s.site_name_fe || '',
+          "Site Owner FE": s.site_owner_fe || '',
+          "Koordinat FE": feC.display,
+          "Panjang (Km)": s.panjang || ''
+        };
+      });
 
       const worksheet = XLSX.utils.json_to_sheet(excelData);
       const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, "Database Segment GitHub");
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Database Segment");
       XLSX.writeFile(workbook, "Mitratel_FTTT_Database_Segment.xlsx");
     };
 
@@ -1020,13 +1257,13 @@
         createdTimestamp = new Date(detectTimeStr.replace(' ', 'T')).getTime() || Date.now();
       } else if (timeMatchDownAt) {
         detectTimeStr = timeMatchDownAt[1];
-        createdTimestamp = new Date(detectTimeStr.replace(' ', 'T')).getTime() || Date.now();
+        createdTimestamp = new Date(timeMatchDownAt[1].replace(' ', 'T')).getTime() || Date.now();
       }
 
       const allTickets = [...incmMatches, ...trMatches, ...incMatches].join(', ');
       let routeCase = rawText.replace(/\[\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}\]/, '').replace(/down at \d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}/i, '').trim();
 
-      const manualClusterSelect = document.getElementById('raw-input-cluster').value;
+      const manualClusterSelect = document.getElementById('raw-input-cluster')?.value;
       const areaCluster = manualClusterSelect || detectAreaClusterAI(routeCase);
 
       const now = new Date();
@@ -1145,7 +1382,7 @@
           if (lat && lon) {
             const decLat = convertDMSToDD(lat[0], lat[1], lat[2], latRef);
             const decLon = convertDMSToDD(lon[0], lon[1], lon[2], lonRef);
-            const gpsStr = `${decLat.toFixed(6)}, ${decLon.toFixed(6)}`;
+            const gpsStr = `${decLat.toFixed(7)},${decLon.toFixed(7)}`;
             document.getElementById('evidence-gps').value = gpsStr;
             document.getElementById('evidence-gps-info').innerText = `GPS Terdeteksi: ${gpsStr}`;
           }
@@ -1233,7 +1470,7 @@
 
         let logEntry = activity || `Status diupdate ke: ${newStatus}`;
         if (rca1 !== '-' && rca2 !== '-') logEntry += `\nRCA: ${rca1} -> ${rca2}`;
-        if (gps) logEntry += `\nEvidence Koordinat FO Cut: ${gps}`;
+        if (gps) logEntry += `\nEvidence Koordinat: ${gps}`;
         if (hasEvidence) logEntry += `\n[Lampiran Foto Evidence Tersedia]`;
 
         timelyLogs.push({ time: timeStr, date: dateStr, text: logEntry });
@@ -1362,6 +1599,13 @@
       XLSX.writeFile(workbook, `Mitratel_FTTT_Trouble_Tickets_${dateToday}.xlsx`);
     };
 
+    window.debouncedRenderTable = function() {
+      clearTimeout(searchDebounceTimer);
+      searchDebounceTimer = setTimeout(() => {
+        window.renderTable();
+      }, 150);
+    };
+
     window.renderTable = function() {
       const tbody = document.getElementById('ticket-table-body');
       if (!tbody) return;
@@ -1412,21 +1656,24 @@
         return;
       }
 
-      filtered.forEach((t, index) => {
-        let custBadge = `<span class="bg-teal-500/10 text-teal-400 border border-teal-500/20 font-bold px-2.5 py-1 rounded-lg text-[10px] inline-flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-teal-400"></span>XLS</span>`;
+      const renderBatch = filtered.slice(0, 150);
+      let htmlContent = "";
+
+      renderBatch.forEach((t, index) => {
+        let custBadge = `<span class="bg-teal-500/10 text-teal-400 border border-teal-500/20 font-bold px-2 py-0.5 rounded text-[10px] inline-flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-teal-400"></span>XLS</span>`;
         if (t.customer && t.customer.includes('IOH')) {
-          custBadge = `<span class="bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 font-bold px-2.5 py-1 rounded-lg text-[10px] inline-flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>IOH</span>`;
+          custBadge = `<span class="bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 font-bold px-2 py-0.5 rounded text-[10px] inline-flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>IOH</span>`;
         }
 
-        let statusBadge = `<span class="bg-slate-700/50 text-slate-300 border border-slate-600/50 px-2.5 py-1 rounded-lg text-[10px] font-medium">${t.status}</span>`;
+        let statusBadge = `<span class="bg-slate-700/50 text-slate-300 border border-slate-600/50 px-2 py-0.5 rounded text-[10px] font-medium">${t.status}</span>`;
         if (t.status === 'Open') {
-          statusBadge = `<span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 px-2.5 py-1 rounded-lg text-[10px] font-semibold inline-flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span>Open</span>`;
+          statusBadge = `<span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 px-2 py-0.5 rounded text-[10px] font-semibold inline-flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span>Open</span>`;
         } else if (t.status === 'In Progress') {
-          statusBadge = `<span class="bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2.5 py-1 rounded-lg text-[10px] font-semibold inline-flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>In Progress</span>`;
+          statusBadge = `<span class="bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2 py-0.5 rounded text-[10px] font-semibold inline-flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>In Progress</span>`;
         } else if (t.status === 'Pending') {
-          statusBadge = `<span class="bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2.5 py-1 rounded-lg text-[10px] font-semibold inline-flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>Pending</span>`;
+          statusBadge = `<span class="bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded text-[10px] font-semibold inline-flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>Pending</span>`;
         } else if (t.status === 'Closed') {
-          statusBadge = `<span class="bg-teal-500/10 text-teal-400 border border-teal-500/20 px-2.5 py-1 rounded-lg text-[10px] font-semibold inline-flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-teal-400"></span>Closed</span>`;
+          statusBadge = `<span class="bg-teal-500/10 text-teal-400 border border-teal-500/20 px-2 py-0.5 rounded text-[10px] font-semibold inline-flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-teal-400"></span>Closed</span>`;
         }
 
         const ttr = calculateTicketTTR(t);
@@ -1440,41 +1687,40 @@
         const openTimeStr = formatDateTimeString(t.createdAtTime || t.detectTime);
         const closeTimeStr = t.closedAtFormatted || '-';
 
-        const tr = document.createElement('tr');
-        tr.className = "hover:bg-slate-800/40 transition-colors border-b border-slate-800/50";
-        tr.innerHTML = `
-          <td class="p-4 font-medium text-slate-500">${index + 1}</td>
-          <td class="p-4">${custBadge}</td>
-          <td class="p-4">
-            <span class="bg-slate-900 text-slate-300 border border-teal-500/20 px-2.5 py-1 rounded-lg font-mono text-[10px] whitespace-nowrap">${t.areaCluster}</span>
-          </td>
-          <td class="p-4 font-mono font-semibold text-white max-w-[140px] break-words">${t.ticketNumbers}</td>
-          <td class="p-4 max-w-[180px] truncate text-slate-300" title="${t.routeCase}">${t.routeCase}</td>
-          <td class="p-4 font-mono text-[11px] text-rose-400/90 whitespace-nowrap">${openTimeStr}</td>
-          <td class="p-4 font-mono text-[11px] text-teal-400/90 whitespace-nowrap">${closeTimeStr}</td>
-          <td class="p-4 max-w-[140px] truncate">
-            <p class="font-medium text-slate-200 text-[11px] truncate" title="${t.rca1}">${t.rca1}</p>
-            <p class="text-[10px] text-slate-400 truncate" title="${t.rca2}">${t.rca2}</p>
-          </td>
-          <td class="p-4 text-cyan-400 font-mono text-[11px]">${t.stopClock}</td>
-          <td class="p-4 whitespace-nowrap">
-            <span class="px-2.5 py-1 rounded-lg border font-mono font-bold text-[11px] ${ttrBadgeColor}">${ttr.formattedStr}</span>
-          </td>
-          <td class="p-4 whitespace-nowrap">${statusBadge}</td>
-          <td class="p-4 text-center whitespace-nowrap">
-            <div class="flex items-center justify-center gap-2">
-              <button onclick="window.openProgressModal('${t.firebaseKey}')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-teal-500/30 px-2.5 py-1.5 rounded-xl text-[11px] font-medium transition flex items-center gap-1.5 active:scale-95">
-                <i data-feather="edit-2" class="w-3 h-3 text-teal-400"></i> Progress
-              </button>
-              <button onclick="window.openTimelyReport('${t.firebaseKey}')" class="bg-teal-600/20 hover:bg-teal-600/30 text-teal-300 border border-teal-500/30 px-2.5 py-1.5 rounded-xl text-[11px] font-medium transition flex items-center gap-1.5 active:scale-95">
-                <i data-feather="file-text" class="w-3 h-3 text-teal-400"></i> Report
-              </button>
-            </div>
-          </td>
+        htmlContent += `
+          <tr class="hover:bg-slate-800/40 transition-colors border-b border-slate-800/50">
+            <td class="p-3 font-medium text-slate-500">${index + 1}</td>
+            <td class="p-3">${custBadge}</td>
+            <td class="p-3">
+              <span class="bg-slate-900 text-slate-300 border border-teal-500/20 px-2 py-0.5 rounded font-mono text-[10px] whitespace-nowrap">${t.areaCluster}</span>
+            </td>
+            <td class="p-3 font-mono font-semibold text-white max-w-[140px] break-words">${t.ticketNumbers}</td>
+            <td class="p-3 max-w-[180px] truncate text-slate-300" title="${t.routeCase}">${t.routeCase}</td>
+            <td class="p-3 font-mono text-[11px] text-rose-400/90 whitespace-nowrap">${openTimeStr}</td>
+            <td class="p-3 font-mono text-[11px] text-teal-400/90 whitespace-nowrap">${closeTimeStr}</td>
+            <td class="p-3 max-w-[140px] truncate">
+              <p class="font-medium text-slate-200 text-[11px] truncate" title="${t.rca1}">${t.rca1}</p>
+              <p class="text-[10px] text-slate-400 truncate" title="${t.rca2}">${t.rca2}</p>
+            </td>
+            <td class="p-3 text-cyan-400 font-mono text-[11px]">${t.stopClock}</td>
+            <td class="p-3 whitespace-nowrap">
+              <span class="px-2 py-0.5 rounded border font-mono font-bold text-[11px] ${ttrBadgeColor}">${ttr.formattedStr}</span>
+            </td>
+            <td class="p-3 whitespace-nowrap">${statusBadge}</td>
+            <td class="p-3 text-center whitespace-nowrap">
+              <div class="flex items-center justify-center gap-1.5">
+                <button onclick="window.openProgressModal('${t.firebaseKey}')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-teal-500/30 px-2 py-1 rounded-lg text-[10px] font-medium transition flex items-center gap-1 active:scale-95">
+                  <i data-feather="edit-2" class="w-3 h-3 text-teal-400"></i> Progress
+                </button>
+                <button onclick="window.openTimelyReport('${t.firebaseKey}')" class="bg-teal-600/20 hover:bg-teal-600/30 text-teal-300 border border-teal-500/30 px-2 py-1 rounded-lg text-[10px] font-medium transition flex items-center gap-1 active:scale-95">
+                  <i data-feather="file-text" class="w-3 h-3 text-teal-400"></i> Report
+                </button>
+              </div>
+            </td>
+          </tr>
         `;
-        tbody.appendChild(tr);
       });
-
+      tbody.innerHTML = htmlContent;
       feather.replace();
     };
 
@@ -1500,7 +1746,7 @@
               data: [statusCounts['Open'], statusCounts['In Progress'], statusCounts['Pending'], statusCounts['Closed']],
               backgroundColor: ['#f43f5e', '#06b6d4', '#fbbf24', '#14b8a6'],
               borderColor: 'rgba(15, 23, 42, 0.8)',
-              borderWidth: 3,
+              borderWidth: 2,
               hoverOffset: 4
             }]
           },
@@ -1511,7 +1757,7 @@
             plugins: {
               legend: { 
                 position: 'right', 
-                labels: { color: '#cbd5e1', font: { size: 10, family: "'Inter', sans-serif" }, usePointStyle: true, boxWidth: 6 } 
+                labels: { color: '#cbd5e1', font: { size: 9, family: "'Inter', sans-serif" }, usePointStyle: true, boxWidth: 6 } 
               }
             }
           }
@@ -1535,9 +1781,9 @@
               backgroundColor: 'rgba(20, 184, 166, 0.7)',
               borderColor: '#14b8a6',
               borderWidth: 1,
-              borderRadius: 6,
+              borderRadius: 4,
               barThickness: 'flex',
-              maxBarThickness: 40
+              maxBarThickness: 35
             }]
           },
           options: {
@@ -1546,12 +1792,12 @@
             scales: {
               y: { 
                 beginAtZero: true, 
-                ticks: { color: '#94a3b8', stepSize: 1, font: { size: 10, family: "'Inter', sans-serif" } }, 
+                ticks: { color: '#94a3b8', stepSize: 1, font: { size: 9, family: "'Inter', sans-serif" } }, 
                 grid: { color: 'rgba(255,255,255,0.05)', borderDash: [5, 5] },
                 border: { display: false }
               },
               x: { 
-                ticks: { color: '#94a3b8', font: { size: 9, family: "'Inter', sans-serif" }, maxRotation: 45, minRotation: 0 }, 
+                ticks: { color: '#94a3b8', font: { size: 8, family: "'Inter', sans-serif" }, maxRotation: 45, minRotation: 0 }, 
                 grid: { display: false },
                 border: { display: false }
               }
