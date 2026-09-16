@@ -4,43 +4,46 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mitratel FTTT Helpdesk Monitoring & TTR Tracker</title>
+  
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Feather Icons -->
   <script src="https://unpkg.com/feather-icons"></script>
+  <!-- Exif JS for GPS extraction -->
   <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
+  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- SheetJS (xlsx) -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  
+  <!-- Google Fonts: Inter -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
   <style>
     body { font-family: 'Inter', sans-serif; overflow-x: hidden; }
     .glass-card {
-      background: rgba(15, 23, 42, 0.85);
+      background: rgba(15, 23, 42, 0.88);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(20, 184, 166, 0.15);
-      will-change: transform, opacity;
-      transform: translateZ(0);
+      border: 1px solid rgba(20, 184, 166, 0.18);
     }
     .glass-card-sm {
-      background: rgba(15, 23, 42, 0.7);
+      background: rgba(15, 23, 42, 0.75);
       backdrop-filter: blur(8px);
-      border: 1px solid rgba(20, 184, 166, 0.1);
-      will-change: transform;
-      transform: translateZ(0);
+      border: 1px solid rgba(20, 184, 166, 0.12);
     }
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
     ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
     ::-webkit-scrollbar-thumb { background: rgba(20, 184, 166, 0.4); border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: rgba(20, 184, 166, 0.7); }
     .sidebar-transition { transition: width 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
-    .smooth-scroll { scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
-    .fast-render { contain: content; }
   </style>
 </head>
 <body class="bg-gradient-to-br from-slate-950 via-teal-950/30 to-slate-950 text-slate-100 min-h-screen w-screen antialiased selection:bg-teal-500 selection:text-white overflow-x-hidden">
 
-  <div id="toast-container" class="fixed bottom-5 right-5 z-[200] space-y-2 pointer-events-none"></div>
+  <div id="toast-container" class="fixed bottom-5 right-5 z-[600] space-y-2 pointer-events-none"></div>
 
-  <div id="login-overlay" class="fixed inset-0 bg-slate-950/95 backdrop-blur-xl z-[100] flex items-center justify-center p-4">
+  <div id="login-overlay" class="fixed inset-0 bg-slate-950/95 backdrop-blur-xl z-[400] flex items-center justify-center p-4">
     <div class="glass-card rounded-3xl w-full max-w-md p-8 shadow-2xl border border-teal-500/30">
       <div class="flex flex-col items-center text-center mb-6">
         <div class="p-3.5 bg-gradient-to-tr from-teal-600 to-cyan-500 rounded-2xl shadow-lg shadow-teal-500/25 text-white mb-3">
@@ -78,7 +81,8 @@
 
   <div id="dashboard-content" class="hidden flex h-screen w-screen overflow-hidden relative">
     
-    <aside id="sidebar-nav" class="w-64 glass-card border-r border-teal-900/40 flex flex-col justify-between z-25 flex-shrink-0 sidebar-transition">
+    <!-- SIDEBAR -->
+    <aside id="sidebar-nav" class="w-64 glass-card border-r border-teal-900/40 flex flex-col justify-between z-30 flex-shrink-0 sidebar-transition">
       <div>
         <div class="p-4 border-b border-teal-900/40 flex items-center justify-between">
           <div id="sidebar-brand-content" class="flex items-center gap-3 overflow-hidden">
@@ -126,98 +130,106 @@
       </div>
     </aside>
 
-    <main class="flex-1 h-screen overflow-hidden p-4 md:p-6 flex flex-col relative bg-slate-950/60">
+    <main class="flex-1 h-screen overflow-hidden p-3 md:p-4 flex flex-col relative bg-slate-950/60">
       
-      <section id="view-dashboard-noc" class="flex-1 flex flex-col min-h-0 space-y-4 max-w-7xl w-full mx-auto overflow-y-auto pr-1">
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-teal-900/40 pb-4 flex-shrink-0">
-          <div class="flex items-center gap-3">
-            <div class="p-2.5 bg-gradient-to-tr from-teal-600 to-cyan-500 rounded-2xl shadow-lg shadow-teal-500/20 text-white">
-              <i data-feather="monitor" class="w-5 h-5"></i>
+      <section id="view-dashboard-noc" class="flex-1 flex flex-col min-h-0 space-y-2 max-w-[1920px] w-full mx-auto overflow-y-auto pr-1">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 border-b border-teal-900/40 pb-2 flex-shrink-0">
+          <div class="flex items-center gap-2.5">
+            <div class="p-2 bg-gradient-to-tr from-teal-600 to-cyan-500 rounded-xl shadow-lg shadow-teal-500/20 text-white">
+              <i data-feather="monitor" class="w-4 h-4"></i>
             </div>
             <div>
-              <h1 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+              <h1 class="text-sm md:text-base font-bold tracking-tight text-white flex items-center gap-2">
                 Mitratel FTTT Dashboard Ticket
-                <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-teal-500/10 text-teal-400 border border-teal-500/30 flex items-center gap-1">
+                <span class="text-[9px] font-semibold px-2 py-0.5 rounded-full bg-teal-500/10 text-teal-400 border border-teal-500/30 flex items-center gap-1">
                   <span class="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse"></span> Cloud Sync
                 </span>
               </h1>
-              <p class="text-xs text-slate-400">Dashboard Rekapitulasi, Real-Time TTR Tracking & Timely Report</p>
+              <p class="text-[10px] text-slate-400">Dashboard Rekapitulasi, Real-Time TTR Tracking & Timely Report</p>
             </div>
           </div>
           
-          <button onclick="window.openInputModal()" class="bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-500 text-white px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 shadow-lg shadow-teal-500/25 transition active:scale-95">
-            <i data-feather="plus-circle" class="w-4 h-4"></i> Input Raw Ticket
+          <button onclick="window.openInputModal()" class="bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-500 text-white px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow-lg shadow-teal-500/25 transition active:scale-95">
+            <i data-feather="plus-circle" class="w-3.5 h-3.5"></i> Input Raw Ticket
           </button>
         </div>
 
-        <!-- METRIK TICKETS NOC -->
-        <div class="grid grid-cols-2 md:grid-cols-5 gap-3 flex-shrink-0">
-          <div class="glass-card p-3 rounded-2xl relative overflow-hidden group">
-            <p class="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Total Ticket</p>
-            <h3 id="stat-total" class="text-2xl font-extrabold text-white mt-0.5">0</h3>
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-2 flex-shrink-0">
+          <div class="glass-card p-2 rounded-xl relative overflow-hidden">
+            <p class="text-[9px] font-medium text-slate-400 uppercase tracking-wider">Total Ticket</p>
+            <h3 id="stat-total" class="text-base font-extrabold text-white mt-0.5">0</h3>
           </div>
-          <div class="glass-card p-3 rounded-2xl relative overflow-hidden group">
+          <div class="glass-card p-2 rounded-xl relative overflow-hidden">
             <div class="absolute top-0 left-0 bottom-0 w-1 bg-gradient-to-b from-rose-500 to-red-600"></div>
-            <p class="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Ticket Open</p>
-            <h3 id="stat-open" class="text-2xl font-extrabold text-rose-400 mt-0.5">0</h3>
+            <p class="text-[9px] font-medium text-slate-400 uppercase tracking-wider">Ticket Open</p>
+            <h3 id="stat-open" class="text-base font-extrabold text-rose-400 mt-0.5">0</h3>
           </div>
-          <div class="glass-card p-3 rounded-2xl relative overflow-hidden group">
+          <div class="glass-card p-2 rounded-xl relative overflow-hidden">
             <div class="absolute top-0 left-0 bottom-0 w-1 bg-gradient-to-b from-cyan-400 to-teal-500"></div>
-            <p class="text-[10px] font-medium text-slate-400 uppercase tracking-wider">In Progress</p>
-            <h3 id="stat-progress" class="text-2xl font-extrabold text-cyan-400 mt-0.5">0</h3>
+            <p class="text-[9px] font-medium text-slate-400 uppercase tracking-wider">In Progress</p>
+            <h3 id="stat-progress" class="text-base font-extrabold text-cyan-400 mt-0.5">0</h3>
           </div>
-          <div class="glass-card p-3 rounded-2xl relative overflow-hidden group">
+          <div class="glass-card p-2 rounded-xl relative overflow-hidden">
             <div class="absolute top-0 left-0 bottom-0 w-1 bg-gradient-to-b from-amber-400 to-orange-500"></div>
-            <p class="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Pending</p>
-            <h3 id="stat-pending" class="text-2xl font-extrabold text-amber-400 mt-0.5">0</h3>
+            <p class="text-[9px] font-medium text-slate-400 uppercase tracking-wider">Pending</p>
+            <h3 id="stat-pending" class="text-base font-extrabold text-amber-400 mt-0.5">0</h3>
           </div>
-          <div class="glass-card p-3 rounded-2xl relative overflow-hidden group col-span-2 md:col-span-1">
+          <div class="glass-card p-2 rounded-xl relative overflow-hidden col-span-2 md:col-span-1">
             <div class="absolute top-0 left-0 bottom-0 w-1 bg-gradient-to-b from-teal-400 to-emerald-500"></div>
-            <p class="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Ticket Close</p>
+            <p class="text-[9px] font-medium text-slate-400 uppercase tracking-wider">Ticket Close</p>
             <div class="flex items-baseline justify-between mt-0.5">
-              <h3 id="stat-close" class="text-2xl font-extrabold text-teal-400">0</h3>
-              <span class="text-[10px] text-slate-400 font-mono bg-slate-800/80 px-1.5 py-0.5 rounded border border-teal-500/20">
+              <h3 id="stat-close" class="text-base font-extrabold text-teal-400">0</h3>
+              <span class="text-[9px] text-slate-400 font-mono bg-slate-800/80 px-1 py-0.5 rounded border border-teal-500/20">
                 MTTR: <span id="stat-mttr" class="text-teal-300 font-bold">0j 0m</span>
               </span>
             </div>
           </div>
         </div>
 
-        <!-- CHARTS SECTION -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 flex-shrink-0">
-          <div class="glass-card p-3 rounded-2xl">
-            <h4 class="text-xs font-semibold text-slate-300 mb-2 flex items-center gap-2">
-              <i data-feather="pie-chart" class="w-3.5 h-3.5 text-rose-400"></i> Proporsi Status Tiket
+        <!-- COMPACT CHARTS (BOX 1) -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-2 flex-shrink-0">
+          <div class="glass-card p-2 rounded-xl">
+            <h4 class="text-[10px] font-semibold text-slate-300 mb-1 flex items-center gap-1.5">
+              <i data-feather="pie-chart" class="w-3 h-3 text-rose-400"></i> Proporsi Status Tiket
             </h4>
-            <div class="relative h-28 w-full">
+            <div class="relative h-20 w-full">
               <canvas id="chart-status"></canvas>
             </div>
           </div>
-          <div class="glass-card p-3 rounded-2xl md:col-span-2">
-            <h4 class="text-xs font-semibold text-slate-300 mb-2 flex items-center gap-2">
-              <i data-feather="bar-chart-2" class="w-3.5 h-3.5 text-teal-400"></i> Distribusi Klaster Wilayah
+
+          <div class="glass-card p-2 rounded-xl">
+            <h4 class="text-[10px] font-semibold text-slate-300 mb-1 flex items-center gap-1.5">
+              <i data-feather="cpu" class="w-3 h-3 text-amber-400"></i> Klasifikasi RCA 1
             </h4>
-            <div class="relative h-28 w-full">
+            <div class="relative h-20 w-full">
+              <canvas id="chart-rca"></canvas>
+            </div>
+          </div>
+
+          <div class="glass-card p-2 rounded-xl">
+            <h4 class="text-[10px] font-semibold text-slate-300 mb-1 flex items-center gap-1.5">
+              <i data-feather="bar-chart-2" class="w-3 h-3 text-teal-400"></i> Distribusi Klaster Wilayah
+            </h4>
+            <div class="relative h-20 w-full">
               <canvas id="chart-area"></canvas>
             </div>
           </div>
         </div>
 
-        <!-- FILTER BAR -->
-        <div class="glass-card p-3 rounded-2xl flex flex-col md:flex-row gap-3 items-center justify-between flex-shrink-0">
+        <div class="glass-card p-2 rounded-xl flex flex-col md:flex-row gap-2 items-center justify-between flex-shrink-0">
           <div class="flex flex-wrap gap-2 items-center w-full md:w-auto">
-            <div class="relative w-full md:w-56">
+            <div class="relative w-full md:w-52">
               <i data-feather="search" class="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"></i>
-              <input type="text" id="search-input" oninput="window.debouncedRenderTable()" placeholder="Cari Ticket, Site, Link..." class="bg-slate-900/90 border border-slate-700/80 text-xs text-white rounded-xl pl-8 pr-3 py-2 w-full focus:outline-none focus:border-teal-500/80">
+              <input type="text" id="search-input" oninput="window.debouncedRenderTable()" placeholder="Cari Ticket, Site, Link..." class="bg-slate-900/90 border border-slate-700/80 text-xs text-white rounded-xl pl-8 pr-3 py-1.5 w-full focus:outline-none focus:border-teal-500/80">
             </div>
             
-            <select id="filter-customer" onchange="window.renderTable()" class="bg-slate-900/90 border border-slate-700/80 text-xs text-slate-300 rounded-xl px-2.5 py-2 focus:outline-none focus:border-teal-500/80 cursor-pointer">
+            <select id="filter-customer" onchange="window.renderTable()" class="bg-slate-900/90 border border-slate-700/80 text-xs text-slate-300 rounded-xl px-2.5 py-1.5 focus:outline-none focus:border-teal-500/80 cursor-pointer">
               <option value="">Semua Customer</option>
               <option value="XLS">XLS (XL Axiata)</option>
               <option value="IOH">IOH (Indosat)</option>
             </select>
 
-            <select id="filter-area" onchange="window.renderTable()" class="bg-slate-900/90 border border-slate-700/80 text-xs text-slate-300 rounded-xl px-2.5 py-2 focus:outline-none focus:border-teal-500/80 cursor-pointer">
+            <select id="filter-area" onchange="window.renderTable()" class="bg-slate-900/90 border border-slate-700/80 text-xs text-slate-300 rounded-xl px-2.5 py-1.5 focus:outline-none focus:border-teal-500/80 cursor-pointer">
               <option value="">Semua Klaster Wilayah</option>
               <option value="Kab. Tangerang">Kab. Tangerang</option>
               <option value="Tangerang">Tangerang</option>
@@ -234,7 +246,7 @@
               <option value="Ketapang">Ketapang</option>
             </select>
 
-            <select id="filter-status" onchange="window.renderTable()" class="bg-slate-900/90 border border-slate-700/80 text-xs text-slate-300 rounded-xl px-2.5 py-2 focus:outline-none focus:border-teal-500/80 cursor-pointer">
+            <select id="filter-status" onchange="window.renderTable()" class="bg-slate-900/90 border border-slate-700/80 text-xs text-slate-300 rounded-xl px-2.5 py-1.5 focus:outline-none focus:border-teal-500/80 cursor-pointer">
               <option value="">Semua Status</option>
               <option value="Open">Open</option>
               <option value="In Progress">In Progress</option>
@@ -243,28 +255,43 @@
             </select>
           </div>
           
-          <button onclick="window.exportToExcel()" class="bg-teal-600/20 hover:bg-teal-600/30 text-teal-300 border border-teal-500/30 px-3 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition active:scale-95 shadow-md flex-shrink-0">
+          <button onclick="window.exportToExcel()" class="bg-teal-600/20 hover:bg-teal-600/30 text-teal-300 border border-teal-500/30 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition active:scale-95 shadow-md flex-shrink-0">
             <i data-feather="download" class="w-3.5 h-3.5 text-teal-400"></i> Export Excel
           </button>
         </div>
 
-        <div class="glass-card rounded-2xl overflow-hidden shadow-2xl flex-1 flex flex-col min-h-0">
-          <div class="flex-1 overflow-auto">
-            <table class="w-full text-left text-xs text-slate-300 whitespace-nowrap">
-              <thead class="bg-slate-900/90 text-slate-400 uppercase font-semibold text-[10px] tracking-wider border-b border-slate-800 sticky top-0 z-10">
+        <!-- MAXIMIZED TABLE VIEW (BOX 2) -->
+        <div class="glass-card rounded-xl overflow-hidden shadow-2xl flex-1 flex flex-col min-h-[550px]">
+          <div class="flex-1 overflow-x-hidden overflow-y-auto">
+            <table class="w-full text-left text-[11px] text-slate-300 border-collapse table-fixed">
+              <colgroup>
+                <col style="width: 35px;">
+                <col style="width: 65px;">
+                <col style="width: 95px;">
+                <col style="width: 125px;">
+                <col style="width: auto;">
+                <col style="width: 90px;">
+                <col style="width: 90px;">
+                <col style="width: 125px;">
+                <col style="width: 75px;">
+                <col style="width: 65px;">
+                <col style="width: 85px;">
+                <col style="width: 65px;">
+              </colgroup>
+              <thead class="bg-slate-900/95 text-slate-400 uppercase font-semibold text-[10px] tracking-wider border-b border-slate-800 sticky top-0 z-10">
                 <tr>
-                  <th class="p-3">No</th>
-                  <th class="p-3">Customer</th>
-                  <th class="p-3">Klaster Wilayah</th>
-                  <th class="p-3">Nomor Tiket</th>
-                  <th class="p-3">Detail Route / Link Case</th>
-                  <th class="p-3">Ticket Open</th>
-                  <th class="p-3">Ticket Close</th>
-                  <th class="p-3">RCA 1 / RCA 2</th>
-                  <th class="p-3">Stop Clock</th>
-                  <th class="p-3">TTR Tiket</th>
-                  <th class="p-3">Status</th>
-                  <th class="p-3 text-center">Aksi</th>
+                  <th class="py-2.5 px-1.5 truncate">No</th>
+                  <th class="py-2.5 px-1.5 truncate">Customer</th>
+                  <th class="py-2.5 px-1.5 truncate">Klaster</th>
+                  <th class="py-2.5 px-1.5 truncate">Nomor Tiket</th>
+                  <th class="py-2.5 px-1.5 truncate">Detail Route / Link Case</th>
+                  <th class="py-2.5 px-1.5 truncate">Ticket Open</th>
+                  <th class="py-2.5 px-1.5 truncate">Ticket Close</th>
+                  <th class="py-2.5 px-1.5 truncate">RCA 1 / RCA 2</th>
+                  <th class="py-2.5 px-1.5 truncate">Stop Clock</th>
+                  <th class="py-2.5 px-1.5 truncate">TTR</th>
+                  <th class="py-2.5 px-1.5 truncate">Status</th>
+                  <th class="py-2.5 px-1.5 text-center truncate">Aksi</th>
                 </tr>
               </thead>
               <tbody id="ticket-table-body" class="divide-y divide-slate-800/60"></tbody>
@@ -273,15 +300,15 @@
         </div>
       </section>
 
-      <section id="view-email-ticket" class="hidden flex-1 flex flex-col min-h-0 space-y-4 max-w-7xl w-full mx-auto overflow-y-auto pr-1">
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-teal-900/40 pb-4 flex-shrink-0">
+      <section id="view-email-ticket" class="hidden flex-1 flex flex-col min-h-0 space-y-3 max-w-[1920px] w-full mx-auto overflow-y-auto pr-1">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 border-b border-teal-900/40 pb-3 flex-shrink-0">
           <div>
-            <h1 class="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
-              <i data-feather="mail" class="text-teal-400"></i> E-Mail Ticket Inbox (<span class="text-teal-300 font-mono text-lg">hdfomtel@gmail.com</span>)
+            <h1 class="text-base md:text-lg font-bold tracking-tight text-white flex items-center gap-2">
+              <i data-feather="mail" class="text-teal-400 w-4 h-4"></i> E-Mail Ticket Inbox 
             </h1>
-            <p class="text-xs text-slate-400 mt-1">Monitoring telemetri inbox email customer XLSMART & IOH terintegrasi langsung dari Zoho ke Gmail dan Firebase.</p>
+            <p class="text-[11px] text-slate-400 mt-0.5">Monitoring telemetri inbox email customer XLSMART & IOH terintegrasi langsung dari Zoho ke Gmail dan Firebase.</p>
           </div>
-          <div class="flex items-center gap-2.5">
+          <div class="flex items-center gap-2">
             <div id="email-sync-status" class="text-xs font-mono text-teal-400 bg-teal-500/10 border border-teal-500/30 px-3 py-1.5 rounded-xl flex items-center gap-2 shadow-sm">
               <span class="w-2 h-2 rounded-full bg-teal-400 animate-pulse"></span> Gmail Listener Active
             </div>
@@ -291,47 +318,45 @@
           </div>
         </div>
 
-        <!-- METRIK TELEMETRI INBOX GMAIL (3 METRIK) -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-3 flex-shrink-0">
-          <div class="glass-card p-3.5 rounded-2xl border border-teal-500/20">
+          <div class="glass-card p-3 rounded-xl border border-teal-500/20">
             <div class="flex items-center justify-between">
               <p class="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Total Mail Inbox</p>
               <i data-feather="inbox" class="w-4 h-4 text-teal-400"></i>
             </div>
-            <h3 id="stat-email-total" class="text-2xl font-extrabold text-white mt-1">67</h3>
+            <h3 id="stat-email-total" class="text-lg font-extrabold text-white mt-1"></h3>
             <p class="text-[10px] text-slate-400 mt-0.5">Akun: <span class="text-teal-300 font-mono">hdfomtel@gmail.com</span></p>
           </div>
 
-          <div class="glass-card p-3.5 rounded-2xl border border-teal-500/20">
+          <div class="glass-card p-3 rounded-xl border border-teal-500/20">
             <div class="flex items-center justify-between">
               <p class="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Email XLSMART [TR@OWS]</p>
               <span class="w-2 h-2 rounded-full bg-teal-400"></span>
             </div>
-            <h3 id="stat-email-xls" class="text-2xl font-extrabold text-teal-400 mt-1">54</h3>
+            <h3 id="stat-email-xls" class="text-lg font-extrabold text-teal-400 mt-1"></h3>
             <p class="text-[10px] text-slate-400 mt-0.5">Pengirim TR-SDMT / OWS</p>
           </div>
 
-          <div class="glass-card p-3.5 rounded-2xl border border-teal-500/20">
+          <div class="glass-card p-3 rounded-xl border border-teal-500/20">
             <div class="flex items-center justify-between">
               <p class="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Email IOH [DATACOM/INC]</p>
               <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
             </div>
-            <h3 id="stat-email-ioh" class="text-2xl font-extrabold text-cyan-400 mt-1">13</h3>
+            <h3 id="stat-email-ioh" class="text-lg font-extrabold text-cyan-400 mt-1"></h3>
             <p class="text-[10px] text-slate-400 mt-0.5">Pengirim MSH 3PP / IOH</p>
           </div>
         </div>
 
-        <!-- TABEL EMAIL INBOX FEED SESUAI GAMBAR DUA -->
-        <div class="glass-card rounded-2xl overflow-hidden shadow-xl flex-1 flex flex-col min-h-0 border border-teal-500/20">
+        <div class="glass-card rounded-xl overflow-hidden shadow-xl flex-1 flex flex-col min-h-0 border border-teal-500/20">
           <div class="p-3 bg-slate-900/80 border-b border-slate-800 flex flex-col md:flex-row justify-between items-start md:items-center gap-3 text-xs flex-shrink-0">
             <div class="flex items-center gap-2">
               <span class="w-2.5 h-2.5 rounded-full bg-teal-400 animate-pulse"></span> 
-              <span class="font-bold text-white tracking-tight">Live Email Telemetry Stream (Filtered: XLSmart & IOH New Tickets)</span>
-              <span id="email-count-badge" class="bg-teal-500/20 text-teal-300 border border-teal-500/30 px-2 py-0.5 rounded font-mono text-[10px]">67 Emails</span>
+              <span class="font-bold text-white tracking-tight">Live Email</span>
+              <span id="email-count-badge" class="bg-teal-500/20 text-teal-300 border border-teal-500/30 px-2 py-0.5 rounded font-mono text-[10px]">  Emails</span>
             </div>
             
             <div class="flex items-center gap-2 w-full md:w-auto">
-              <select id="filter-email-quick" onchange="window.renderEmailTickets()" class="bg-slate-950 border border-slate-700 text-xs text-slate-200 rounded-xl px-2.5 py-1.5 focus:outline-none focus:border-teal-500">
+              <select id="filter-email-quick" onchange="window.renderEmailTickets()" class="bg-slate-950 border border-slate-700 text-xs text-slate-200 rounded-xl px-3 py-1.5 focus:outline-none focus:border-teal-500">
                 <option value="">Semua Category (All)</option>
                 <option value="XLSMART">XLSMART [TR@OWS]</option>
                 <option value="IOH">IOH [DATACOM/INC]</option>
@@ -339,76 +364,59 @@
             </div>
           </div>
 
-          <div class="flex-1 overflow-auto">
-            <table class="w-full text-left text-xs text-slate-300 whitespace-nowrap">
+          <div class="flex-1 overflow-x-hidden overflow-y-auto">
+            <table class="w-full text-left text-xs text-slate-300 table-fixed">
+              <colgroup>
+                <col style="width: 45px;">
+                <col style="width: 55px;">
+                <col style="width: 130px;">
+                <col style="width: 250px;">
+                <col>
+                <col style="width: 140px;">
+              </colgroup>
               <thead class="bg-slate-900/95 text-slate-400 uppercase font-semibold text-[10px] tracking-wider border-b border-slate-800 sticky top-0 z-10 select-none">
                 <tr>
-                  <th class="p-3 w-10 text-center">+</th>
-                  <th class="p-3 w-12 text-center cursor-pointer hover:text-teal-300 transition-colors" onclick="window.sortEmailTickets('no')" title="Urutkan No.">
-                    <div class="flex items-center justify-center gap-1">
-                      <span>NO.</span>
-                      <span id="sort-icon-no" class="text-[9px] text-slate-500">↕</span>
-                    </div>
-                  </th>
-                  <th class="p-3 cursor-pointer hover:text-teal-300 transition-colors" onclick="window.sortEmailTickets('sender')" title="Urutkan Sender">
-                    <div class="flex items-center gap-1">
-                      <span>SENDER</span>
-                      <span id="sort-icon-sender" class="text-[9px] text-slate-500">↕</span>
-                    </div>
-                  </th>
-                  <th class="p-3 cursor-pointer hover:text-teal-300 transition-colors" onclick="window.sortEmailTickets('subject')" title="Urutkan Subject">
-                    <div class="flex items-center gap-1">
-                      <span>SUBJECT & NO. TICKET</span>
-                      <span id="sort-icon-subject" class="text-[9px] text-slate-500">↕</span>
-                    </div>
-                  </th>
-                  <th class="p-3 cursor-pointer hover:text-teal-300 transition-colors" onclick="window.sortEmailTickets('body')" title="Urutkan Body Email">
-                    <div class="flex items-center gap-1">
-                      <span>BODY E-MAIL</span>
-                      <span id="sort-icon-body" class="text-[9px] text-slate-500">↕</span>
-                    </div>
-                  </th>
-                  <th class="p-3 cursor-pointer hover:text-teal-300 transition-colors" onclick="window.sortEmailTickets('date')" title="Urutkan Waktu (Newest / Oldest)">
-                    <div class="flex items-center gap-1">
-                      <span>TIME RECEIVED</span>
-                      <span id="sort-icon-date" class="text-[9px] text-teal-400 font-bold">▼</span>
-                    </div>
-                  </th>
+                  <th class="p-2.5 text-center truncate">+</th>
+                  <th class="p-2.5 text-center cursor-pointer hover:text-teal-300 transition-colors truncate" onclick="window.sortEmailTickets('no')">NO.</th>
+                  <th class="p-2.5 cursor-pointer hover:text-teal-300 transition-colors truncate" onclick="window.sortEmailTickets('sender')">SENDER</th>
+                  <th class="p-2.5 cursor-pointer hover:text-teal-300 transition-colors truncate" onclick="window.sortEmailTickets('subject')">SUBJECT & TICKET</th>
+                  <th class="p-2.5 cursor-pointer hover:text-teal-300 transition-colors truncate" onclick="window.sortEmailTickets('body')">BODY E-MAIL (PREVIEW)</th>
+                  <th class="p-2.5 cursor-pointer hover:text-teal-300 transition-colors truncate" onclick="window.sortEmailTickets('date')">TIME RECEIVED</th>
                 </tr>
                 <tr class="bg-slate-950/90 border-b border-slate-800">
-                  <th class="p-2"></th>
-                  <th class="p-2"></th>
-                  <th class="p-2"><input type="text" id="filter-email-sender" oninput="window.debouncedRenderEmailTickets()" placeholder="Search SENDER" class="w-full bg-slate-900 border border-slate-700 text-[11px] text-white rounded px-2.5 py-1 focus:outline-none focus:border-teal-500"></th>
-                  <th class="p-2"><input type="text" id="filter-email-subject" oninput="window.debouncedRenderEmailTickets()" placeholder="Search Subject" class="w-full bg-slate-900 border border-slate-700 text-[11px] text-white rounded px-2.5 py-1 focus:outline-none focus:border-teal-500"></th>
-                  <th class="p-2"><input type="text" id="filter-email-body" oninput="window.debouncedRenderEmailTickets()" placeholder="Search Body E-Mail" class="w-full bg-slate-900 border border-slate-700 text-[11px] text-white rounded px-2.5 py-1 focus:outline-none focus:border-teal-500"></th>
-                  <th class="p-2"><input type="text" id="filter-email-date" oninput="window.debouncedRenderEmailTickets()" placeholder="Search Time" class="w-full bg-slate-900 border border-slate-700 text-[11px] text-white rounded px-2.5 py-1 focus:outline-none focus:border-teal-500"></th>
+                  <th class="p-1.5"></th>
+                  <th class="p-1.5"></th>
+                  <th class="p-1.5"><input type="text" id="filter-email-sender" oninput="window.debouncedRenderEmailTickets()" placeholder="Search SENDER" class="w-full bg-slate-900 border border-slate-700 text-[11px] text-white rounded px-2 py-1 focus:outline-none focus:border-teal-500"></th>
+                  <th class="p-1.5"><input type="text" id="filter-email-subject" oninput="window.debouncedRenderEmailTickets()" placeholder="Search Subject" class="w-full bg-slate-900 border border-slate-700 text-[11px] text-white rounded px-2 py-1 focus:outline-none focus:border-teal-500"></th>
+                  <th class="p-1.5"><input type="text" id="filter-email-body" oninput="window.debouncedRenderEmailTickets()" placeholder="Search Body" class="w-full bg-slate-900 border border-slate-700 text-[11px] text-white rounded px-2 py-1 focus:outline-none focus:border-teal-500"></th>
+                  <th class="p-1.5"><input type="text" id="filter-email-date" oninput="window.debouncedRenderEmailTickets()" placeholder="Search Time" class="w-full bg-slate-900 border border-slate-700 text-[11px] text-white rounded px-2 py-1 focus:outline-none focus:border-teal-500"></th>
                 </tr>
               </thead>
-              <tbody id="email-ticket-table-body" class="divide-y divide-slate-800/60 fast-render"></tbody>
+              <tbody id="email-ticket-table-body" class="divide-y divide-slate-800/60 text-[11px]"></tbody>
             </table>
           </div>
         </div>
       </section>
 
-      <section id="view-database-segment" class="hidden flex-1 flex flex-col min-h-0 space-y-4 max-w-7xl w-full mx-auto overflow-y-auto pr-1">
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-teal-900/40 pb-4 flex-shrink-0">
+      <section id="view-database-segment" class="hidden flex-1 flex flex-col min-h-0 space-y-3 max-w-[1920px] w-full mx-auto overflow-y-auto pr-1">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 border-b border-teal-900/40 pb-3 flex-shrink-0">
           <div>
-            <h1 class="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
-              <i data-feather="database" class="text-teal-400"></i> Database Segment (Google Spreadsheet)
+            <h1 class="text-base md:text-lg font-bold tracking-tight text-white flex items-center gap-2">
+              <i data-feather="database" class="text-teal-400 w-4 h-4"></i> Database Segment (Google Spreadsheet)
             </h1>
-            <p class="text-xs text-slate-400 mt-1">Sinkronisasi data master segmen jaringan fiber optik langsung dari Google Spreadsheet dengan pembersihan otomatis format koordinat.</p>
+            <p class="text-[11px] text-slate-400 mt-0.5">Sinkronisasi data master segmen jaringan fiber optik langsung dari Google Spreadsheet dengan pembersihan otomatis format koordinat.</p>
           </div>
           <div class="flex items-center gap-2">
-            <button onclick="window.syncGoogleSheetCsv(true)" class="bg-teal-600/20 hover:bg-teal-600/30 text-teal-300 border border-teal-500/30 px-3.5 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2 transition shadow-md">
-              <i data-feather="refresh-cw" class="w-4 h-4 text-teal-400"></i> Sync Spreadsheet
+            <button onclick="window.syncGoogleSheetCsv(true)" class="bg-teal-600/20 hover:bg-teal-600/30 text-teal-300 border border-teal-500/30 px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition shadow-md">
+              <i data-feather="refresh-cw" class="w-3.5 h-3.5 text-teal-400"></i> Sync Spreadsheet
             </button>
-            <button onclick="window.exportDatabaseExcel()" class="bg-teal-600/20 hover:bg-teal-600/30 text-teal-300 border border-teal-500/30 px-3.5 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2 transition shadow-md">
-              <i data-feather="download" class="w-4 h-4 text-teal-400"></i> Export Excel
+            <button onclick="window.exportDatabaseExcel()" class="bg-teal-600/20 hover:bg-teal-600/30 text-teal-300 border border-teal-500/30 px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition shadow-md">
+              <i data-feather="download" class="w-3.5 h-3.5 text-teal-400"></i> Export Excel
             </button>
           </div>
         </div>
 
-        <div class="glass-card p-3 rounded-2xl flex flex-col md:flex-row gap-4 items-center justify-between flex-shrink-0">
+        <div class="glass-card p-3 rounded-xl flex flex-col md:flex-row gap-3 items-center justify-between flex-shrink-0">
           <div class="relative w-full md:w-80">
             <i data-feather="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"></i>
             <input type="text" id="db-search" oninput="window.debouncedRenderDatabaseSegment()" placeholder="Cari Area, Site NE/FE..." class="bg-slate-900/90 border border-slate-700/80 text-xs text-white rounded-xl pl-9 pr-3 py-2 w-full focus:outline-none focus:border-teal-500">
@@ -418,25 +426,38 @@
           </div>
         </div>
 
-        <div class="glass-card rounded-2xl overflow-hidden shadow-xl flex-1 flex flex-col min-h-0">
-          <div class="flex-1 overflow-auto">
-            <table class="w-full text-left text-xs text-slate-300 whitespace-nowrap">
+        <div class="glass-card rounded-xl overflow-hidden shadow-xl flex-1 flex flex-col min-h-0">
+          <div class="flex-1 overflow-x-hidden overflow-y-auto">
+            <table class="w-full text-left text-xs text-slate-300 table-fixed">
+              <colgroup>
+                <col style="width: 45px;">
+                <col style="width: 100px;">
+                <col style="width: 130px;">
+                <col>
+                <col style="width: 130px;">
+                <col style="width: 130px;">
+                <col style="width: 130px;">
+                <col>
+                <col style="width: 130px;">
+                <col style="width: 120px;">
+                <col style="width: 80px;">
+              </colgroup>
               <thead class="bg-slate-900/90 text-slate-400 uppercase font-semibold text-[10px] tracking-wider border-b border-slate-800 sticky top-0 z-10">
                 <tr>
-                  <th class="p-3">No.</th>
-                  <th class="p-3">Area</th>
-                  <th class="p-3">ID Site NE</th>
-                  <th class="p-3">Site Name NE</th>
-                  <th class="p-3">Site Owner NE</th>
-                  <th class="p-3 text-teal-300">Koordinat NE</th>
-                  <th class="p-3">ID Site FE</th>
-                  <th class="p-3">Site Name FE</th>
-                  <th class="p-3">Site Owner FE</th>
-                  <th class="p-3 text-cyan-300">Koordinat FE</th>
-                  <th class="p-3">Panjang (Km)</th>
+                  <th class="p-2.5 truncate">No.</th>
+                  <th class="p-2.5 truncate">Area</th>
+                  <th class="p-2.5 truncate">ID Site NE</th>
+                  <th class="p-2.5 truncate">Site Name NE</th>
+                  <th class="p-2.5 truncate">Owner NE</th>
+                  <th class="p-2.5 text-teal-300 truncate">Koordinat NE</th>
+                  <th class="p-2.5 truncate">ID Site FE</th>
+                  <th class="p-2.5 truncate">Site Name FE</th>
+                  <th class="p-2.5 truncate">Owner FE</th>
+                  <th class="p-2.5 text-cyan-300 truncate">Koordinat FE</th>
+                  <th class="p-2.5 truncate">Panjang</th>
                 </tr>
               </thead>
-              <tbody id="db-segment-tbody" class="divide-y divide-slate-800/60"></tbody>
+              <tbody id="db-segment-tbody" class="divide-y divide-slate-800/60 text-[11px]"></tbody>
             </table>
           </div>
         </div>
@@ -445,7 +466,7 @@
     </main>
   </div>
 
-  <div id="modal-input" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
+  <div id="modal-input" class="fixed inset-0 bg-slate-950/40 backdrop-blur-sm hidden flex items-center justify-center p-4 z-[500]">
     <div class="glass-card rounded-3xl w-full max-w-xl p-6 shadow-2xl border border-teal-500/30">
       <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-800">
         <h3 class="text-base font-bold text-white flex items-center gap-2">
@@ -489,7 +510,7 @@
     </div>
   </div>
 
-  <div id="modal-progress" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center p-4 z-50 overflow-y-auto">
+  <div id="modal-progress" class="fixed inset-0 bg-slate-950/40 backdrop-blur-sm hidden flex items-center justify-center p-4 z-[500] overflow-y-auto">
     <div class="glass-card rounded-3xl w-full max-w-2xl p-6 shadow-2xl border border-teal-500/30 my-8">
       <div class="flex justify-between items-center mb-5 border-b border-slate-800 pb-3">
         <h3 class="text-base font-bold text-white flex items-center gap-2">
@@ -639,7 +660,7 @@
     </div>
   </div>
 
-  <div id="modal-timely-report" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
+  <div id="modal-timely-report" class="fixed inset-0 bg-slate-950/40 backdrop-blur-sm hidden flex items-center justify-center p-4 z-[500]">
     <div class="glass-card rounded-3xl w-full max-w-2xl p-6 shadow-2xl border border-teal-500/30">
       <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-800">
         <h3 class="text-base font-bold text-white flex items-center gap-2">
@@ -837,7 +858,6 @@
         dashboardContent.classList.add('hidden');
       }
       
-      /* Real-time listener untuk Tickets NOC Dashboard */
       onValue(ticketsRef, (snapshot) => {
         const data = snapshot.val();
         if (data && Object.keys(data).length > 0) {
@@ -853,7 +873,6 @@
         console.error("Firebase read error (tickets):", error);
       });
 
-      /* Real-time listener untuk Email Tickets dari Google Apps Script / Gmail Listener */
       onValue(emailTicketsRef, (snapshot) => {
         const data = snapshot.val();
         const syncStatusEl = document.getElementById('email-sync-status');
@@ -903,13 +922,12 @@
             };
           }).reverse();
         } else {
-          /* Fallback Sample Email Data hdfomtel@gmail.com */
           window.emailInboxList = [
             {
               id: "em_1",
               sender: "MSH 3PP",
               subject: "[FLP_3rd_UMT][Open - Major] DOWN - 23BJM005S_KAYU_TANGI_MT(17BJM002)<>23MRB023_TRANSKALIMANTAN_CM(173048) - DATACOM-INC-20260915-00027214",
-              body: "Dear Partner, Kindly need your help for troubleshooting DOWN link 23BJM005S_KAYU_TANGI_MT <> 23MRB023_TRANSKALIMANTAN_CM. Ticket INC: DATACOM-INC-20260915-00027214. Down time: [2026-09-15 20:35:00]",
+              body: "Dear Partner, Kindly need your help for troubleshooting DOWN link 23BJM005S_KAYU_TANGI_MT <> 23MRB023_TRANSKALIMANTAN_CM. Segment = 23BJM005S_KAYU_TANGI_MT(17BJM002)<>23MRB023_TRANSKALIMANTAN_CM(173048). Ticket INC: DATACOM-INC-20260915-00027214. Down time: [2026-09-15 20:35:00]",
               category: "IOH",
               receivedDateTime: "15/09/2026 20:35:00"
             },
@@ -920,30 +938,6 @@
               body: "Fiber Cut CSR ## IP Link From_Klungkung_PAG-BASRP1083-03H <TO> Keramas INCM-20260915-00029680 TR-20260915-00000376 [2026-09-15 20:34:00]",
               category: "XLSMART",
               receivedDateTime: "15/09/2026 20:34:00"
-            },
-            {
-              id: "em_3",
-              sender: "TR-SDMT",
-              subject: "[TR@OWS] (Open) MS Partner Checking Final Answer [TR-20260915-00000549] UMT-Leased Fiber-260913180 : Fiber Cut CSR ## IP Link From_LIMBUNGAN_MA-RIPBRO375-01H <TO> LIMBUNGAN PEKANBARU",
-              body: "Fiber Cut CSR ## IP Link From_LIMBUNGAN_MA-RIPBRO375-01H <TO> LIMBUNGAN PEKANBARU INCM-20260915-00029801 TR-20260915-00000549 [2026-09-15 20:33:00]",
-              category: "XLSMART",
-              receivedDateTime: "15/09/2026 20:33:00"
-            },
-            {
-              id: "em_4",
-              sender: "TR-SDMT",
-              subject: "[TR@OWS] (New) Create TR [TR-20260915-00000955] - UMT-Leased Fiber-260913602 : Fiber Cut CSR ## IP Link From_Puspitek Serpong_PAG-JK1468-04H <TO> Serpong Rumpin_MA-JKA242-01H",
-              body: "Fiber Cut CSR ## IP Link From_Puspitek Serpong_PAG-JK1468-04H <TO> Serpong Rumpin_MA-JKA242-01H INCM-20260915-00029955 TR-20260915-00000955 [2026-09-15 20:18:00]",
-              category: "XLSMART",
-              receivedDateTime: "15/09/2026 20:18:00"
-            },
-            {
-              id: "em_5",
-              sender: "tocxljabo1",
-              subject: "Fiber Cut FTTS ## Link From Sukamanah Bekasi_MA-JK4968-01H <> JAW-JB-CKR-0128_Karanganyar_Karang_Bahagia VIA UMT",
-              body: "Dear Rekan UMT Mohon dibantu case site dibawah ini: Title Fiber Cut FTTS ## Link From Sukamanah Bekasi_MA-JK4968-01H <> JAW-JB-CKR-0128_Karanganyar_Karang_Bahagia VIA UMT INCM-20260915-00029100 TR-20260915-00000850 [2026-09-15 19:07:00]",
-              category: "XLSMART",
-              receivedDateTime: "15/09/2026 19:07:00"
             }
           ];
         }
@@ -969,6 +963,7 @@
 
   <script>
     let chartStatusInstance = null;
+    let chartRcaInstance = null;
     let chartAreaInstance = null;
     let isSidebarOpen = true;
     let searchDebounceTimer = null;
@@ -1196,19 +1191,6 @@
         return 0;
       });
 
-      // Update sort icons in table headers
-      ['no', 'sender', 'subject', 'body', 'date'].forEach(col => {
-        const iconEl = document.getElementById(`sort-icon-${col}`);
-        if (!iconEl) return;
-        if (window.emailSortColumn === col) {
-          iconEl.innerText = window.emailSortDirection === 'asc' ? '▲' : '▼';
-          iconEl.className = 'text-[9px] text-teal-400 font-bold';
-        } else {
-          iconEl.innerText = '↕';
-          iconEl.className = 'text-[9px] text-slate-500 opacity-60';
-        }
-      });
-
       if (filtered.length === 0) {
         tbody.innerHTML = `<tr><td colspan="6" class="text-center py-10 text-slate-500">Tidak ada email tiket yang cocok dengan filter pencarian.</td></tr>`;
         return;
@@ -1227,37 +1209,41 @@
           formattedSubject = `<span class="text-amber-400 font-bold">[DATACOM-INC]</span> ` + formattedSubject;
         }
 
-        const safeFullText = (item.subject + " " + item.body).replace(/\\/g, "\\\\").replace(/'/g, "\\'").replace(/\n/g, "\\n").replace(/\r/g, "");
+        const shortBodyPreview = (item.body || '').length > 55 ? (item.body || '').substring(0, 55) + '...' : (item.body || '');
+        const isIoh = item.category === 'IOH' || ((item.subject || '') + ' ' + (item.body || '')).toUpperCase().includes('DATACOM');
+        const importBtnLabel = isIoh ? "Auto-Import ke Dashboard (Subject & Segment)" : "Auto-Import ke Dashboard (Subject & Title)";
+
+        const safeIndexId = String(item.id).replace(/'/g, "\\'");
 
         rowsHtml += `
           <tr class="hover:bg-slate-800/50 transition-colors border-b border-slate-800/50">
-            <td class="p-3 text-center">
-              <button onclick="window.toggleEmailDetail('${item.id}')" class="w-6 h-6 rounded-full bg-teal-500/20 text-teal-400 hover:bg-teal-500 hover:text-white transition flex items-center justify-center mx-auto text-xs font-bold font-mono" id="btn_toggle_${item.id}">
+            <td class="p-2.5 text-center">
+              <button onclick="window.toggleEmailDetail('${safeIndexId}')" class="w-5 h-5 rounded-full bg-teal-500/20 text-teal-400 hover:bg-teal-500 hover:text-white transition flex items-center justify-center mx-auto text-[11px] font-bold font-mono" id="btn_toggle_${item.id}">
                 +
               </button>
             </td>
-            <td class="p-3 text-center text-slate-500 font-medium">${idx + 1}</td>
-            <td class="p-3 font-mono text-teal-300 text-[11px] max-w-[130px] truncate" title="${item.sender}">${item.sender}</td>
-            <td class="p-3 font-medium text-white max-w-xs truncate" title="${item.subject}">${formattedSubject}</td>
-            <td class="p-3 max-w-md truncate text-slate-300 font-mono text-[11px]" title="${item.body}">${item.body}</td>
-            <td class="p-3 font-mono text-[11px] text-slate-400">${item.receivedDateTime}</td>
+            <td class="p-2.5 text-center text-slate-500 font-medium">${idx + 1}</td>
+            <td class="p-2.5 font-mono text-teal-300 truncate" title="${item.sender}">${item.sender}</td>
+            <td class="p-2.5 font-medium text-white truncate max-w-[250px]" title="${item.subject}">${formattedSubject}</td>
+            <td class="p-2.5 text-slate-400 font-mono truncate max-w-[280px]" title="${item.body}">${shortBodyPreview}</td>
+            <td class="p-2.5 font-mono text-[10px] text-slate-400 whitespace-nowrap">${item.receivedDateTime}</td>
           </tr>
           <tr id="${detailId}" class="hidden bg-slate-900/90 border-b border-teal-500/30">
-            <td colspan="6" class="p-5">
-              <div class="glass-card p-5 rounded-2xl space-y-4 border border-teal-500/30">
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 border-b border-slate-800 pb-3">
+            <td colspan="6" class="p-4">
+              <div class="glass-card p-4 rounded-xl space-y-3 border border-teal-500/30">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 border-b border-slate-800 pb-2">
                   <div>
-                    <h4 class="text-xs font-bold text-teal-400 font-mono uppercase tracking-wider">DETAIL ISI EMAIL (hdfomtel@gmail.com)</h4>
-                    <p class="text-[11px] text-slate-300 mt-0.5">Subject: <span class="text-white font-semibold">${item.subject}</span></p>
+                    <h4 class="text-[10px] font-bold text-teal-400 font-mono uppercase tracking-wider">DETAIL ISI EMAIL (hdfomtel@gmail.com)</h4>
+                    <p class="text-[11px] text-slate-300 mt-0.5 truncate max-w-xl" title="${item.subject}">Subject: <span class="text-white font-semibold">${item.subject}</span></p>
                   </div>
-                  <div class="flex items-center gap-2">
-                    <span class="text-[11px] text-slate-300 font-mono bg-slate-950 px-3 py-1 rounded-lg border border-slate-800">Received: ${item.receivedDateTime}</span>
-                    <button onclick="window.autoImportEmailToTicket('${safeFullText}')" class="bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-500 text-white px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-lg shadow-teal-500/20 transition active:scale-95">
-                      <i data-feather="zap" class="w-3.5 h-3.5 text-amber-300"></i> Auto-Import ke Dashboard
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <span class="text-[10px] text-slate-300 font-mono bg-slate-950 px-2.5 py-1 rounded-lg border border-slate-800 whitespace-nowrap">Received: ${item.receivedDateTime}</span>
+                    <button onclick="window.autoImportEmailSmart('${safeIndexId}')" class="bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-500 text-white px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 shadow-lg shadow-teal-500/20 transition active:scale-95 whitespace-nowrap">
+                      <i data-feather="zap" class="w-4 h-4 text-amber-300"></i> ${importBtnLabel}
                     </button>
                   </div>
                 </div>
-                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 font-mono text-xs text-slate-200 whitespace-pre-wrap leading-relaxed select-all max-h-96 overflow-y-auto font-normal">${item.body}</div>
+                <div class="bg-slate-950 p-3 rounded-lg border border-slate-800 font-mono text-xs text-slate-200 whitespace-pre-wrap leading-relaxed select-all max-h-72 overflow-y-auto font-normal">${item.body}</div>
               </div>
             </td>
           </tr>
@@ -1270,20 +1256,93 @@
     window.toggleEmailDetail = function(id) {
       const detailRow = document.getElementById(`email_detail_${id}`);
       const btn = document.getElementById(`btn_toggle_${id}`);
+      if (!detailRow || !btn) return;
       if (detailRow.classList.contains('hidden')) {
         detailRow.classList.remove('hidden');
         btn.innerText = '-';
-        btn.className = "w-6 h-6 rounded-full bg-rose-500/20 text-rose-400 hover:bg-rose-500 hover:text-white transition flex items-center justify-center mx-auto text-xs font-bold font-mono";
+        btn.className = "w-5 h-5 rounded-full bg-rose-500/20 text-rose-400 hover:bg-rose-500 hover:text-white transition flex items-center justify-center mx-auto text-[11px] font-bold font-mono";
       } else {
         detailRow.classList.add('hidden');
         btn.innerText = '+';
-        btn.className = "w-6 h-6 rounded-full bg-teal-500/20 text-teal-400 hover:bg-teal-500 hover:text-white transition flex items-center justify-center mx-auto text-xs font-bold font-mono";
+        btn.className = "w-5 h-5 rounded-full bg-teal-500/20 text-teal-400 hover:bg-teal-500 hover:text-white transition flex items-center justify-center mx-auto text-[11px] font-bold font-mono";
       }
     };
 
-    window.autoImportEmailToTicket = function(fullText) {
-      if (!fullText) return;
-      window.parseAndAddTicket(fullText);
+    window.autoImportEmailSmart = function(emailId) {
+      const item = (window.emailInboxList || []).find(e => String(e.id) === String(emailId));
+      if (!item) {
+        window.showToast("Data email tidak ditemukan!", "error");
+        return;
+      }
+
+      const subject = item.subject || '';
+      const body = item.body || '';
+      const fullText = subject + "\n" + body;
+      const upperCat = (item.category || '').toUpperCase();
+      const isIoh = upperCat.includes('IOH') || fullText.toUpperCase().includes('DATACOM');
+
+      let parsedPayload = "";
+
+      if (isIoh) {
+        let segmentVal = "";
+        const lines = body.split('\n');
+        for (let i = 0; i < lines.length; i++) {
+          let line = lines[i].trim();
+          if (line.startsWith('Segment =') || line.startsWith('Segment:')) {
+            segmentVal = line.replace(/^Segment\s*[:=]\s*/, '').trim();
+            if (!segmentVal && i + 1 < lines.length) {
+              segmentVal = lines[i + 1].trim();
+            }
+            break;
+          }
+          if (line.includes('<>') && (line.includes('_') || line.toUpperCase().includes('TGX') || line.toUpperCase().includes('BJM'))) {
+            segmentVal = line;
+            break;
+          }
+        }
+        if (!segmentVal) {
+          const matchSeg = body.match(/([A-Z0-9_-]+_[<>][A-Z0-9_-]+)/);
+          if (matchSeg) segmentVal = matchSeg[1];
+        }
+        parsedPayload = `${subject}\nSegment = ${segmentVal || body.substring(0, 80)}`;
+      } else {
+        // XLSmart: extract full title spanning multiple lines before "Ticket No."
+        let fullTitle = "";
+        const bodyLines = body.split('\n');
+        let capturing = false;
+        for (let l of bodyLines) {
+          let trimmed = l.trim();
+          if (trimmed.startsWith('Title :') || trimmed.startsWith('Title:')) {
+            capturing = true;
+            fullTitle += trimmed.replace(/^Title\s*[:]\s*/, '').trim() + " ";
+            continue;
+          }
+          if (capturing) {
+            if (trimmed.startsWith('Ticket No.') || trimmed.startsWith('Ticket No') || trimmed.startsWith('ERN :') || trimmed.startsWith('Site ID')) {
+              break;
+            }
+            if (trimmed === '') {
+              // check if next line terminates
+              break;
+            }
+            fullTitle += trimmed + " ";
+          }
+        }
+        fullTitle = fullTitle.replace(/\s+/g, ' ').trim();
+
+        if (!fullTitle) {
+          const matchTitle = body.match(/Title\s*[:]\s*([^\n]+(?:\n(?![A-Za-z\s]+:)[^\n]+)*)/i);
+          if (matchTitle) {
+            fullTitle = matchTitle[1].replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
+          } else {
+            fullTitle = body.substring(0, 80);
+          }
+        }
+
+        parsedPayload = `${subject}\nTitle : ${fullTitle}`;
+      }
+
+      window.parseAndAddTicket(parsedPayload);
       window.showToast("Tiket dari Email Berhasil Di-Import ke Dashboard!", "success");
     };
 
@@ -1332,25 +1391,25 @@
 
         htmlContent += `
           <tr class="hover:bg-slate-800/40 transition-colors border-b border-slate-800/50">
-            <td class="p-3 text-slate-500 font-medium">${s.no || (idx + 1)}</td>
-            <td class="p-3 text-white font-medium">${s.witel || '-'}</td>
-            <td class="p-3 font-mono text-teal-300 text-[11px]">${s.site_ne || '-'}</td>
-            <td class="p-3 text-slate-200">${s.site_name_ne || '-'}</td>
-            <td class="p-3 text-slate-400 text-[11px]">${s.site_owner_ne || '-'}</td>
-            <td class="p-3 font-mono text-[11px]">
+            <td class="p-2.5 text-slate-500 font-medium truncate">${s.no || (idx + 1)}</td>
+            <td class="p-2.5 text-white font-medium truncate" title="${s.witel || '-'}">${s.witel || '-'}</td>
+            <td class="p-2.5 font-mono text-teal-300 text-[11px] truncate" title="${s.site_ne || '-'}">${s.site_ne || '-'}</td>
+            <td class="p-2.5 text-slate-200 truncate" title="${s.site_name_ne || '-'}">${s.site_name_ne || '-'}</td>
+            <td class="p-2.5 text-slate-400 text-[11px] truncate" title="${s.site_owner_ne || '-'}">${s.site_owner_ne || '-'}</td>
+            <td class="p-2.5 font-mono text-[11px] truncate">
               <a href="${neCoord.url}" target="_blank" class="text-teal-400 hover:text-teal-300 underline underline-offset-2 flex items-center gap-1" title="Buka di Google Maps">
-                <i data-feather="external-link" class="w-3 h-3 flex-shrink-0"></i> ${neCoord.display}
+                <i data-feather="external-link" class="w-3 h-3 flex-shrink-0"></i> <span class="truncate">${neCoord.display}</span>
               </a>
             </td>
-            <td class="p-3 font-mono text-cyan-300 text-[11px]">${s.site_fe || '-'}</td>
-            <td class="p-3 text-slate-200">${s.site_name_fe || '-'}</td>
-            <td class="p-3 text-slate-400 text-[11px]">${s.site_owner_fe || '-'}</td>
-            <td class="p-3 font-mono text-[11px]">
+            <td class="p-2.5 font-mono text-cyan-300 text-[11px] truncate" title="${s.site_fe || '-'}">${s.site_fe || '-'}</td>
+            <td class="p-2.5 text-slate-200 truncate" title="${s.site_name_fe || '-'}">${s.site_name_fe || '-'}</td>
+            <td class="p-2.5 text-slate-400 text-[11px] truncate" title="${s.site_owner_fe || '-'}">${s.site_owner_fe || '-'}</td>
+            <td class="p-2.5 font-mono text-[11px] truncate">
               <a href="${feCoord.url}" target="_blank" class="text-cyan-400 hover:text-cyan-300 underline underline-offset-2 flex items-center gap-1" title="Buka di Google Maps">
-                <i data-feather="external-link" class="w-3 h-3 flex-shrink-0"></i> ${feCoord.display}
+                <i data-feather="external-link" class="w-3 h-3 flex-shrink-0"></i> <span class="truncate">${feCoord.display}</span>
               </a>
             </td>
-            <td class="p-3 font-mono text-slate-300">${s.panjang || '-'}</td>
+            <td class="p-2.5 font-mono text-slate-300 truncate" title="${s.panjang || '-'}">${s.panjang || '-'}</td>
           </tr>
         `;
       });
@@ -1813,9 +1872,9 @@
       let htmlContent = "";
 
       renderBatch.forEach((t, index) => {
-        let custBadge = `<span class="bg-teal-500/10 text-teal-400 border border-teal-500/20 font-bold px-2 py-0.5 rounded text-[10px] inline-flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-teal-400"></span>XLS</span>`;
+        let custBadge = `<span class="bg-teal-500/10 text-teal-400 border border-teal-500/20 font-bold px-1.5 py-0.5 rounded text-[9px] inline-flex items-center gap-0.5"><span class="w-1 h-1 rounded-full bg-teal-400"></span>XLS</span>`;
         if (t.customer && t.customer.includes('IOH')) {
-          custBadge = `<span class="bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 font-bold px-2 py-0.5 rounded text-[10px] inline-flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>IOH</span>`;
+          custBadge = `<span class="bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 font-bold px-1.5 py-0.5 rounded text-[9px] inline-flex items-center gap-0.5"><span class="w-1 h-1 rounded-full bg-cyan-400"></span>IOH</span>`;
         }
 
         let statusBadge = `<span class="bg-slate-700/50 text-slate-300 border border-slate-600/50 px-2 py-0.5 rounded text-[10px] font-medium">${t.status}</span>`;
@@ -1842,31 +1901,31 @@
 
         htmlContent += `
           <tr class="hover:bg-slate-800/40 transition-colors border-b border-slate-800/50">
-            <td class="p-3 font-medium text-slate-500">${index + 1}</td>
-            <td class="p-3">${custBadge}</td>
-            <td class="p-3">
-              <span class="bg-slate-900 text-slate-300 border border-teal-500/20 px-2 py-0.5 rounded font-mono text-[10px] whitespace-nowrap">${t.areaCluster}</span>
+            <td class="py-2 px-1.5 font-medium text-slate-500 truncate">${index + 1}</td>
+            <td class="py-2 px-1.5 truncate">${custBadge}</td>
+            <td class="py-2 px-1.5 truncate">
+              <span class="bg-slate-900 text-slate-200 border border-teal-500/20 px-1.5 py-0.5 rounded font-mono text-[10px] truncate block">${t.areaCluster}</span>
             </td>
-            <td class="p-3 font-mono font-semibold text-white max-w-[140px] break-words">${t.ticketNumbers}</td>
-            <td class="p-3 max-w-[180px] truncate text-slate-300" title="${t.routeCase}">${t.routeCase}</td>
-            <td class="p-3 font-mono text-[11px] text-rose-400/90 whitespace-nowrap">${openTimeStr}</td>
-            <td class="p-3 font-mono text-[11px] text-teal-400/90 whitespace-nowrap">${closeTimeStr}</td>
-            <td class="p-3 max-w-[140px] truncate">
-              <p class="font-medium text-slate-200 text-[11px] truncate" title="${t.rca1}">${t.rca1}</p>
-              <p class="text-[10px] text-slate-400 truncate" title="${t.rca2}">${t.rca2}</p>
+            <td class="py-2 px-1.5 font-mono font-semibold text-white truncate text-[11px]" title="${t.ticketNumbers}">${t.ticketNumbers}</td>
+            <td class="py-2 px-1.5 text-slate-200 truncate text-[11px]" title="${t.routeCase}">${t.routeCase}</td>
+            <td class="py-2 px-1.5 font-mono text-[9px] text-rose-400/95 truncate" title="${openTimeStr}">${openTimeStr}</td>
+            <td class="py-2 px-1.5 font-mono text-[9px] text-teal-400/95 truncate" title="${closeTimeStr}">${closeTimeStr}</td>
+            <td class="py-2 px-1.5 truncate">
+              <p class="font-medium text-slate-100 text-[10px] truncate" title="${t.rca1}">${t.rca1}</p>
+              <p class="text-[9px] text-slate-400 truncate" title="${t.rca2}">${t.rca2}</p>
             </td>
-            <td class="p-3 text-cyan-400 font-mono text-[11px]">${t.stopClock}</td>
-            <td class="p-3 whitespace-nowrap">
-              <span class="px-2 py-0.5 rounded border font-mono font-bold text-[11px] ${ttrBadgeColor}">${ttr.formattedStr}</span>
+            <td class="py-2 px-1.5 text-cyan-400 font-mono text-[9px] truncate" title="${t.stopClock}">${t.stopClock}</td>
+            <td class="py-2 px-1.5 truncate">
+              <span class="px-1.5 py-0.5 rounded border font-mono font-bold text-[9px] inline-block ${ttrBadgeColor}" title="${ttr.formattedStr}">${ttr.formattedStr}</span>
             </td>
-            <td class="p-3 whitespace-nowrap">${statusBadge}</td>
-            <td class="p-3 text-center whitespace-nowrap">
-              <div class="flex items-center justify-center gap-1.5">
-                <button onclick="window.openProgressModal('${t.firebaseKey}')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-teal-500/30 px-2 py-1 rounded-lg text-[10px] font-medium transition flex items-center gap-1 active:scale-95">
-                  <i data-feather="edit-2" class="w-3 h-3 text-teal-400"></i> Progress
+            <td class="py-2 px-1.5 truncate">${statusBadge}</td>
+            <td class="py-2 px-1.5 text-center truncate">
+              <div class="flex items-center justify-center gap-1">
+                <button onclick="window.openProgressModal('${t.firebaseKey}')" class="p-1.5 bg-slate-800 hover:bg-slate-700 text-teal-300 border border-teal-500/30 rounded-lg transition active:scale-95 shadow-sm" title="Log Progress & RCA">
+                  <i data-feather="edit-2" class="w-3.5 h-3.5 text-teal-400"></i>
                 </button>
-                <button onclick="window.openTimelyReport('${t.firebaseKey}')" class="bg-teal-600/20 hover:bg-teal-600/30 text-teal-300 border border-teal-500/30 px-2 py-1 rounded-lg text-[10px] font-medium transition flex items-center gap-1 active:scale-95">
-                  <i data-feather="file-text" class="w-3 h-3 text-teal-400"></i> Report
+                <button onclick="window.openTimelyReport('${t.firebaseKey}')" class="p-1.5 bg-teal-600/20 hover:bg-teal-600/30 text-teal-300 border border-teal-500/30 rounded-lg transition active:scale-95 shadow-sm" title="Timely Report">
+                  <i data-feather="file-text" class="w-3.5 h-3.5 text-teal-400"></i>
                 </button>
               </div>
             </td>
@@ -1879,10 +1938,15 @@
 
     function updateCharts(dataList) {
       const statusCounts = { 'Open': 0, 'In Progress': 0, 'Pending': 0, 'Closed': 0 };
+      const rcaCounts = {};
       const areaCounts = {};
       
       dataList.forEach(t => {
         if(statusCounts[t.status] !== undefined) statusCounts[t.status]++;
+        
+        let rcaKey = t.rca1 && t.rca1 !== '-' ? t.rca1 : 'Unclassified';
+        rcaCounts[rcaKey] = (rcaCounts[rcaKey] || 0) + 1;
+
         if(t.areaCluster) {
           areaCounts[t.areaCluster] = (areaCounts[t.areaCluster] || 0) + 1;
         }
@@ -1911,13 +1975,62 @@
               responsive: true,
               maintainAspectRatio: false,
               animation: { duration: 250 },
-              cutout: '65%',
+              cutout: '55%',
               plugins: {
                 legend: { 
                   position: 'right', 
-                  labels: { color: '#cbd5e1', font: { size: 9, family: "'Inter', sans-serif" }, usePointStyle: true, boxWidth: 6 } 
+                  labels: { color: '#cbd5e1', font: { size: 8, family: "'Inter', sans-serif" }, usePointStyle: true, boxWidth: 4 } 
                 }
               }
+            }
+          });
+        }
+      }
+
+      const ctxRca = document.getElementById('chart-rca')?.getContext('2d');
+      if (ctxRca) {
+        const sortedRca = Object.entries(rcaCounts).sort((a, b) => b[1] - a[1]).slice(0, 4);
+        const rcaLabels = sortedRca.map(item => item[0]);
+        const rcaData = sortedRca.map(item => item[1]);
+
+        if (chartRcaInstance) {
+          chartRcaInstance.data.labels = rcaLabels;
+          chartRcaInstance.data.datasets[0].data = rcaData;
+          chartRcaInstance.update('none');
+        } else {
+          chartRcaInstance = new Chart(ctxRca, {
+            type: 'bar',
+            data: {
+              labels: rcaLabels,
+              datasets: [{
+                label: 'Jumlah RCA',
+                data: rcaData,
+                backgroundColor: 'rgba(251, 191, 36, 0.7)',
+                borderColor: '#fbbf24',
+                borderWidth: 1,
+                borderRadius: 2,
+                barThickness: 'flex',
+                maxBarThickness: 14
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              animation: { duration: 250 },
+              scales: {
+                y: { 
+                  beginAtZero: true, 
+                  ticks: { color: '#94a3b8', stepSize: 1, font: { size: 7, family: "'Inter', sans-serif" } }, 
+                  grid: { color: 'rgba(255,255,255,0.05)', borderDash: [4, 4] },
+                  border: { display: false }
+                },
+                x: { 
+                  ticks: { color: '#94a3b8', font: { size: 6, family: "'Inter', sans-serif" }, maxRotation: 15, minRotation: 0 }, 
+                  grid: { display: false },
+                  border: { display: false }
+                }
+              },
+              plugins: { legend: { display: false } }
             }
           });
         }
@@ -1944,9 +2057,9 @@
                 backgroundColor: 'rgba(20, 184, 166, 0.7)',
                 borderColor: '#14b8a6',
                 borderWidth: 1,
-                borderRadius: 4,
+                borderRadius: 2,
                 barThickness: 'flex',
-                maxBarThickness: 35
+                maxBarThickness: 14
               }]
             },
             options: {
@@ -1956,12 +2069,12 @@
               scales: {
                 y: { 
                   beginAtZero: true, 
-                  ticks: { color: '#94a3b8', stepSize: 1, font: { size: 9, family: "'Inter', sans-serif" } }, 
-                  grid: { color: 'rgba(255,255,255,0.05)', borderDash: [5, 5] },
+                  ticks: { color: '#94a3b8', stepSize: 1, font: { size: 7, family: "'Inter', sans-serif" } }, 
+                  grid: { color: 'rgba(255,255,255,0.05)', borderDash: [4, 4] },
                   border: { display: false }
                 },
                 x: { 
-                  ticks: { color: '#94a3b8', font: { size: 8, family: "'Inter', sans-serif" }, maxRotation: 45, minRotation: 0 }, 
+                  ticks: { color: '#94a3b8', font: { size: 6, family: "'Inter', sans-serif" }, maxRotation: 20, minRotation: 0 }, 
                   grid: { display: false },
                   border: { display: false }
                 }
