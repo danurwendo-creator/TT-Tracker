@@ -22,57 +22,61 @@
   <style>
     body { font-family: 'Inter', sans-serif; overflow-x: hidden; }
     .glass-card {
-      background: rgba(15, 23, 42, 0.88);
+      background: rgba(30, 10, 15, 0.88);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(20, 184, 166, 0.18);
+      border: 1px solid rgba(239, 68, 68, 0.22);
     }
     .glass-card-sm {
-      background: rgba(15, 23, 42, 0.75);
+      background: rgba(30, 10, 15, 0.75);
       backdrop-filter: blur(8px);
-      border: 1px solid rgba(20, 184, 166, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.15);
     }
     ::-webkit-scrollbar { width: 5px; height: 5px; }
-    ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
-    ::-webkit-scrollbar-thumb { background: rgba(20, 184, 166, 0.4); border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: rgba(20, 184, 166, 0.7); }
+    ::-webkit-scrollbar-track { background: rgba(30, 10, 15, 0.6); }
+    ::-webkit-scrollbar-thumb { background: rgba(239, 68, 68, 0.4); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(239, 68, 68, 0.7); }
     .sidebar-transition { transition: width 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
   </style>
 </head>
-<body class="bg-gradient-to-br from-slate-950 via-teal-950/30 to-slate-950 text-slate-100 min-h-screen w-screen antialiased selection:bg-teal-500 selection:text-white overflow-x-hidden">
+<body class="bg-gradient-to-br from-slate-950 via-red-950/40 to-stone-950 text-slate-100 min-h-screen w-screen antialiased selection:bg-rose-500 selection:text-white overflow-x-hidden">
 
   <div id="toast-container" class="fixed bottom-5 right-5 z-[600] space-y-2 pointer-events-none"></div>
 
   <div id="login-overlay" class="fixed inset-0 bg-slate-950/95 backdrop-blur-xl z-[400] flex items-center justify-center p-4">
-    <div class="glass-card rounded-3xl w-full max-w-md p-8 shadow-2xl border border-teal-500/30">
+    <div class="glass-card rounded-3xl w-full max-w-md p-8 shadow-2xl border border-red-500/30">
       <div class="flex flex-col items-center text-center mb-6">
-        <div class="p-3.5 bg-gradient-to-tr from-teal-600 to-cyan-500 rounded-2xl shadow-lg shadow-teal-500/25 text-white mb-3">
-          <i data-feather="shield" class="w-7 h-7"></i>
+        <div class="p-3 bg-gradient-to-tr from-red-600 to-rose-500 rounded-2xl shadow-lg shadow-red-500/25 text-white mb-3 flex items-center justify-center w-16 h-16">
+          <svg class="w-10 h-10 text-white" viewBox="0 0 100 100" fill="currentColor">
+            <path d="M10 20 L50 70 L90 20 L90 35 L50 85 L10 35 Z" opacity="0.9"/>
+            <path d="M10 40 L50 90 L90 40 L90 55 L50 105 L10 55 Z" opacity="0.6"/>
+            <path d="M15 15 L50 60 L85 15 L85 30 L50 75 L15 30 Z"/>
+          </svg>
         </div>
         <h2 class="text-2xl font-bold text-white tracking-tight">Mitratel FTTT Login</h2>
-        <p class="text-xs text-slate-400 mt-1">Masukkan kredensial tim untuk mengakses dashboard monitoring.</p>
+        <p class="text-xs text-slate-300 mt-1">Masukkan kredensial tim untuk mengakses dashboard monitoring.</p>
       </div>
 
       <div id="login-error" class="hidden mb-4 p-3 bg-rose-500/10 border border-rose-500/30 rounded-xl text-rose-400 text-xs text-center font-medium"></div>
 
       <form onsubmit="window.handleLogin(event)" class="space-y-4">
         <div>
-          <label class="block text-xs font-medium text-slate-300 mb-1.5">Email Helpdesk</label>
+          <label class="block text-xs font-medium text-slate-200 mb-1.5">Email Helpdesk</label>
           <div class="relative">
-            <i data-feather="mail" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500"></i>
-            <input type="email" id="login-email" required placeholder="admin@mitratel.co.id" class="w-full bg-slate-900/90 border border-slate-700/80 text-xs text-white rounded-xl pl-10 pr-3.5 py-3 focus:outline-none focus:border-teal-500 transition-colors">
+            <i data-feather="mail" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+            <input type="email" id="login-email" required placeholder="admin@mitratel.co.id" class="w-full bg-slate-900/90 border border-slate-700/80 text-xs text-white rounded-xl pl-10 pr-3.5 py-3 focus:outline-none focus:border-red-500 transition-colors">
           </div>
         </div>
 
         <div>
-          <label class="block text-xs font-medium text-slate-300 mb-1.5">Password</label>
+          <label class="block text-xs font-medium text-slate-200 mb-1.5">Password</label>
           <div class="relative">
-            <i data-feather="key" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500"></i>
-            <input type="password" id="login-password" required placeholder="••••••••" class="w-full bg-slate-900/90 border border-slate-700/80 text-xs text-white rounded-xl pl-10 pr-3.5 py-3 focus:outline-none focus:border-teal-500 transition-colors">
+            <i data-feather="key" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+            <input type="password" id="login-password" required placeholder="••••••••" class="w-full bg-slate-900/90 border border-slate-700/80 text-xs text-white rounded-xl pl-10 pr-3.5 py-3 focus:outline-none focus:border-red-500 transition-colors">
           </div>
         </div>
 
-        <button type="submit" id="btn-login" class="w-full mt-2 bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-500 hover:to-cyan-500 text-white font-semibold py-3 rounded-xl text-xs transition shadow-lg shadow-teal-500/25 flex items-center justify-center gap-2 active:scale-95">
+        <button type="submit" id="btn-login" class="w-full mt-2 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-semibold py-3 rounded-xl text-xs transition shadow-lg shadow-red-500/25 flex items-center justify-center gap-2 active:scale-95">
           <i data-feather="log-in" class="w-4 h-4"></i> Masuk ke Dashboard
         </button>
       </form>
@@ -82,42 +86,44 @@
   <div id="dashboard-content" class="hidden flex h-screen w-screen overflow-hidden relative">
     
     <!-- SIDEBAR -->
-    <aside id="sidebar-nav" class="w-64 glass-card border-r border-teal-900/40 flex flex-col justify-between z-30 flex-shrink-0 sidebar-transition">
+    <aside id="sidebar-nav" class="w-64 glass-card border-r border-red-950/40 flex flex-col justify-between z-30 flex-shrink-0 sidebar-transition">
       <div>
-        <div class="p-4 border-b border-teal-900/40 flex items-center justify-between">
+        <div class="p-4 border-b border-red-950/40 flex items-center justify-between">
           <div id="sidebar-brand-content" class="flex items-center gap-3 overflow-hidden">
-            <div class="p-2.5 bg-gradient-to-tr from-teal-600 to-cyan-500 rounded-xl text-white shadow-lg shadow-teal-500/20 flex-shrink-0">
-              <i data-feather="activity" class="w-5 h-5"></i>
+            <div class="p-2 bg-gradient-to-tr from-red-600 to-rose-500 rounded-xl text-white shadow-lg shadow-red-500/20 flex-shrink-0 flex items-center justify-center w-10 h-10">
+              <svg class="w-6 h-6 text-white" viewBox="0 0 100 100" fill="currentColor">
+                <path d="M15 15 L50 60 L85 15 L85 30 L50 75 L15 30 Z"/>
+              </svg>
             </div>
             <div class="truncate sidebar-text-content">
               <h2 class="font-bold text-sm text-white tracking-tight truncate">Mitratel FTTT</h2>
-              <p class="text-[10px] text-teal-400 font-medium truncate">NOC Operations Center</p>
+              <p class="text-[10px] text-red-300 font-medium truncate">NOC Operations Center</p>
             </div>
           </div>
-          <button onclick="window.toggleSidebar()" class="text-teal-300 hover:text-white p-2 rounded-xl hover:bg-teal-500/20 transition flex-shrink-0" title="Collapse/Expand Sidebar">
+          <button onclick="window.toggleSidebar()" class="text-red-300 hover:text-white p-2 rounded-xl hover:bg-red-500/20 transition flex-shrink-0" title="Collapse/Expand Sidebar">
             <i data-feather="menu" class="w-4 h-4"></i>
           </button>
         </div>
 
         <nav class="p-3 space-y-1.5 text-xs">
-          <button onclick="window.switchTab('dashboard-noc')" id="nav-dashboard-noc" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium bg-gradient-to-r from-teal-600/30 to-cyan-600/10 text-teal-300 border border-teal-500/30 shadow-sm transition-all group" title="1. Dashboard Ticket">
-            <i data-feather="monitor" class="w-4 h-4 text-teal-400 flex-shrink-0"></i> 
+          <button onclick="window.switchTab('dashboard-noc')" id="nav-dashboard-noc" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium bg-gradient-to-r from-red-600/30 to-rose-600/10 text-red-200 border border-red-500/30 shadow-sm transition-all group" title="1. Dashboard Ticket">
+            <i data-feather="monitor" class="w-4 h-4 text-red-400 flex-shrink-0"></i> 
             <span class="sidebar-label truncate">1. Dashboard Ticket</span>
           </button>
 
-          <button onclick="window.switchTab('email-ticket')" id="nav-email-ticket" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium text-slate-300 hover:bg-teal-500/10 hover:text-teal-300 transition-all group" title="2. E-Mail Ticket">
-            <i data-feather="mail" class="w-4 h-4 text-teal-400 flex-shrink-0"></i> 
+          <button onclick="window.switchTab('email-ticket')" id="nav-email-ticket" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium text-slate-300 hover:bg-red-500/10 hover:text-red-300 transition-all group" title="2. E-Mail Ticket">
+            <i data-feather="mail" class="w-4 h-4 text-red-400 flex-shrink-0"></i> 
             <span class="sidebar-label truncate">2. E-Mail Ticket</span>
           </button>
           
-          <button onclick="window.switchTab('database-segment')" id="nav-database-segment" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium text-slate-300 hover:bg-teal-500/10 hover:text-teal-300 transition-all group" title="3. Database Segment">
-            <i data-feather="database" class="w-4 h-4 text-teal-400 flex-shrink-0"></i> 
+          <button onclick="window.switchTab('database-segment')" id="nav-database-segment" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium text-slate-300 hover:bg-red-500/10 hover:text-red-300 transition-all group" title="3. Database Segment">
+            <i data-feather="database" class="w-4 h-4 text-red-400 flex-shrink-0"></i> 
             <span class="sidebar-label truncate">3. Database Segment</span>
           </button>
         </nav>
       </div>
 
-      <div class="p-3 border-t border-teal-900/40">
+      <div class="p-3 border-t border-red-950/40">
         <div class="glass-card-sm p-2.5 rounded-xl flex items-center justify-between">
           <div class="overflow-hidden sidebar-text-content">
             <p class="text-[9px] text-slate-400">Logged in as</p>
@@ -130,27 +136,27 @@
       </div>
     </aside>
 
-    <main class="flex-1 h-screen overflow-hidden p-3 md:p-4 flex flex-col relative bg-slate-950/60">
+    <main class="flex-1 h-screen overflow-hidden p-3 md:p-4 flex flex-col relative bg-slate-950/40">
       
       <!-- TAB 1: DASHBOARD TICKET -->
       <section id="view-dashboard-noc" class="flex-1 flex flex-col min-h-0 space-y-2 max-w-[1920px] w-full mx-auto overflow-y-auto pr-1">
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 border-b border-teal-900/40 pb-2 flex-shrink-0">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 border-b border-rose-950/40 pb-2 flex-shrink-0">
           <div class="flex items-center gap-2.5">
-            <div class="p-2 bg-gradient-to-tr from-teal-600 to-cyan-500 rounded-xl shadow-lg shadow-teal-500/20 text-white">
+            <div class="p-2 bg-gradient-to-tr from-rose-600 to-red-500 rounded-xl shadow-lg shadow-rose-500/20 text-white">
               <i data-feather="monitor" class="w-4 h-4"></i>
             </div>
             <div>
               <h1 class="text-sm md:text-base font-bold tracking-tight text-white flex items-center gap-2">
                 Mitratel FTTT Dashboard Ticket
-                <span class="text-[9px] font-semibold px-2 py-0.5 rounded-full bg-teal-500/10 text-teal-400 border border-teal-500/30 flex items-center gap-1">
-                  <span class="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse"></span> Cloud Sync
+                <span class="text-[9px] font-semibold px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/30 flex items-center gap-1">
+                  <span class="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse"></span> Cloud Sync
                 </span>
               </h1>
               <p class="text-[10px] text-slate-400">Dashboard Rekapitulasi, Real-Time TTR Tracking & Timely Report</p>
             </div>
           </div>
           
-          <button onclick="window.openInputModal()" class="bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-500 text-white px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow-lg shadow-teal-500/25 transition active:scale-95">
+          <button onclick="window.openInputModal()" class="bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 text-white px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow-lg shadow-rose-500/25 transition active:scale-95">
             <i data-feather="plus-circle" class="w-3.5 h-3.5"></i> Input Raw Ticket
           </button>
         </div>
@@ -166,22 +172,22 @@
             <h3 id="stat-open" class="text-base font-extrabold text-rose-400 mt-0.5">0</h3>
           </div>
           <div class="glass-card p-2 rounded-xl relative overflow-hidden">
-            <div class="absolute top-0 left-0 bottom-0 w-1 bg-gradient-to-b from-cyan-400 to-teal-500"></div>
+            <div class="absolute top-0 left-0 bottom-0 w-1 bg-gradient-to-b from-amber-400 to-orange-500"></div>
             <p class="text-[9px] font-medium text-slate-400 uppercase tracking-wider">In Progress</p>
-            <h3 id="stat-progress" class="text-base font-extrabold text-cyan-400 mt-0.5">0</h3>
+            <h3 id="stat-progress" class="text-base font-extrabold text-amber-400 mt-0.5">0</h3>
           </div>
           <div class="glass-card p-2 rounded-xl relative overflow-hidden">
-            <div class="absolute top-0 left-0 bottom-0 w-1 bg-gradient-to-b from-amber-400 to-orange-500"></div>
+            <div class="absolute top-0 left-0 bottom-0 w-1 bg-gradient-to-b from-yellow-400 to-amber-600"></div>
             <p class="text-[9px] font-medium text-slate-400 uppercase tracking-wider">Pending</p>
-            <h3 id="stat-pending" class="text-base font-extrabold text-amber-400 mt-0.5">0</h3>
+            <h3 id="stat-pending" class="text-base font-extrabold text-yellow-400 mt-0.5">0</h3>
           </div>
           <div class="glass-card p-2 rounded-xl relative overflow-hidden col-span-2 md:col-span-1">
-            <div class="absolute top-0 left-0 bottom-0 w-1 bg-gradient-to-b from-teal-400 to-emerald-500"></div>
+            <div class="absolute top-0 left-0 bottom-0 w-1 bg-gradient-to-b from-emerald-400 to-green-600"></div>
             <p class="text-[9px] font-medium text-slate-400 uppercase tracking-wider">Ticket Close</p>
             <div class="flex items-baseline justify-between mt-0.5">
-              <h3 id="stat-close" class="text-base font-extrabold text-teal-400">0</h3>
-              <span class="text-[9px] text-slate-400 font-mono bg-slate-800/80 px-1 py-0.5 rounded border border-teal-500/20">
-                MTTR: <span id="stat-mttr" class="text-teal-300 font-bold">0j 0m</span>
+              <h3 id="stat-close" class="text-base font-extrabold text-emerald-400">0</h3>
+              <span class="text-[9px] text-slate-400 font-mono bg-slate-800/80 px-1 py-0.5 rounded border border-rose-500/20">
+                MTTR: <span id="stat-mttr" class="text-rose-300 font-bold">0j 0m</span>
               </span>
             </div>
           </div>
@@ -209,7 +215,7 @@
 
           <div class="glass-card p-2 rounded-xl">
             <h4 class="text-[10px] font-semibold text-slate-300 mb-1 flex items-center gap-1.5">
-              <i data-feather="bar-chart-2" class="w-3 h-3 text-teal-400"></i> Distribusi Klaster Wilayah
+              <i data-feather="bar-chart-2" class="w-3 h-3 text-rose-400"></i> Distribusi Klaster Wilayah
             </h4>
             <div class="relative h-20 w-full">
               <canvas id="chart-area"></canvas>
@@ -221,16 +227,16 @@
           <div class="flex flex-wrap gap-2 items-center w-full md:w-auto">
             <div class="relative w-full md:w-52">
               <i data-feather="search" class="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"></i>
-              <input type="text" id="search-input" oninput="window.debouncedRenderTable()" placeholder="Cari Ticket, Site, Link..." class="bg-slate-900/90 border border-slate-700/80 text-xs text-white rounded-xl pl-8 pr-3 py-1.5 w-full focus:outline-none focus:border-teal-500/80">
+              <input type="text" id="search-input" oninput="window.debouncedRenderTable()" placeholder="Cari Ticket, Site, Link..." class="bg-slate-900/90 border border-slate-700/80 text-xs text-white rounded-xl pl-8 pr-3 py-1.5 w-full focus:outline-none focus:border-rose-500/80">
             </div>
             
-            <select id="filter-customer" onchange="window.renderTable()" class="bg-slate-900/90 border border-slate-700/80 text-xs text-slate-300 rounded-xl px-2.5 py-1.5 focus:outline-none focus:border-teal-500/80 cursor-pointer">
+            <select id="filter-customer" onchange="window.renderTable()" class="bg-slate-900/90 border border-slate-700/80 text-xs text-slate-300 rounded-xl px-2.5 py-1.5 focus:outline-none focus:border-rose-500/80 cursor-pointer">
               <option value="">Semua Customer</option>
               <option value="XLS">XLS (XL Axiata)</option>
               <option value="IOH">IOH (Indosat)</option>
             </select>
 
-            <select id="filter-area" onchange="window.renderTable()" class="bg-slate-900/90 border border-slate-700/80 text-xs text-slate-300 rounded-xl px-2.5 py-1.5 focus:outline-none focus:border-teal-500/80 cursor-pointer">
+            <select id="filter-area" onchange="window.renderTable()" class="bg-slate-900/90 border border-slate-700/80 text-xs text-slate-300 rounded-xl px-2.5 py-1.5 focus:outline-none focus:border-rose-500/80 cursor-pointer">
               <option value="">Semua Klaster Wilayah</option>
               <option value="Kab. Tangerang">Kab. Tangerang</option>
               <option value="Tangerang">Tangerang</option>
@@ -247,7 +253,7 @@
               <option value="Ketapang">Ketapang</option>
             </select>
 
-            <select id="filter-status" onchange="window.renderTable()" class="bg-slate-900/90 border border-slate-700/80 text-xs text-slate-300 rounded-xl px-2.5 py-1.5 focus:outline-none focus:border-teal-500/80 cursor-pointer">
+            <select id="filter-status" onchange="window.renderTable()" class="bg-slate-900/90 border border-slate-700/80 text-xs text-slate-300 rounded-xl px-2.5 py-1.5 focus:outline-none focus:border-rose-500/80 cursor-pointer">
               <option value="">Semua Status</option>
               <option value="Open">Open</option>
               <option value="In Progress">In Progress</option>
@@ -256,8 +262,8 @@
             </select>
           </div>
           
-          <button onclick="window.exportToExcel()" class="bg-teal-600/20 hover:bg-teal-600/30 text-teal-300 border border-teal-500/30 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition active:scale-95 shadow-md flex-shrink-0">
-            <i data-feather="download" class="w-3.5 h-3.5 text-teal-400"></i> Export Excel
+          <button onclick="window.exportToExcel()" class="bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition active:scale-95 shadow-md flex-shrink-0">
+            <i data-feather="download" class="w-3.5 h-3.5 text-rose-400"></i> Export Excel
           </button>
         </div>
 
@@ -303,62 +309,62 @@
 
       <!-- TAB 2: E-MAIL TICKET INBOX -->
       <section id="view-email-ticket" class="hidden flex-1 flex flex-col min-h-0 space-y-3 max-w-[1920px] w-full mx-auto overflow-y-auto pr-1">
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 border-b border-teal-900/40 pb-3 flex-shrink-0">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 border-b border-rose-950/40 pb-3 flex-shrink-0">
           <div>
             <h1 class="text-base md:text-lg font-bold tracking-tight text-white flex items-center gap-2">
-              <i data-feather="mail" class="text-teal-400 w-4 h-4"></i> E-Mail Ticket Inbox 
+              <i data-feather="mail" class="text-rose-400 w-4 h-4"></i> E-Mail Ticket Inbox 
             </h1>
             <p class="text-[11px] text-slate-400 mt-0.5">Monitoring telemetri inbox email customer XLSMART & IOH terintegrasi langsung dari Zoho ke Gmail dan Firebase.</p>
           </div>
           <div class="flex items-center gap-2">
-            <div id="email-sync-status" class="text-xs font-mono text-teal-400 bg-teal-500/10 border border-teal-500/30 px-3 py-1.5 rounded-xl flex items-center gap-2 shadow-sm">
-              <span class="w-2 h-2 rounded-full bg-teal-400 animate-pulse"></span> Gmail Listener Active
+            <div id="email-sync-status" class="text-xs font-mono text-rose-400 bg-rose-500/10 border border-rose-500/30 px-3 py-1.5 rounded-xl flex items-center gap-2 shadow-sm">
+              <span class="w-2 h-2 rounded-full bg-rose-400 animate-pulse"></span> Gmail Listener Active
             </div>
             <button onclick="window.syncGoogleSheetCsv(true)" class="bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 border border-slate-700 px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition">
-              <i data-feather="refresh-cw" class="w-3.5 h-3.5 text-teal-400"></i> Refresh Feed
+              <i data-feather="refresh-cw" class="w-3.5 h-3.5 text-rose-400"></i> Refresh Feed
             </button>
           </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-3 flex-shrink-0">
-          <div class="glass-card p-3 rounded-xl border border-teal-500/20">
+          <div class="glass-card p-3 rounded-xl border border-rose-500/20">
             <div class="flex items-center justify-between">
               <p class="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Total Mail Inbox</p>
-              <i data-feather="inbox" class="w-4 h-4 text-teal-400"></i>
+              <i data-feather="inbox" class="w-4 h-4 text-rose-400"></i>
             </div>
             <h3 id="stat-email-total" class="text-lg font-extrabold text-white mt-1"></h3>
-            <p class="text-[10px] text-slate-400 mt-0.5">Akun: <span class="text-teal-300 font-mono">hdfomtel@gmail.com</span></p>
+            <p class="text-[10px] text-slate-400 mt-0.5">Akun: <span class="text-rose-300 font-mono">hdfomtel@gmail.com</span></p>
           </div>
 
-          <div class="glass-card p-3 rounded-xl border border-teal-500/20">
+          <div class="glass-card p-3 rounded-xl border border-rose-500/20">
             <div class="flex items-center justify-between">
               <p class="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Email XLSMART [TR@OWS]</p>
-              <span class="w-2 h-2 rounded-full bg-teal-400"></span>
+              <span class="w-2 h-2 rounded-full bg-rose-400"></span>
             </div>
-            <h3 id="stat-email-xls" class="text-lg font-extrabold text-teal-400 mt-1"></h3>
+            <h3 id="stat-email-xls" class="text-lg font-extrabold text-rose-400 mt-1"></h3>
             <p class="text-[10px] text-slate-400 mt-0.5">Pengirim TR-SDMT / OWS</p>
           </div>
 
-          <div class="glass-card p-3 rounded-xl border border-teal-500/20">
+          <div class="glass-card p-3 rounded-xl border border-rose-500/20">
             <div class="flex items-center justify-between">
               <p class="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Email IOH [DATACOM/INC]</p>
-              <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+              <span class="w-2 h-2 rounded-full bg-amber-400"></span>
             </div>
-            <h3 id="stat-email-ioh" class="text-lg font-extrabold text-cyan-400 mt-1"></h3>
+            <h3 id="stat-email-ioh" class="text-lg font-extrabold text-amber-400 mt-1"></h3>
             <p class="text-[10px] text-slate-400 mt-0.5">Pengirim MSH 3PP / IOH</p>
           </div>
         </div>
 
-        <div class="glass-card rounded-xl overflow-hidden shadow-xl flex-1 flex flex-col min-h-0 border border-teal-500/20">
+        <div class="glass-card rounded-xl overflow-hidden shadow-xl flex-1 flex flex-col min-h-0 border border-rose-500/20">
           <div class="p-3 bg-slate-900/80 border-b border-slate-800 flex flex-col md:flex-row justify-between items-start md:items-center gap-3 text-xs flex-shrink-0">
             <div class="flex items-center gap-2">
-              <span class="w-2.5 h-2.5 rounded-full bg-teal-400 animate-pulse"></span> 
+              <span class="w-2.5 h-2.5 rounded-full bg-rose-400 animate-pulse"></span> 
               <span class="font-bold text-white tracking-tight">Live Email</span>
-              <span id="email-count-badge" class="bg-teal-500/20 text-teal-300 border border-teal-500/30 px-2 py-0.5 rounded font-mono text-[10px]">  Emails</span>
+              <span id="email-count-badge" class="bg-rose-500/20 text-rose-300 border border-rose-500/30 px-2 py-0.5 rounded font-mono text-[10px]">  Emails</span>
             </div>
             
             <div class="flex items-center gap-2 w-full md:w-auto">
-              <select id="filter-email-quick" onchange="window.renderEmailTickets()" class="bg-slate-950 border border-slate-700 text-xs text-slate-200 rounded-xl px-3 py-1.5 focus:outline-none focus:border-teal-500">
+              <select id="filter-email-quick" onchange="window.renderEmailTickets()" class="bg-slate-950 border border-slate-700 text-xs text-slate-200 rounded-xl px-3 py-1.5 focus:outline-none focus:border-rose-500">
                 <option value="">Semua Category (All)</option>
                 <option value="XLSMART">XLSMART [TR@OWS]</option>
                 <option value="IOH">IOH [DATACOM/INC]</option>
@@ -379,19 +385,19 @@
               <thead class="bg-slate-900/95 text-slate-400 uppercase font-semibold text-[10px] tracking-wider border-b border-slate-800 sticky top-0 z-10 select-none">
                 <tr>
                   <th class="p-2.5 text-center truncate">+</th>
-                  <th class="p-2.5 text-center cursor-pointer hover:text-teal-300 transition-colors truncate" onclick="window.sortEmailTickets('no')">NO.</th>
-                  <th class="p-2.5 cursor-pointer hover:text-teal-300 transition-colors truncate" onclick="window.sortEmailTickets('sender')">SENDER</th>
-                  <th class="p-2.5 cursor-pointer hover:text-teal-300 transition-colors truncate" onclick="window.sortEmailTickets('subject')">SUBJECT & TICKET</th>
-                  <th class="p-2.5 cursor-pointer hover:text-teal-300 transition-colors truncate" onclick="window.sortEmailTickets('body')">BODY E-MAIL (PREVIEW)</th>
-                  <th class="p-2.5 cursor-pointer hover:text-teal-300 transition-colors truncate" onclick="window.sortEmailTickets('date')">TIME RECEIVED</th>
+                  <th class="p-2.5 text-center cursor-pointer hover:text-rose-300 transition-colors truncate" onclick="window.sortEmailTickets('no')">NO.</th>
+                  <th class="p-2.5 cursor-pointer hover:text-rose-300 transition-colors truncate" onclick="window.sortEmailTickets('sender')">SENDER</th>
+                  <th class="p-2.5 cursor-pointer hover:text-rose-300 transition-colors truncate" onclick="window.sortEmailTickets('subject')">SUBJECT & TICKET</th>
+                  <th class="p-2.5 cursor-pointer hover:text-rose-300 transition-colors truncate" onclick="window.sortEmailTickets('body')">BODY E-MAIL (PREVIEW)</th>
+                  <th class="p-2.5 cursor-pointer hover:text-rose-300 transition-colors truncate" onclick="window.sortEmailTickets('date')">TIME RECEIVED</th>
                 </tr>
                 <tr class="bg-slate-950/90 border-b border-slate-800">
                   <th class="p-1.5"></th>
                   <th class="p-1.5"></th>
-                  <th class="p-1.5"><input type="text" id="filter-email-sender" oninput="window.debouncedRenderEmailTickets()" placeholder="Search SENDER" class="w-full bg-slate-900 border border-slate-700 text-[11px] text-white rounded px-2 py-1 focus:outline-none focus:border-teal-500"></th>
-                  <th class="p-1.5"><input type="text" id="filter-email-subject" oninput="window.debouncedRenderEmailTickets()" placeholder="Search Subject" class="w-full bg-slate-900 border border-slate-700 text-[11px] text-white rounded px-2 py-1 focus:outline-none focus:border-teal-500"></th>
-                  <th class="p-1.5"><input type="text" id="filter-email-body" oninput="window.debouncedRenderEmailTickets()" placeholder="Search Body" class="w-full bg-slate-900 border border-slate-700 text-[11px] text-white rounded px-2 py-1 focus:outline-none focus:border-teal-500"></th>
-                  <th class="p-1.5"><input type="text" id="filter-email-date" oninput="window.debouncedRenderEmailTickets()" placeholder="Search Time" class="w-full bg-slate-900 border border-slate-700 text-[11px] text-white rounded px-2 py-1 focus:outline-none focus:border-teal-500"></th>
+                  <th class="p-1.5"><input type="text" id="filter-email-sender" oninput="window.debouncedRenderEmailTickets()" placeholder="Search SENDER" class="w-full bg-slate-900 border border-slate-700 text-[11px] text-white rounded px-2 py-1 focus:outline-none focus:border-rose-500"></th>
+                  <th class="p-1.5"><input type="text" id="filter-email-subject" oninput="window.debouncedRenderEmailTickets()" placeholder="Search Subject" class="w-full bg-slate-900 border border-slate-700 text-[11px] text-white rounded px-2 py-1 focus:outline-none focus:border-rose-500"></th>
+                  <th class="p-1.5"><input type="text" id="filter-email-body" oninput="window.debouncedRenderEmailTickets()" placeholder="Search Body" class="w-full bg-slate-900 border border-slate-700 text-[11px] text-white rounded px-2 py-1 focus:outline-none focus:border-rose-500"></th>
+                  <th class="p-1.5"><input type="text" id="filter-email-date" oninput="window.debouncedRenderEmailTickets()" placeholder="Search Time" class="w-full bg-slate-900 border border-slate-700 text-[11px] text-white rounded px-2 py-1 focus:outline-none focus:border-rose-500"></th>
                 </tr>
               </thead>
               <tbody id="email-ticket-table-body" class="divide-y divide-slate-800/60 text-[11px]"></tbody>
@@ -402,19 +408,19 @@
 
       <!-- TAB 3: DATABASE SEGMENT -->
       <section id="view-database-segment" class="hidden flex-1 flex flex-col min-h-0 space-y-3 max-w-[1920px] w-full mx-auto overflow-y-auto pr-1">
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 border-b border-teal-900/40 pb-3 flex-shrink-0">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 border-b border-rose-950/40 pb-3 flex-shrink-0">
           <div>
             <h1 class="text-base md:text-lg font-bold tracking-tight text-white flex items-center gap-2">
-              <i data-feather="database" class="text-teal-400 w-4 h-4"></i> Database Segment (Google Spreadsheet)
+              <i data-feather="database" class="text-rose-400 w-4 h-4"></i> Database Segment (Google Spreadsheet)
             </h1>
             <p class="text-[11px] text-slate-400 mt-0.5">Sinkronisasi data master segmen jaringan fiber optik langsung dari Google Spreadsheet dengan pembersihan otomatis format koordinat.</p>
           </div>
           <div class="flex items-center gap-2">
-            <button onclick="window.syncGoogleSheetCsv(true)" class="bg-teal-600/20 hover:bg-teal-600/30 text-teal-300 border border-teal-500/30 px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition shadow-md">
-              <i data-feather="refresh-cw" class="w-3.5 h-3.5 text-teal-400"></i> Sync Spreadsheet
+            <button onclick="window.syncGoogleSheetCsv(true)" class="bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition shadow-md">
+              <i data-feather="refresh-cw" class="w-3.5 h-3.5 text-rose-400"></i> Sync Spreadsheet
             </button>
-            <button onclick="window.exportDatabaseExcel()" class="bg-teal-600/20 hover:bg-teal-600/30 text-teal-300 border border-teal-500/30 px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition shadow-md">
-              <i data-feather="download" class="w-3.5 h-3.5 text-teal-400"></i> Export Excel
+            <button onclick="window.exportDatabaseExcel()" class="bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition shadow-md">
+              <i data-feather="download" class="w-3.5 h-3.5 text-rose-400"></i> Export Excel
             </button>
           </div>
         </div>
@@ -422,10 +428,10 @@
         <div class="glass-card p-3 rounded-xl flex flex-col md:flex-row gap-3 items-center justify-between flex-shrink-0">
           <div class="relative w-full md:w-80">
             <i data-feather="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"></i>
-            <input type="text" id="db-search" oninput="window.debouncedRenderDatabaseSegment()" placeholder="Cari Area, Site NE/FE..." class="bg-slate-900/90 border border-slate-700/80 text-xs text-white rounded-xl pl-9 pr-3 py-2 w-full focus:outline-none focus:border-teal-500">
+            <input type="text" id="db-search" oninput="window.debouncedRenderDatabaseSegment()" placeholder="Cari Area, Site NE/FE..." class="bg-slate-900/90 border border-slate-700/80 text-xs text-white rounded-xl pl-9 pr-3 py-2 w-full focus:outline-none focus:border-rose-500">
           </div>
-          <div id="db-status-badge" class="text-xs text-teal-400 font-mono flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full bg-teal-400 animate-ping"></span> Total Master Segment: <span id="db-total-count" class="text-white font-bold">0</span>
+          <div id="db-status-badge" class="text-xs text-rose-400 font-mono flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-rose-400 animate-ping"></span> Total Master Segment: <span id="db-total-count" class="text-white font-bold">0</span>
           </div>
         </div>
 
@@ -452,11 +458,11 @@
                   <th class="p-2.5 truncate">ID Site NE</th>
                   <th class="p-2.5 truncate">Site Name NE</th>
                   <th class="p-2.5 truncate">Owner NE</th>
-                  <th class="p-2.5 text-teal-300 truncate">Koordinat NE</th>
+                  <th class="p-2.5 text-rose-300 truncate">Koordinat NE</th>
                   <th class="p-2.5 truncate">ID Site FE</th>
                   <th class="p-2.5 truncate">Site Name FE</th>
                   <th class="p-2.5 truncate">Owner FE</th>
-                  <th class="p-2.5 text-cyan-300 truncate">Koordinat FE</th>
+                  <th class="p-2.5 text-amber-300 truncate">Koordinat FE</th>
                   <th class="p-2.5 truncate">Panjang</th>
                 </tr>
               </thead>
@@ -471,10 +477,10 @@
 
   <!-- MODALS -->
   <div id="modal-input" class="fixed inset-0 bg-slate-950/40 backdrop-blur-sm hidden flex items-center justify-center p-4 z-[500]">
-    <div class="glass-card rounded-3xl w-full max-w-xl p-6 shadow-2xl border border-teal-500/30">
+    <div class="glass-card rounded-3xl w-full max-w-xl p-6 shadow-2xl border border-rose-500/30">
       <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-800">
         <h3 class="text-base font-bold text-white flex items-center gap-2">
-          <i data-feather="terminal" class="text-teal-400 w-5 h-5"></i> Paste Raw Broadcast Trouble Ticket
+          <i data-feather="terminal" class="text-rose-400 w-5 h-5"></i> Paste Raw Broadcast Trouble Ticket
         </h3>
         <button onclick="window.closeInputModal()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition"><i data-feather="x" class="w-5 h-5"></i></button>
       </div>
@@ -483,7 +489,7 @@
       <div class="space-y-3">
         <div>
           <label class="block text-xs font-medium text-slate-300 mb-1">Pilih / Deteksi Klaster Wilayah Tiket</label>
-          <select id="raw-input-cluster" class="w-full bg-slate-900/90 border border-slate-700/80 text-xs text-slate-200 rounded-xl p-3 focus:outline-none focus:border-teal-500 cursor-pointer">
+          <select id="raw-input-cluster" class="w-full bg-slate-900/90 border border-slate-700/80 text-xs text-slate-200 rounded-xl p-3 focus:outline-none focus:border-rose-500 cursor-pointer">
             <option value="">-- Auto Detect AI / Pilih Klaster --</option>
             <option value="Kab. Tangerang">Kab. Tangerang</option>
             <option value="Tangerang">Tangerang</option>
@@ -503,22 +509,22 @@
 
         <div>
           <label class="block text-xs font-medium text-slate-300 mb-1">Raw Broadcast Message</label>
-          <textarea id="raw-ticket-input" oninput="window.previewAutoCluster()" rows="5" placeholder="Contoh: Fiber Cut CSR ## IP Link From_3G_GEREM_RAYA... INCM-20260910-00029680 TR-20260910-00000635 [2026-09-10 15:25:38]" class="w-full bg-slate-900/90 border border-slate-700/80 text-xs text-slate-200 rounded-xl p-3.5 focus:outline-none focus:border-teal-500 font-mono"></textarea>
+          <textarea id="raw-ticket-input" oninput="window.previewAutoCluster()" rows="5" placeholder="Contoh: Fiber Cut CSR ## IP Link From_3G_GEREM_RAYA... INCM-20260910-00029680 TR-20260910-00000635 [2026-09-10 15:25:38]" class="w-full bg-slate-900/90 border border-slate-700/80 text-xs text-slate-200 rounded-xl p-3.5 focus:outline-none focus:border-rose-500 font-mono"></textarea>
         </div>
       </div>
       
       <div class="mt-5 flex justify-end gap-2.5">
         <button onclick="window.closeInputModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-medium transition">Batal</button>
-        <button onclick="window.processRawTicket()" class="px-4 py-2 bg-teal-600 hover:bg-teal-500 text-white font-medium rounded-xl text-xs transition shadow-lg shadow-teal-600/25">Parse & Simpan ke Cloud</button>
+        <button onclick="window.processRawTicket()" class="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white font-medium rounded-xl text-xs transition shadow-lg shadow-rose-600/25">Parse & Simpan ke Cloud</button>
       </div>
     </div>
   </div>
 
   <div id="modal-progress" class="fixed inset-0 bg-slate-950/40 backdrop-blur-sm hidden flex items-center justify-center p-4 z-[500] overflow-y-auto">
-    <div class="glass-card rounded-3xl w-full max-w-2xl p-6 shadow-2xl border border-teal-500/30 my-8">
+    <div class="glass-card rounded-3xl w-full max-w-2xl p-6 shadow-2xl border border-rose-500/30 my-8">
       <div class="flex justify-between items-center mb-5 border-b border-slate-800 pb-3">
         <h3 class="text-base font-bold text-white flex items-center gap-2">
-          <i data-feather="edit-3" class="text-teal-400 w-5 h-5"></i> Log Progress, RCA & Evidence
+          <i data-feather="edit-3" class="text-rose-400 w-5 h-5"></i> Log Progress, RCA & Evidence
         </h3>
         <button onclick="window.closeProgressModal()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition"><i data-feather="x" class="w-5 h-5"></i></button>
       </div>
@@ -527,10 +533,10 @@
 
       <div class="space-y-4 text-xs">
         <div class="glass-card-sm p-4 rounded-2xl space-y-2">
-          <label class="block font-semibold text-teal-400 text-[11px] flex items-center gap-1.5">
+          <label class="block font-semibold text-rose-400 text-[11px] flex items-center gap-1.5">
             <i data-feather="map-pin" class="w-3.5 h-3.5"></i> Update Klaster Wilayah / Koreksi Wilayah
           </label>
-          <select id="update-cluster" class="w-full bg-slate-900 border border-slate-700/80 text-white rounded-xl p-2.5 focus:outline-none focus:border-teal-500 cursor-pointer">
+          <select id="update-cluster" class="w-full bg-slate-900 border border-slate-700/80 text-white rounded-xl p-2.5 focus:outline-none focus:border-rose-500 cursor-pointer">
             <option value="Kab. Tangerang">Kab. Tangerang</option>
             <option value="Tangerang">Tangerang</option>
             <option value="Cilegon">Cilegon</option>
@@ -550,7 +556,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label class="block font-medium text-slate-400 mb-1.5">Status Lapangan</label>
-            <select id="update-status" class="w-full bg-slate-900/90 border border-slate-700/80 text-white rounded-xl p-2.5 focus:outline-none focus:border-teal-500">
+            <select id="update-status" class="w-full bg-slate-900/90 border border-slate-700/80 text-white rounded-xl p-2.5 focus:outline-none focus:border-rose-500">
               <option value="Open">Open</option>
               <option value="In Progress">In Progress (Dispatch/Work Progress)</option>
               <option value="Pending">Pending (Stop Clock / Waiting Parts)</option>
@@ -559,16 +565,15 @@
           </div>
           <div>
             <label class="block font-medium text-slate-400 mb-1.5">Deskripsi Ringkas Aktivitas</label>
-            <input type="text" id="update-activity" placeholder="e.g. Splicing FO selesai, koordinat telah diisi" class="w-full bg-slate-900/90 border border-slate-700/80 text-white rounded-xl p-2.5 focus:outline-none focus:border-teal-500">
+            <input type="text" id="update-activity" placeholder="e.g. Splicing FO selesai, koordinat telah diisi" class="w-full bg-slate-900/90 border border-slate-700/80 text-white rounded-xl p-2.5 focus:outline-none focus:border-rose-500">
           </div>
         </div>
 
-        <!-- NEW: Waktu Aktual Lapangan -->
         <div class="glass-card-sm p-4 rounded-2xl space-y-2">
-          <label class="block font-semibold text-teal-300 text-[11px] flex items-center gap-1.5">
+          <label class="block font-semibold text-rose-300 text-[11px] flex items-center gap-1.5">
             <i data-feather="clock" class="w-3.5 h-3.5"></i> Waktu Aktual Aktivitas Lapangan (Menyesuaikan Laporan Teknisi)
           </label>
-          <input type="datetime-local" id="update-actual-time" class="w-full bg-slate-900 border border-slate-700/80 text-white rounded-xl p-2.5 font-mono text-xs focus:outline-none focus:border-teal-500">
+          <input type="datetime-local" id="update-actual-time" class="w-full bg-slate-900 border border-slate-700/80 text-white rounded-xl p-2.5 font-mono text-xs focus:outline-none focus:border-rose-500">
           <p class="text-[10px] text-slate-400">Kosongkan jika ingin menggunakan waktu sistem saat ini.</p>
         </div>
 
@@ -580,7 +585,7 @@
           <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div>
               <label class="text-[10px] text-slate-400 block mb-1">Status Ticket</label>
-              <select id="rca-status-ticket" onchange="window.updateRcaPartOptions()" class="w-full bg-slate-900 border border-slate-700/80 text-white rounded-lg p-2 focus:outline-none focus:border-teal-500">
+              <select id="rca-status-ticket" onchange="window.updateRcaPartOptions()" class="w-full bg-slate-900 border border-slate-700/80 text-white rounded-lg p-2 focus:outline-none focus:border-rose-500">
                 <option value="">-- Pilih Status --</option>
                 <option value="Ticket Confirm">Ticket Confirm</option>
                 <option value="Ticket Cancellation">Ticket Cancellation</option>
@@ -588,13 +593,13 @@
             </div>
             <div>
               <label class="text-[10px] text-slate-400 block mb-1">Part Of</label>
-              <select id="rca-part-of" onchange="window.updateRca1Options()" class="w-full bg-slate-900 border border-slate-700/80 text-white rounded-lg p-2 focus:outline-none focus:border-teal-500">
+              <select id="rca-part-of" onchange="window.updateRca1Options()" class="w-full bg-slate-900 border border-slate-700/80 text-white rounded-lg p-2 focus:outline-none focus:border-rose-500">
                 <option value="">-- Pilih Part Of --</option>
               </select>
             </div>
             <div>
               <label class="text-[10px] text-slate-400 block mb-1">RCA 1</label>
-              <select id="rca-1" onchange="window.updateRca2Options()" class="w-full bg-slate-900 border border-slate-700/80 text-white rounded-lg p-2 focus:outline-none focus:border-teal-500">
+              <select id="rca-1" onchange="window.updateRca2Options()" class="w-full bg-slate-900 border border-slate-700/80 text-white rounded-lg p-2 focus:outline-none focus:border-rose-500">
                 <option value="">-- Pilih RCA 1 --</option>
               </select>
             </div>
@@ -602,7 +607,7 @@
 
           <div>
             <label class="text-[10px] text-slate-400 block mb-1">RCA 2 (Detail Specific Cause)</label>
-            <select id="rca-2" class="w-full bg-slate-900 border border-slate-700/80 text-white rounded-lg p-2 focus:outline-none focus:border-teal-500">
+            <select id="rca-2" class="w-full bg-slate-900 border border-slate-700/80 text-white rounded-lg p-2 focus:outline-none focus:border-rose-500">
               <option value="">-- Pilih RCA 2 --</option>
             </select>
           </div>
@@ -610,11 +615,11 @@
 
         <div class="glass-card-sm p-4 rounded-2xl space-y-3">
           <div class="flex justify-between items-center">
-            <span class="font-semibold text-cyan-400 text-[11px] flex items-center gap-1.5">
+            <span class="font-semibold text-amber-300 text-[11px] flex items-center gap-1.5">
               <i data-feather="clock" class="w-3.5 h-3.5"></i> Kondisi Stop Clock
             </span>
             <label class="flex items-center gap-2 text-[11px] text-slate-300 cursor-pointer select-none">
-              <input type="checkbox" id="enable-stopclock" onchange="window.toggleStopClockSection()" class="rounded bg-slate-900 border-slate-700 text-teal-600">
+              <input type="checkbox" id="enable-stopclock" onchange="window.toggleStopClockSection()" class="rounded bg-slate-900 border-slate-700 text-rose-600">
               Aktifkan Stop Clock
             </label>
           </div>
@@ -622,13 +627,13 @@
           <div id="stopclock-fields" class="grid grid-cols-1 md:grid-cols-3 gap-3 hidden">
             <div>
               <label class="text-[10px] text-slate-400 block mb-1">RCA 3 (Stop Clock)</label>
-              <select id="sc-rca3" onchange="window.updateScIssueOptions()" class="w-full bg-slate-900 border border-slate-700/80 text-white rounded-lg p-2 focus:outline-none focus:border-teal-500">
+              <select id="sc-rca3" onchange="window.updateScIssueOptions()" class="w-full bg-slate-900 border border-slate-700/80 text-white rounded-lg p-2 focus:outline-none focus:border-rose-500">
                 <option value="">-- Pilih RCA 3 --</option>
               </select>
             </div>
             <div>
               <label class="text-[10px] text-slate-400 block mb-1">Stop Clock Issue</label>
-              <select id="sc-issue" onchange="window.autoFillScDuration()" class="w-full bg-slate-900 border border-slate-700/80 text-white rounded-lg p-2 focus:outline-none focus:border-teal-500">
+              <select id="sc-issue" onchange="window.autoFillScDuration()" class="w-full bg-slate-900 border border-slate-700/80 text-white rounded-lg p-2 focus:outline-none focus:border-rose-500">
                 <option value="">-- Pilih Issue --</option>
               </select>
             </div>
@@ -640,26 +645,26 @@
         </div>
 
         <div class="glass-card-sm p-4 rounded-2xl space-y-3">
-          <span class="font-semibold text-teal-400 block text-[11px] flex items-center gap-1.5">
+          <span class="font-semibold text-rose-400 block text-[11px] flex items-center gap-1.5">
             <i data-feather="camera" class="w-3.5 h-3.5"></i> Evidence Foto FO Cut & Koordinat
           </span>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-3 items-center">
             <div>
               <label class="block text-[10px] text-slate-400 mb-1">Upload Foto Titik FO Cut</label>
-              <input type="file" id="evidence-file" accept="image/*" onchange="window.handleEvidenceUpload(event)" class="w-full text-slate-300 bg-slate-900 border border-slate-700/80 rounded-lg p-1.5 text-xs file:mr-2 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:text-xs file:bg-teal-600 file:text-white cursor-pointer">
+              <input type="file" id="evidence-file" accept="image/*" onchange="window.handleEvidenceUpload(event)" class="w-full text-slate-300 bg-slate-900 border border-slate-700/80 rounded-lg p-1.5 text-xs file:mr-2 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:text-xs file:bg-rose-600 file:text-white cursor-pointer">
             </div>
 
             <div>
               <label class="block text-[10px] text-slate-400 mb-1">Koordinat (lat,long)</label>
-              <input type="text" id="evidence-gps" placeholder="-6.2454487,106.9004475" class="w-full bg-slate-900 border border-slate-700/80 text-white rounded-lg p-2 font-mono text-xs focus:outline-none focus:border-teal-500">
+              <input type="text" id="evidence-gps" placeholder="-6.2454487,106.9004475" class="w-full bg-slate-900 border border-slate-700/80 text-white rounded-lg p-2 font-mono text-xs focus:outline-none focus:border-rose-500">
             </div>
           </div>
 
           <div id="evidence-preview-container" class="hidden flex items-center gap-3 pt-2">
             <img id="evidence-preview" class="w-16 h-16 object-cover rounded-xl border border-slate-700 shadow-md">
             <div class="text-[10px] text-slate-400 space-y-0.5">
-              <p id="evidence-time" class="font-mono text-teal-400 font-medium"></p>
+              <p id="evidence-time" class="font-mono text-rose-400 font-medium"></p>
               <p id="evidence-gps-info" class="font-mono text-slate-300"></p>
             </div>
           </div>
@@ -668,16 +673,16 @@
 
       <div class="mt-6 flex justify-end gap-2.5">
         <button onclick="window.closeProgressModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-medium transition">Batal</button>
-        <button onclick="window.saveProgressUpdate()" class="px-4 py-2 bg-teal-600 hover:bg-teal-500 text-white font-medium rounded-xl text-xs transition shadow-lg shadow-teal-600/25">Update Cloud</button>
+        <button onclick="window.saveProgressUpdate()" class="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white font-medium rounded-xl text-xs transition shadow-lg shadow-rose-600/25">Update Cloud</button>
       </div>
     </div>
   </div>
 
   <div id="modal-timely-report" class="fixed inset-0 bg-slate-950/40 backdrop-blur-sm hidden flex items-center justify-center p-4 z-[500]">
-    <div class="glass-card rounded-3xl w-full max-w-2xl p-6 shadow-2xl border border-teal-500/30">
+    <div class="glass-card rounded-3xl w-full max-w-2xl p-6 shadow-2xl border border-rose-500/30">
       <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-800">
         <h3 class="text-base font-bold text-white flex items-center gap-2">
-          <i data-feather="file-text" class="text-teal-400 w-5 h-5"></i> Timely Report Chronology
+          <i data-feather="file-text" class="text-rose-400 w-5 h-5"></i> Timely Report Chronology
         </h3>
         <button onclick="window.closeTimelyReportModal()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition"><i data-feather="x" class="w-5 h-5"></i></button>
       </div>
@@ -685,20 +690,20 @@
       <div class="bg-slate-950/80 border border-slate-800 rounded-2xl p-4 font-mono text-xs text-slate-200 h-64 overflow-y-auto whitespace-pre-wrap leading-relaxed select-all" id="timely-report-content"></div>
 
       <div id="timely-report-evidence-container" class="hidden mt-4 pt-3 border-t border-slate-800 flex items-center gap-4">
-        <img id="timely-report-img" class="w-20 h-20 object-cover rounded-xl border border-teal-500/30 shadow-lg" alt="Evidence FO Cut">
+        <img id="timely-report-img" class="w-20 h-20 object-cover rounded-xl border border-rose-500/30 shadow-lg" alt="Evidence FO Cut">
         <div class="text-xs space-y-1 font-mono">
-          <p class="text-teal-400 font-semibold flex items-center gap-1.5"><i data-feather="camera" class="w-3.5 h-3.5"></i> Lampiran Evidence Foto Terlampir</p>
+          <p class="text-rose-400 font-semibold flex items-center gap-1.5"><i data-feather="camera" class="w-3.5 h-3.5"></i> Lampiran Evidence Foto Terlampir</p>
           <p id="timely-report-gps" class="text-slate-300"></p>
         </div>
       </div>
 
       <div class="mt-5 flex justify-between items-center">
-        <span id="copy-status" class="text-xs text-teal-400 font-medium opacity-0 transition-opacity flex items-center gap-1">
+        <span id="copy-status" class="text-xs text-rose-400 font-medium opacity-0 transition-opacity flex items-center gap-1">
           <i data-feather="check-circle" class="w-3.5 h-3.5"></i> Berhasil di-copy!
         </span>
         <div class="flex gap-2.5">
           <button onclick="window.closeTimelyReportModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-medium transition">Tutup</button>
-          <button onclick="window.copyTimelyReport()" class="px-4 py-2 bg-teal-600 hover:bg-teal-500 text-white font-medium rounded-xl text-xs flex items-center gap-2 transition shadow-lg shadow-teal-600/25">
+          <button onclick="window.copyTimelyReport()" class="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white font-medium rounded-xl text-xs flex items-center gap-2 transition shadow-lg shadow-rose-600/25">
             <i data-feather="copy" class="w-3.5 h-3.5"></i> Copy Report Teks
           </button>
         </div>
@@ -706,7 +711,6 @@
     </div>
   </div>
 
-  <!-- FIREBASE MODULE SCRIPT -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -843,7 +847,7 @@
               };
             });
 
-            if (statusEl) statusEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-teal-400"></span> Total Master Segment: <span id="db-total-count" class="text-white font-bold">${window.segmentList.length}</span>`;
+            if (statusEl) statusEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-rose-400"></span> Total Master Segment: <span id="db-total-count" class="text-white font-bold">${window.segmentList.length}</span>`;
             if (typeof window.renderDatabaseSegment === 'function') window.renderDatabaseSegment();
             return;
           }
@@ -855,7 +859,7 @@
       window.segmentList = [
         { firebaseKey: "s1", no: "1", witel: "Pekanbaru", site_ne: "SUM-RI-PBR-0908", site_name_ne: "Cinta Raja KOTA PEKANBARU", site_owner_ne: "PT PROFESIONAL TELEKOMUNIKASI INDONESIA", lat_ne: "0,504027778", lon_ne: "101,5238889", site_fe: "SUM-RI-PBR-0943", site_name_fe: "TENAYAN JAYA RELOCATION", site_owner_fe: "PT PROFESIONAL TELEKOMUNIKASI INDONESIA", lat_fe: "0,485716667", lon_ne: "101,5278917", panjang: "4.779" }
       ];
-      if (statusEl) statusEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-teal-400"></span> Total Master Segment (Fallback): <span id="db-total-count" class="text-white font-bold">${window.segmentList.length}</span>`;
+      if (statusEl) statusEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-rose-400"></span> Total Master Segment (Fallback): <span id="db-total-count" class="text-white font-bold">${window.segmentList.length}</span>`;
       if (typeof window.renderDatabaseSegment === 'function') window.renderDatabaseSegment();
     };
 
@@ -892,8 +896,8 @@
         const syncStatusEl = document.getElementById('email-sync-status');
         
         if (syncStatusEl) {
-          syncStatusEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-teal-400 animate-pulse"></span> Gmail Live Sync Active`;
-          syncStatusEl.className = "text-xs font-mono text-teal-400 bg-teal-500/10 border border-teal-500/30 px-3 py-1.5 rounded-xl flex items-center gap-2";
+          syncStatusEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-red-400 animate-pulse"></span> Gmail Live Sync Active`;
+          syncStatusEl.className = "text-xs font-mono text-red-300 bg-red-500/10 border border-red-500/30 px-3 py-1.5 rounded-xl flex items-center gap-2";
         }
 
         if (data) {
@@ -906,13 +910,25 @@
 
           window.emailInboxList = rawList.map(item => {
             let formattedDate = item.timestamp || item.receivedDateTime || item.date || '-';
-            if (item.timestamp || item.created_at) {
+            const rawTimeVal = item.timestamp || item.receivedDateTime || item.date || item.created_at;
+            if (rawTimeVal) {
               try {
-                const d = new Date(item.timestamp || item.created_at);
+                const d = new Date(rawTimeVal);
                 if (!isNaN(d.getTime())) {
-                  formattedDate = d.toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' }) + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                  formattedDate = d.toLocaleString('id-ID', {
+                    timeZone: 'Asia/Jakarta',
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false
+                  });
                 }
-              } catch(e){}
+              } catch(e) {
+                formattedDate = String(rawTimeVal);
+              }
             }
 
             let category = item.category || 'OTHER';
@@ -975,7 +991,6 @@
     });
   </script>
 
-  <!-- APPLICATION JAVASCRIPT LOGIC -->
   <script>
     let chartStatusInstance = null;
     let chartRcaInstance = null;
@@ -1009,7 +1024,7 @@
       if (!container) return;
       
       const toast = document.createElement('div');
-      const bg = type === 'success' ? 'from-teal-600 to-cyan-600 border-teal-400/40' : 'from-rose-600 to-red-600 border-rose-400/40';
+      const bg = type === 'success' ? 'from-rose-600 to-red-600 border-rose-400/40' : 'from-amber-600 to-orange-600 border-amber-400/40';
       toast.className = `bg-gradient-to-r ${bg} text-white px-4 py-3 rounded-2xl shadow-2xl border font-medium text-xs flex items-center gap-2.5 pointer-events-auto animate-bounce transition-all`;
       toast.innerHTML = `<i data-feather="${type === 'success' ? 'check-circle' : 'alert-circle'}" class="w-4 h-4"></i> ${message}`;
       
@@ -1124,9 +1139,16 @@
       if (!timestamp) return '-';
       const d = new Date(timestamp);
       if (isNaN(d.getTime())) return timestamp;
-      const date = d.toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: '2-digit' });
-      const time = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      return `${date} ${time}`;
+      
+      return d.toLocaleString('id-ID', {
+        timeZone: 'Asia/Jakarta',
+        day: '2-digit',
+        month: '2-digit',
+        year: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      });
     }
 
     window.onload = () => {
@@ -1141,21 +1163,21 @@
       document.getElementById('view-email-ticket').classList.add('hidden');
       document.getElementById('view-database-segment').classList.add('hidden');
 
-      document.getElementById('nav-dashboard-noc').className = "w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium text-slate-300 hover:bg-teal-500/10 hover:text-teal-300 transition-all";
-      document.getElementById('nav-email-ticket').className = "w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium text-slate-300 hover:bg-teal-500/10 hover:text-teal-300 transition-all";
-      document.getElementById('nav-database-segment').className = "w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium text-slate-300 hover:bg-teal-500/10 hover:text-teal-300 transition-all";
+      document.getElementById('nav-dashboard-noc').className = "w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium text-slate-300 hover:bg-rose-500/10 hover:text-rose-300 transition-all";
+      document.getElementById('nav-email-ticket').className = "w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium text-slate-300 hover:bg-rose-500/10 hover:text-rose-300 transition-all";
+      document.getElementById('nav-database-segment').className = "w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium text-slate-300 hover:bg-rose-500/10 hover:text-rose-300 transition-all";
 
       if (tabId === 'dashboard-noc') {
         document.getElementById('view-dashboard-noc').classList.remove('hidden');
-        document.getElementById('nav-dashboard-noc').className = "w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium bg-gradient-to-r from-teal-600/30 to-cyan-600/10 text-teal-300 border border-teal-500/30 shadow-sm transition-all";
+        document.getElementById('nav-dashboard-noc').className = "w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium bg-gradient-to-r from-rose-600/30 to-red-600/10 text-rose-300 border border-rose-500/30 shadow-sm transition-all";
         window.renderTable();
       } else if (tabId === 'email-ticket') {
         document.getElementById('view-email-ticket').classList.remove('hidden');
-        document.getElementById('nav-email-ticket').className = "w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium bg-gradient-to-r from-teal-600/30 to-cyan-600/10 text-teal-300 border border-teal-500/30 shadow-sm transition-all";
+        document.getElementById('nav-email-ticket').className = "w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium bg-gradient-to-r from-rose-600/30 to-red-600/10 text-rose-300 border border-rose-500/30 shadow-sm transition-all";
         window.renderEmailTickets();
       } else if (tabId === 'database-segment') {
         document.getElementById('view-database-segment').classList.remove('hidden');
-        document.getElementById('nav-database-segment').className = "w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium bg-gradient-to-r from-teal-600/30 to-cyan-600/10 text-teal-300 border border-teal-500/30 shadow-sm transition-all";
+        document.getElementById('nav-database-segment').className = "w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium bg-gradient-to-r from-rose-600/30 to-red-600/10 text-rose-300 border border-rose-500/30 shadow-sm transition-all";
         window.renderDatabaseSegment();
       }
       feather.replace();
@@ -1219,9 +1241,9 @@
         if (formattedSubject.includes('[TR@OWS] (New)')) {
           formattedSubject = `<span class="text-rose-400 font-bold">[TR@OWS] (New)</span> ` + formattedSubject.replace('[TR@OWS] (New)', '');
         } else if (formattedSubject.includes('[TR@OWS] (Open)')) {
-          formattedSubject = `<span class="text-cyan-400 font-bold">[TR@OWS] (Open)</span> ` + formattedSubject.replace('[TR@OWS] (Open)', '');
+          formattedSubject = `<span class="text-amber-400 font-bold">[TR@OWS] (Open)</span> ` + formattedSubject.replace('[TR@OWS] (Open)', '');
         } else if (formattedSubject.includes('DATACOM-INC')) {
-          formattedSubject = `<span class="text-amber-400 font-bold">[DATACOM-INC]</span> ` + formattedSubject;
+          formattedSubject = `<span class="text-rose-300 font-bold">[DATACOM-INC]</span> ` + formattedSubject;
         }
 
         const shortBodyPreview = (item.body || '').length > 55 ? (item.body || '').substring(0, 55) + '...' : (item.body || '');
@@ -1233,27 +1255,27 @@
         rowsHtml += `
           <tr class="hover:bg-slate-800/50 transition-colors border-b border-slate-800/50">
             <td class="p-2.5 text-center">
-              <button onclick="window.toggleEmailDetail('${safeIndexId}')" class="w-5 h-5 rounded-full bg-teal-500/20 text-teal-400 hover:bg-teal-500 hover:text-white transition flex items-center justify-center mx-auto text-[11px] font-bold font-mono" id="btn_toggle_${item.id}">
+              <button onclick="window.toggleEmailDetail('${safeIndexId}')" class="w-5 h-5 rounded-full bg-rose-500/20 text-rose-400 hover:bg-rose-500 hover:text-white transition flex items-center justify-center mx-auto text-[11px] font-bold font-mono" id="btn_toggle_${item.id}">
                 +
               </button>
             </td>
             <td class="p-2.5 text-center text-slate-500 font-medium">${idx + 1}</td>
-            <td class="p-2.5 font-mono text-teal-300 truncate" title="${item.sender}">${item.sender}</td>
+            <td class="p-2.5 font-mono text-rose-300 truncate" title="${item.sender}">${item.sender}</td>
             <td class="p-2.5 font-medium text-white truncate max-w-[250px]" title="${item.subject}">${formattedSubject}</td>
             <td class="p-2.5 text-slate-400 font-mono truncate max-w-[280px]" title="${item.body}">${shortBodyPreview}</td>
             <td class="p-2.5 font-mono text-[10px] text-slate-400 whitespace-nowrap">${item.receivedDateTime}</td>
           </tr>
-          <tr id="${detailId}" class="hidden bg-slate-900/90 border-b border-teal-500/30">
+          <tr id="${detailId}" class="hidden bg-slate-900/90 border-b border-rose-500/30">
             <td colspan="6" class="p-4">
-              <div class="glass-card p-4 rounded-xl space-y-3 border border-teal-500/30">
+              <div class="glass-card p-4 rounded-xl space-y-3 border border-rose-500/30">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 border-b border-slate-800 pb-2">
                   <div>
-                    <h4 class="text-[10px] font-bold text-teal-400 font-mono uppercase tracking-wider">DETAIL ISI EMAIL (hdfomtel@gmail.com)</h4>
+                    <h4 class="text-[10px] font-bold text-rose-400 font-mono uppercase tracking-wider">DETAIL ISI EMAIL (hdfomtel@gmail.com)</h4>
                     <p class="text-[11px] text-slate-300 mt-0.5 truncate max-w-xl" title="${item.subject}">Subject: <span class="text-white font-semibold">${item.subject}</span></p>
                   </div>
                   <div class="flex items-center gap-2 flex-wrap">
                     <span class="text-[10px] text-slate-300 font-mono bg-slate-950 px-2.5 py-1 rounded-lg border border-slate-800 whitespace-nowrap">Received: ${item.receivedDateTime}</span>
-                    <button onclick="window.autoImportEmailSmart('${safeIndexId}')" class="bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-500 text-white px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 shadow-lg shadow-teal-500/20 transition active:scale-95 whitespace-nowrap">
+                    <button onclick="window.autoImportEmailSmart('${safeIndexId}')" class="bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 text-white px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 shadow-lg shadow-rose-500/20 transition active:scale-95 whitespace-nowrap">
                       <i data-feather="zap" class="w-4 h-4 text-amber-300"></i> ${importBtnLabel}
                     </button>
                   </div>
@@ -1279,7 +1301,7 @@
       } else {
         detailRow.classList.add('hidden');
         btn.innerText = '+';
-        btn.className = "w-5 h-5 rounded-full bg-teal-500/20 text-teal-400 hover:bg-teal-500 hover:text-white transition flex items-center justify-center mx-auto text-[11px] font-bold font-mono";
+        btn.className = "w-5 h-5 rounded-full bg-rose-500/20 text-rose-400 hover:bg-rose-500 hover:text-white transition flex items-center justify-center mx-auto text-[11px] font-bold font-mono";
       }
     };
 
@@ -1406,19 +1428,19 @@
           <tr class="hover:bg-slate-800/40 transition-colors border-b border-slate-800/50">
             <td class="p-2.5 text-slate-500 font-medium truncate">${s.no || (idx + 1)}</td>
             <td class="p-2.5 text-white font-medium truncate" title="${s.witel || '-'}">${s.witel || '-'}</td>
-            <td class="p-2.5 font-mono text-teal-300 text-[11px] truncate" title="${s.site_ne || '-'}">${s.site_ne || '-'}</td>
+            <td class="p-2.5 font-mono text-rose-300 text-[11px] truncate" title="${s.site_ne || '-'}">${s.site_ne || '-'}</td>
             <td class="p-2.5 text-slate-200 truncate" title="${s.site_name_ne || '-'}">${s.site_name_ne || '-'}</td>
             <td class="p-2.5 text-slate-400 text-[11px] truncate" title="${s.site_owner_ne || '-'}">${s.site_owner_ne || '-'}</td>
             <td class="p-2.5 font-mono text-[11px] truncate">
-              <a href="${neCoord.url}" target="_blank" class="text-teal-400 hover:text-teal-300 underline underline-offset-2 flex items-center gap-1" title="Buka di Google Maps">
+              <a href="${neCoord.url}" target="_blank" class="text-rose-400 hover:text-rose-300 underline underline-offset-2 flex items-center gap-1" title="Buka di Google Maps">
                 <i data-feather="external-link" class="w-3 h-3 flex-shrink-0"></i> <span class="truncate">${neCoord.display}</span>
               </a>
             </td>
-            <td class="p-2.5 font-mono text-cyan-300 text-[11px] truncate" title="${s.site_fe || '-'}">${s.site_fe || '-'}</td>
+            <td class="p-2.5 font-mono text-amber-300 text-[11px] truncate" title="${s.site_fe || '-'}">${s.site_fe || '-'}</td>
             <td class="p-2.5 text-slate-200 truncate" title="${s.site_name_fe || '-'}">${s.site_name_fe || '-'}</td>
             <td class="p-2.5 text-slate-400 text-[11px] truncate" title="${s.site_owner_fe || '-'}">${s.site_owner_fe || '-'}</td>
             <td class="p-2.5 font-mono text-[11px] truncate">
-              <a href="${feCoord.url}" target="_blank" class="text-cyan-400 hover:text-cyan-300 underline underline-offset-2 flex items-center gap-1" title="Buka di Google Maps">
+              <a href="${feCoord.url}" target="_blank" class="text-amber-400 hover:text-amber-300 underline underline-offset-2 flex items-center gap-1" title="Buka di Google Maps">
                 <i data-feather="external-link" class="w-3 h-3 flex-shrink-0"></i> <span class="truncate">${feCoord.display}</span>
               </a>
             </td>
@@ -1638,7 +1660,6 @@
       document.getElementById('update-status').value = ticket.status;
       document.getElementById('update-activity').value = '';
       
-      // Default to current local datetime for convenient selection
       const nowLocal = new Date();
       nowLocal.setMinutes(nowLocal.getMinutes() - nowLocal.getTimezoneOffset());
       document.getElementById('update-actual-time').value = nowLocal.toISOString().slice(0, 16);
@@ -1775,7 +1796,7 @@
 
     window.copyTimelyReport = function() {
       const text = document.getElementById('timely-report-content').innerText;
-      navigator.clipboard.writeText(text).then(() => {
+      document.execCommand('copy') || navigator.clipboard.writeText(text).then(() => {
         const status = document.getElementById('copy-status');
         status.classList.remove('opacity-0');
         setTimeout(() => status.classList.add('opacity-0'), 2000);
@@ -1894,24 +1915,24 @@
       let htmlContent = "";
 
       renderBatch.forEach((t, index) => {
-        let custBadge = `<span class="bg-teal-500/10 text-teal-400 border border-teal-500/20 font-bold px-1.5 py-0.5 rounded text-[9px] inline-flex items-center gap-0.5"><span class="w-1 h-1 rounded-full bg-teal-400"></span>XLS</span>`;
+        let custBadge = `<span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 font-bold px-1.5 py-0.5 rounded text-[9px] inline-flex items-center gap-0.5"><span class="w-1 h-1 rounded-full bg-rose-400"></span>XLS</span>`;
         if (t.customer && t.customer.includes('IOH')) {
-          custBadge = `<span class="bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 font-bold px-1.5 py-0.5 rounded text-[9px] inline-flex items-center gap-0.5"><span class="w-1 h-1 rounded-full bg-cyan-400"></span>IOH</span>`;
+          custBadge = `<span class="bg-amber-500/10 text-amber-400 border border-amber-500/20 font-bold px-1.5 py-0.5 rounded text-[9px] inline-flex items-center gap-0.5"><span class="w-1 h-1 rounded-full bg-amber-400"></span>IOH</span>`;
         }
 
         let statusBadge = `<span class="bg-slate-700/50 text-slate-300 border border-slate-600/50 px-2 py-0.5 rounded text-[10px] font-medium">${t.status}</span>`;
         if (t.status === 'Open') {
           statusBadge = `<span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 px-2 py-0.5 rounded text-[10px] font-semibold inline-flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span>Open</span>`;
         } else if (t.status === 'In Progress') {
-          statusBadge = `<span class="bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2 py-0.5 rounded text-[10px] font-semibold inline-flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>In Progress</span>`;
+          statusBadge = `<span class="bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded text-[10px] font-semibold inline-flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>In Progress</span>`;
         } else if (t.status === 'Pending') {
-          statusBadge = `<span class="bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded text-[10px] font-semibold inline-flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>Pending</span>`;
+          statusBadge = `<span class="bg-yellow-500/10 text-yellow-400 border border-yellow-500/20 px-2 py-0.5 rounded text-[10px] font-semibold inline-flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-yellow-400"></span>Pending</span>`;
         } else if (t.status === 'Closed') {
-          statusBadge = `<span class="bg-teal-500/10 text-teal-400 border border-teal-500/20 px-2 py-0.5 rounded text-[10px] font-semibold inline-flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-teal-400"></span>Closed</span>`;
+          statusBadge = `<span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded text-[10px] font-semibold inline-flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>Closed</span>`;
         }
 
         const ttr = calculateTicketTTR(t);
-        let ttrBadgeColor = "text-teal-400 bg-teal-500/10 border-teal-500/20";
+        let ttrBadgeColor = "text-emerald-400 bg-emerald-500/10 border-emerald-500/20";
         if (ttr.totalMinutes >= 180 && ttr.totalMinutes <= 240) {
           ttrBadgeColor = "text-amber-400 bg-amber-500/10 border-amber-500/20";
         } else if (ttr.totalMinutes > 240) {
@@ -1926,28 +1947,28 @@
             <td class="py-2 px-1.5 font-medium text-slate-500 truncate">${index + 1}</td>
             <td class="py-2 px-1.5 truncate">${custBadge}</td>
             <td class="py-2 px-1.5 truncate">
-              <span class="bg-slate-900 text-slate-200 border border-teal-500/20 px-1.5 py-0.5 rounded font-mono text-[10px] truncate block">${t.areaCluster}</span>
+              <span class="bg-slate-900 text-slate-200 border border-rose-500/20 px-1.5 py-0.5 rounded font-mono text-[10px] truncate block">${t.areaCluster}</span>
             </td>
             <td class="py-2 px-1.5 font-mono font-semibold text-white truncate text-[11px]" title="${t.ticketNumbers}">${t.ticketNumbers}</td>
             <td class="py-2 px-1.5 text-slate-200 truncate text-[11px]" title="${t.routeCase}">${t.routeCase}</td>
             <td class="py-2 px-1.5 font-mono text-[9px] text-rose-400/95 truncate" title="${openTimeStr}">${openTimeStr}</td>
-            <td class="py-2 px-1.5 font-mono text-[9px] text-teal-400/95 truncate" title="${closeTimeStr}">${closeTimeStr}</td>
+            <td class="py-2 px-1.5 font-mono text-[9px] text-emerald-400/95 truncate" title="${closeTimeStr}">${closeTimeStr}</td>
             <td class="py-2 px-1.5 truncate">
               <p class="font-medium text-slate-100 text-[10px] truncate" title="${t.rca1}">${t.rca1}</p>
               <p class="text-[9px] text-slate-400 truncate" title="${t.rca2}">${t.rca2}</p>
             </td>
-            <td class="py-2 px-1.5 text-cyan-400 font-mono text-[9px] truncate" title="${t.stopClock}">${t.stopClock}</td>
+            <td class="py-2 px-1.5 text-amber-400 font-mono text-[9px] truncate" title="${t.stopClock}">${t.stopClock}</td>
             <td class="py-2 px-1.5 truncate">
               <span class="px-1.5 py-0.5 rounded border font-mono font-bold text-[9px] inline-block ${ttrBadgeColor}" title="${ttr.formattedStr}">${ttr.formattedStr}</span>
             </td>
             <td class="py-2 px-1.5 truncate">${statusBadge}</td>
             <td class="py-2 px-1.5 text-center truncate">
               <div class="flex items-center justify-center gap-1">
-                <button onclick="window.openProgressModal('${t.firebaseKey}')" class="p-1.5 bg-slate-800 hover:bg-slate-700 text-teal-300 border border-teal-500/30 rounded-lg transition active:scale-95 shadow-sm" title="Log Progress & RCA">
-                  <i data-feather="edit-2" class="w-3.5 h-3.5 text-teal-400"></i>
+                <button onclick="window.openProgressModal('${t.firebaseKey}')" class="p-1.5 bg-slate-800 hover:bg-slate-700 text-rose-300 border border-rose-500/30 rounded-lg transition active:scale-95 shadow-sm" title="Log Progress & RCA">
+                  <i data-feather="edit-2" class="w-3.5 h-3.5 text-rose-400"></i>
                 </button>
-                <button onclick="window.openTimelyReport('${t.firebaseKey}')" class="p-1.5 bg-teal-600/20 hover:bg-teal-600/30 text-teal-300 border border-teal-500/30 rounded-lg transition active:scale-95 shadow-sm" title="Timely Report">
-                  <i data-feather="file-text" class="w-3.5 h-3.5 text-teal-400"></i>
+                <button onclick="window.openTimelyReport('${t.firebaseKey}')" class="p-1.5 bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 rounded-lg transition active:scale-95 shadow-sm" title="Timely Report">
+                  <i data-feather="file-text" class="w-3.5 h-3.5 text-rose-400"></i>
                 </button>
               </div>
             </td>
@@ -1987,8 +2008,8 @@
               labels: ['Open', 'In Progress', 'Pending', 'Closed'],
               datasets: [{
                 data: newData,
-                backgroundColor: ['#f43f5e', '#06b6d4', '#fbbf24', '#14b8a6'],
-                borderColor: 'rgba(15, 23, 42, 0.8)',
+                backgroundColor: ['#f43f5e', '#fbbf24', '#eab308', '#10b981'],
+                borderColor: 'rgba(30, 10, 15, 0.9)',
                 borderWidth: 2,
                 hoverOffset: 4
               }]
@@ -2027,8 +2048,8 @@
               datasets: [{
                 label: 'Jumlah RCA',
                 data: rcaData,
-                backgroundColor: 'rgba(251, 191, 36, 0.7)',
-                borderColor: '#fbbf24',
+                backgroundColor: 'rgba(244, 63, 94, 0.7)',
+                borderColor: '#f43f5e',
                 borderWidth: 1,
                 borderRadius: 2,
                 barThickness: 'flex',
@@ -2076,8 +2097,8 @@
               datasets: [{
                 label: 'Jumlah Tiket',
                 data: areaData,
-                backgroundColor: 'rgba(20, 184, 166, 0.7)',
-                borderColor: '#14b8a6',
+                backgroundColor: 'rgba(225, 29, 72, 0.7)',
+                borderColor: '#e11d48',
                 borderWidth: 1,
                 borderRadius: 2,
                 barThickness: 'flex',
