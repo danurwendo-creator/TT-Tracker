@@ -1,0 +1,2133 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mitratel FTTT Helpdesk Monitoring & TTR Tracker</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Feather Icons -->
+  <script src="https://unpkg.com/feather-icons"></script>
+  <!-- Exif JS for GPS extraction -->
+  <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- SheetJS (xlsx) -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  
+  <!-- Google Fonts: Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    body { font-family: 'Inter', sans-serif; overflow-x: hidden; }
+    .glass-card {
+      background: rgba(30, 10, 15, 0.88);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(239, 68, 68, 0.22);
+    }
+    .glass-card-sm {
+      background: rgba(30, 10, 15, 0.75);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(239, 68, 68, 0.15);
+    }
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: rgba(30, 10, 15, 0.6); }
+    ::-webkit-scrollbar-thumb { background: rgba(239, 68, 68, 0.4); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(239, 68, 68, 0.7); }
+    .sidebar-transition { transition: width 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-slate-950 via-red-950/40 to-stone-950 text-slate-100 min-h-screen w-screen antialiased selection:bg-rose-500 selection:text-white overflow-x-hidden">
+
+  <div id="toast-container" class="fixed bottom-5 right-5 z-[600] space-y-2 pointer-events-none"></div>
+
+  <div id="login-overlay" class="fixed inset-0 bg-slate-950/95 backdrop-blur-xl z-[400] flex items-center justify-center p-4">
+    <div class="glass-card rounded-3xl w-full max-w-md p-8 shadow-2xl border border-red-500/30">
+      <div class="flex flex-col items-center text-center mb-6">
+        <div class="p-3 bg-gradient-to-tr from-red-600 to-rose-500 rounded-2xl shadow-lg shadow-red-500/25 text-white mb-3 flex items-center justify-center w-16 h-16">
+          <svg class="w-10 h-10 text-white" viewBox="0 0 100 100" fill="currentColor">
+            <path d="M10 20 L50 70 L90 20 L90 35 L50 85 L10 35 Z" opacity="0.9"/>
+            <path d="M10 40 L50 90 L90 40 L90 55 L50 105 L10 55 Z" opacity="0.6"/>
+            <path d="M15 15 L50 60 L85 15 L85 30 L50 75 L15 30 Z"/>
+          </svg>
+        </div>
+        <h2 class="text-2xl font-bold text-white tracking-tight">Mitratel FTTT Login</h2>
+        <p class="text-xs text-slate-300 mt-1">Masukkan kredensial tim untuk mengakses dashboard monitoring.</p>
+      </div>
+
+      <div id="login-error" class="hidden mb-4 p-3 bg-rose-500/10 border border-rose-500/30 rounded-xl text-rose-400 text-xs text-center font-medium"></div>
+
+      <form onsubmit="window.handleLogin(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-medium text-slate-200 mb-1.5">Email Helpdesk</label>
+          <div class="relative">
+            <i data-feather="mail" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+            <input type="email" id="login-email" required placeholder="admin@mitratel.co.id" class="w-full bg-slate-900/90 border border-slate-700/80 text-xs text-white rounded-xl pl-10 pr-3.5 py-3 focus:outline-none focus:border-red-500 transition-colors">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-slate-200 mb-1.5">Password</label>
+          <div class="relative">
+            <i data-feather="key" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+            <input type="password" id="login-password" required placeholder="••••••••" class="w-full bg-slate-900/90 border border-slate-700/80 text-xs text-white rounded-xl pl-10 pr-3.5 py-3 focus:outline-none focus:border-red-500 transition-colors">
+          </div>
+        </div>
+
+        <button type="submit" id="btn-login" class="w-full mt-2 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-semibold py-3 rounded-xl text-xs transition shadow-lg shadow-red-500/25 flex items-center justify-center gap-2 active:scale-95">
+          <i data-feather="log-in" class="w-4 h-4"></i> Masuk ke Dashboard
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div id="dashboard-content" class="hidden flex h-screen w-screen overflow-hidden relative">
+    
+    <!-- SIDEBAR -->
+    <aside id="sidebar-nav" class="w-64 glass-card border-r border-red-950/40 flex flex-col justify-between z-30 flex-shrink-0 sidebar-transition">
+      <div>
+        <div class="p-4 border-b border-red-950/40 flex items-center justify-between">
+          <div id="sidebar-brand-content" class="flex items-center gap-3 overflow-hidden">
+            <div class="p-2 bg-gradient-to-tr from-red-600 to-rose-500 rounded-xl text-white shadow-lg shadow-red-500/20 flex-shrink-0 flex items-center justify-center w-10 h-10">
+              <svg class="w-6 h-6 text-white" viewBox="0 0 100 100" fill="currentColor">
+                <path d="M15 15 L50 60 L85 15 L85 30 L50 75 L15 30 Z"/>
+              </svg>
+            </div>
+            <div class="truncate sidebar-text-content">
+              <h2 class="font-bold text-sm text-white tracking-tight truncate">Mitratel FTTT</h2>
+              <p class="text-[10px] text-red-300 font-medium truncate">NOC Operations Center</p>
+            </div>
+          </div>
+          <button onclick="window.toggleSidebar()" class="text-red-300 hover:text-white p-2 rounded-xl hover:bg-red-500/20 transition flex-shrink-0" title="Collapse/Expand Sidebar">
+            <i data-feather="menu" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <nav class="p-3 space-y-1.5 text-xs">
+          <button onclick="window.switchTab('dashboard-noc')" id="nav-dashboard-noc" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium bg-gradient-to-r from-red-600/30 to-rose-600/10 text-red-200 border border-red-500/30 shadow-sm transition-all group" title="1. Dashboard Ticket">
+            <i data-feather="monitor" class="w-4 h-4 text-red-400 flex-shrink-0"></i> 
+            <span class="sidebar-label truncate">1. Dashboard Ticket</span>
+          </button>
+
+          <button onclick="window.switchTab('email-ticket')" id="nav-email-ticket" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium text-slate-300 hover:bg-red-500/10 hover:text-red-300 transition-all group" title="2. E-Mail Ticket">
+            <i data-feather="mail" class="w-4 h-4 text-red-400 flex-shrink-0"></i> 
+            <span class="sidebar-label truncate">2. E-Mail Ticket</span>
+          </button>
+          
+          <button onclick="window.switchTab('database-segment')" id="nav-database-segment" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium text-slate-300 hover:bg-red-500/10 hover:text-red-300 transition-all group" title="3. Database Segment">
+            <i data-feather="database" class="w-4 h-4 text-red-400 flex-shrink-0"></i> 
+            <span class="sidebar-label truncate">3. Database Segment</span>
+          </button>
+        </nav>
+      </div>
+
+      <div class="p-3 border-t border-red-950/40">
+        <div class="glass-card-sm p-2.5 rounded-xl flex items-center justify-between">
+          <div class="overflow-hidden sidebar-text-content">
+            <p class="text-[9px] text-slate-400">Logged in as</p>
+            <p id="user-display-email" class="text-[11px] text-slate-200 font-mono truncate">user@mitratel.co.id</p>
+          </div>
+          <button onclick="window.handleLogout()" class="text-rose-400 hover:text-rose-300 p-1.5 hover:bg-rose-500/10 rounded-lg transition flex-shrink-0" title="Logout">
+            <i data-feather="log-out" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <main class="flex-1 h-screen overflow-hidden p-3 md:p-4 flex flex-col relative bg-slate-950/40">
+      
+      <!-- TAB 1: DASHBOARD TICKET -->
+      <section id="view-dashboard-noc" class="flex-1 flex flex-col min-h-0 space-y-2 max-w-[1920px] w-full mx-auto overflow-y-auto pr-1">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 border-b border-rose-950/40 pb-2 flex-shrink-0">
+          <div class="flex items-center gap-2.5">
+            <div class="p-2 bg-gradient-to-tr from-rose-600 to-red-500 rounded-xl shadow-lg shadow-rose-500/20 text-white">
+              <i data-feather="monitor" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <h1 class="text-sm md:text-base font-bold tracking-tight text-white flex items-center gap-2">
+                Mitratel FTTT Dashboard Ticket
+                <span class="text-[9px] font-semibold px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/30 flex items-center gap-1">
+                  <span class="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse"></span> Cloud Sync
+                </span>
+              </h1>
+              <p class="text-[10px] text-slate-400">Dashboard Rekapitulasi, Real-Time TTR Tracking & Timely Report</p>
+            </div>
+          </div>
+          
+          <button onclick="window.openInputModal()" class="bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 text-white px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow-lg shadow-rose-500/25 transition active:scale-95">
+            <i data-feather="plus-circle" class="w-3.5 h-3.5"></i> Input Raw Ticket
+          </button>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-2 flex-shrink-0">
+          <div class="glass-card p-2 rounded-xl relative overflow-hidden">
+            <p class="text-[9px] font-medium text-slate-400 uppercase tracking-wider">Total Ticket</p>
+            <h3 id="stat-total" class="text-base font-extrabold text-white mt-0.5">0</h3>
+          </div>
+          <div class="glass-card p-2 rounded-xl relative overflow-hidden">
+            <div class="absolute top-0 left-0 bottom-0 w-1 bg-gradient-to-b from-rose-500 to-red-600"></div>
+            <p class="text-[9px] font-medium text-slate-400 uppercase tracking-wider">Ticket Open</p>
+            <h3 id="stat-open" class="text-base font-extrabold text-rose-400 mt-0.5">0</h3>
+          </div>
+          <div class="glass-card p-2 rounded-xl relative overflow-hidden">
+            <div class="absolute top-0 left-0 bottom-0 w-1 bg-gradient-to-b from-amber-400 to-orange-500"></div>
+            <p class="text-[9px] font-medium text-slate-400 uppercase tracking-wider">In Progress</p>
+            <h3 id="stat-progress" class="text-base font-extrabold text-amber-400 mt-0.5">0</h3>
+          </div>
+          <div class="glass-card p-2 rounded-xl relative overflow-hidden">
+            <div class="absolute top-0 left-0 bottom-0 w-1 bg-gradient-to-b from-yellow-400 to-amber-600"></div>
+            <p class="text-[9px] font-medium text-slate-400 uppercase tracking-wider">Pending</p>
+            <h3 id="stat-pending" class="text-base font-extrabold text-yellow-400 mt-0.5">0</h3>
+          </div>
+          <div class="glass-card p-2 rounded-xl relative overflow-hidden col-span-2 md:col-span-1">
+            <div class="absolute top-0 left-0 bottom-0 w-1 bg-gradient-to-b from-emerald-400 to-green-600"></div>
+            <p class="text-[9px] font-medium text-slate-400 uppercase tracking-wider">Ticket Close</p>
+            <div class="flex items-baseline justify-between mt-0.5">
+              <h3 id="stat-close" class="text-base font-extrabold text-emerald-400">0</h3>
+              <span class="text-[9px] text-slate-400 font-mono bg-slate-800/80 px-1 py-0.5 rounded border border-rose-500/20">
+                MTTR: <span id="stat-mttr" class="text-rose-300 font-bold">0j 0m</span>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- COMPACT CHARTS -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-2 flex-shrink-0">
+          <div class="glass-card p-2 rounded-xl">
+            <h4 class="text-[10px] font-semibold text-slate-300 mb-1 flex items-center gap-1.5">
+              <i data-feather="pie-chart" class="w-3 h-3 text-rose-400"></i> Proporsi Status Tiket
+            </h4>
+            <div class="relative h-20 w-full">
+              <canvas id="chart-status"></canvas>
+            </div>
+          </div>
+
+          <div class="glass-card p-2 rounded-xl">
+            <h4 class="text-[10px] font-semibold text-slate-300 mb-1 flex items-center gap-1.5">
+              <i data-feather="cpu" class="w-3 h-3 text-amber-400"></i> Klasifikasi RCA 1
+            </h4>
+            <div class="relative h-20 w-full">
+              <canvas id="chart-rca"></canvas>
+            </div>
+          </div>
+
+          <div class="glass-card p-2 rounded-xl">
+            <h4 class="text-[10px] font-semibold text-slate-300 mb-1 flex items-center gap-1.5">
+              <i data-feather="bar-chart-2" class="w-3 h-3 text-rose-400"></i> Distribusi Klaster Wilayah
+            </h4>
+            <div class="relative h-20 w-full">
+              <canvas id="chart-area"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass-card p-2 rounded-xl flex flex-col md:flex-row gap-2 items-center justify-between flex-shrink-0">
+          <div class="flex flex-wrap gap-2 items-center w-full md:w-auto">
+            <div class="relative w-full md:w-52">
+              <i data-feather="search" class="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"></i>
+              <input type="text" id="search-input" oninput="window.debouncedRenderTable()" placeholder="Cari Ticket, Site, Link..." class="bg-slate-900/90 border border-slate-700/80 text-xs text-white rounded-xl pl-8 pr-3 py-1.5 w-full focus:outline-none focus:border-rose-500/80">
+            </div>
+            
+            <select id="filter-customer" onchange="window.renderTable()" class="bg-slate-900/90 border border-slate-700/80 text-xs text-slate-300 rounded-xl px-2.5 py-1.5 focus:outline-none focus:border-rose-500/80 cursor-pointer">
+              <option value="">Semua Customer</option>
+              <option value="XLS">XLS (XL Axiata)</option>
+              <option value="IOH">IOH (Indosat)</option>
+            </select>
+
+            <select id="filter-area" onchange="window.renderTable()" class="bg-slate-900/90 border border-slate-700/80 text-xs text-slate-300 rounded-xl px-2.5 py-1.5 focus:outline-none focus:border-rose-500/80 cursor-pointer">
+              <option value="">Semua Klaster Wilayah</option>
+              <option value="Kab. Tangerang">Kab. Tangerang</option>
+              <option value="Tangerang">Tangerang</option>
+              <option value="Cilegon">Cilegon</option>
+              <option value="Jakarta Southern">Jakarta Southern</option>
+              <option value="Jakarta Northern">Jakarta Northern</option>
+              <option value="Bogor - Depok">Bogor - Depok</option>
+              <option value="Bekasi">Bekasi</option>
+              <option value="Pekanbaru">Pekanbaru</option>
+              <option value="Samarinda">Samarinda</option>
+              <option value="Banjarbaru">Banjarbaru</option>
+              <option value="Kotawaringin Barat">Kotawaringin Barat</option>
+              <option value="Kotawaringin Timur">Kotawaringin Timur</option>
+              <option value="Ketapang">Ketapang</option>
+            </select>
+
+            <select id="filter-status" onchange="window.renderTable()" class="bg-slate-900/90 border border-slate-700/80 text-xs text-slate-300 rounded-xl px-2.5 py-1.5 focus:outline-none focus:border-rose-500/80 cursor-pointer">
+              <option value="">Semua Status</option>
+              <option value="Open">Open</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Pending">Pending</option>
+              <option value="Closed">Closed</option>
+            </select>
+          </div>
+          
+          <button onclick="window.exportToExcel()" class="bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition active:scale-95 shadow-md flex-shrink-0">
+            <i data-feather="download" class="w-3.5 h-3.5 text-rose-400"></i> Export Excel
+          </button>
+        </div>
+
+        <!-- MAIN TABLE VIEW -->
+        <div class="glass-card rounded-xl overflow-hidden shadow-2xl flex-1 flex flex-col min-h-[550px]">
+          <div class="flex-1 overflow-x-hidden overflow-y-auto">
+            <table class="w-full text-left text-[11px] text-slate-300 border-collapse table-fixed">
+              <colgroup>
+                <col style="width: 35px;">
+                <col style="width: 65px;">
+                <col style="width: 95px;">
+                <col style="width: 125px;">
+                <col style="width: auto;">
+                <col style="width: 90px;">
+                <col style="width: 90px;">
+                <col style="width: 125px;">
+                <col style="width: 75px;">
+                <col style="width: 65px;">
+                <col style="width: 85px;">
+                <col style="width: 65px;">
+              </colgroup>
+              <thead class="bg-slate-900/95 text-slate-400 uppercase font-semibold text-[10px] tracking-wider border-b border-slate-800 sticky top-0 z-10">
+                <tr>
+                  <th class="py-2.5 px-1.5 truncate">No</th>
+                  <th class="py-2.5 px-1.5 truncate">Customer</th>
+                  <th class="py-2.5 px-1.5 truncate">Klaster</th>
+                  <th class="py-2.5 px-1.5 truncate">Nomor Tiket</th>
+                  <th class="py-2.5 px-1.5 truncate">Detail Route / Link Case</th>
+                  <th class="py-2.5 px-1.5 truncate">Ticket Open</th>
+                  <th class="py-2.5 px-1.5 truncate">Ticket Close</th>
+                  <th class="py-2.5 px-1.5 truncate">RCA 1 / RCA 2</th>
+                  <th class="py-2.5 px-1.5 truncate">Stop Clock</th>
+                  <th class="py-2.5 px-1.5 truncate">TTR</th>
+                  <th class="py-2.5 px-1.5 truncate">Status</th>
+                  <th class="py-2.5 px-1.5 text-center truncate">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="ticket-table-body" class="divide-y divide-slate-800/60"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: E-MAIL TICKET INBOX -->
+      <section id="view-email-ticket" class="hidden flex-1 flex flex-col min-h-0 space-y-3 max-w-[1920px] w-full mx-auto overflow-y-auto pr-1">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 border-b border-rose-950/40 pb-3 flex-shrink-0">
+          <div>
+            <h1 class="text-base md:text-lg font-bold tracking-tight text-white flex items-center gap-2">
+              <i data-feather="mail" class="text-rose-400 w-4 h-4"></i> E-Mail Ticket Inbox 
+            </h1>
+            <p class="text-[11px] text-slate-400 mt-0.5">Monitoring telemetri inbox email customer XLSMART & IOH terintegrasi langsung dari Zoho ke Gmail dan Firebase.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <div id="email-sync-status" class="text-xs font-mono text-rose-400 bg-rose-500/10 border border-rose-500/30 px-3 py-1.5 rounded-xl flex items-center gap-2 shadow-sm">
+              <span class="w-2 h-2 rounded-full bg-rose-400 animate-pulse"></span> Gmail Listener Active
+            </div>
+            <button onclick="window.syncGoogleSheetCsv(true)" class="bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 border border-slate-700 px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition">
+              <i data-feather="refresh-cw" class="w-3.5 h-3.5 text-rose-400"></i> Refresh Feed
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 flex-shrink-0">
+          <div class="glass-card p-3 rounded-xl border border-rose-500/20">
+            <div class="flex items-center justify-between">
+              <p class="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Total Mail Inbox</p>
+              <i data-feather="inbox" class="w-4 h-4 text-rose-400"></i>
+            </div>
+            <h3 id="stat-email-total" class="text-lg font-extrabold text-white mt-1"></h3>
+            <p class="text-[10px] text-slate-400 mt-0.5">Akun: <span class="text-rose-300 font-mono">hdfomtel@gmail.com</span></p>
+          </div>
+
+          <div class="glass-card p-3 rounded-xl border border-rose-500/20">
+            <div class="flex items-center justify-between">
+              <p class="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Email XLSMART [TR@OWS]</p>
+              <span class="w-2 h-2 rounded-full bg-rose-400"></span>
+            </div>
+            <h3 id="stat-email-xls" class="text-lg font-extrabold text-rose-400 mt-1"></h3>
+            <p class="text-[10px] text-slate-400 mt-0.5">Pengirim TR-SDMT / OWS</p>
+          </div>
+
+          <div class="glass-card p-3 rounded-xl border border-rose-500/20">
+            <div class="flex items-center justify-between">
+              <p class="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Email IOH [DATACOM/INC]</p>
+              <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+            </div>
+            <h3 id="stat-email-ioh" class="text-lg font-extrabold text-amber-400 mt-1"></h3>
+            <p class="text-[10px] text-slate-400 mt-0.5">Pengirim MSH 3PP / IOH</p>
+          </div>
+        </div>
+
+        <div class="glass-card rounded-xl overflow-hidden shadow-xl flex-1 flex flex-col min-h-0 border border-rose-500/20">
+          <div class="p-3 bg-slate-900/80 border-b border-slate-800 flex flex-col md:flex-row justify-between items-start md:items-center gap-3 text-xs flex-shrink-0">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-rose-400 animate-pulse"></span> 
+              <span class="font-bold text-white tracking-tight">Live Email</span>
+              <span id="email-count-badge" class="bg-rose-500/20 text-rose-300 border border-rose-500/30 px-2 py-0.5 rounded font-mono text-[10px]">  Emails</span>
+            </div>
+            
+            <div class="flex items-center gap-2 w-full md:w-auto">
+              <select id="filter-email-quick" onchange="window.renderEmailTickets()" class="bg-slate-950 border border-slate-700 text-xs text-slate-200 rounded-xl px-3 py-1.5 focus:outline-none focus:border-rose-500">
+                <option value="">Semua Category (All)</option>
+                <option value="XLSMART">XLSMART [TR@OWS]</option>
+                <option value="IOH">IOH [DATACOM/INC]</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="flex-1 overflow-x-hidden overflow-y-auto">
+            <table class="w-full text-left text-xs text-slate-300 table-fixed">
+              <colgroup>
+                <col style="width: 45px;">
+                <col style="width: 55px;">
+                <col style="width: 130px;">
+                <col style="width: 250px;">
+                <col>
+                <col style="width: 140px;">
+              </colgroup>
+              <thead class="bg-slate-900/95 text-slate-400 uppercase font-semibold text-[10px] tracking-wider border-b border-slate-800 sticky top-0 z-10 select-none">
+                <tr>
+                  <th class="p-2.5 text-center truncate">+</th>
+                  <th class="p-2.5 text-center cursor-pointer hover:text-rose-300 transition-colors truncate" onclick="window.sortEmailTickets('no')">NO.</th>
+                  <th class="p-2.5 cursor-pointer hover:text-rose-300 transition-colors truncate" onclick="window.sortEmailTickets('sender')">SENDER</th>
+                  <th class="p-2.5 cursor-pointer hover:text-rose-300 transition-colors truncate" onclick="window.sortEmailTickets('subject')">SUBJECT & TICKET</th>
+                  <th class="p-2.5 cursor-pointer hover:text-rose-300 transition-colors truncate" onclick="window.sortEmailTickets('body')">BODY E-MAIL (PREVIEW)</th>
+                  <th class="p-2.5 cursor-pointer hover:text-rose-300 transition-colors truncate" onclick="window.sortEmailTickets('date')">TIME RECEIVED</th>
+                </tr>
+                <tr class="bg-slate-950/90 border-b border-slate-800">
+                  <th class="p-1.5"></th>
+                  <th class="p-1.5"></th>
+                  <th class="p-1.5"><input type="text" id="filter-email-sender" oninput="window.debouncedRenderEmailTickets()" placeholder="Search SENDER" class="w-full bg-slate-900 border border-slate-700 text-[11px] text-white rounded px-2 py-1 focus:outline-none focus:border-rose-500"></th>
+                  <th class="p-1.5"><input type="text" id="filter-email-subject" oninput="window.debouncedRenderEmailTickets()" placeholder="Search Subject" class="w-full bg-slate-900 border border-slate-700 text-[11px] text-white rounded px-2 py-1 focus:outline-none focus:border-rose-500"></th>
+                  <th class="p-1.5"><input type="text" id="filter-email-body" oninput="window.debouncedRenderEmailTickets()" placeholder="Search Body" class="w-full bg-slate-900 border border-slate-700 text-[11px] text-white rounded px-2 py-1 focus:outline-none focus:border-rose-500"></th>
+                  <th class="p-1.5"><input type="text" id="filter-email-date" oninput="window.debouncedRenderEmailTickets()" placeholder="Search Time" class="w-full bg-slate-900 border border-slate-700 text-[11px] text-white rounded px-2 py-1 focus:outline-none focus:border-rose-500"></th>
+                </tr>
+              </thead>
+              <tbody id="email-ticket-table-body" class="divide-y divide-slate-800/60 text-[11px]"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: DATABASE SEGMENT -->
+      <section id="view-database-segment" class="hidden flex-1 flex flex-col min-h-0 space-y-3 max-w-[1920px] w-full mx-auto overflow-y-auto pr-1">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 border-b border-rose-950/40 pb-3 flex-shrink-0">
+          <div>
+            <h1 class="text-base md:text-lg font-bold tracking-tight text-white flex items-center gap-2">
+              <i data-feather="database" class="text-rose-400 w-4 h-4"></i> Database Segment (Google Spreadsheet)
+            </h1>
+            <p class="text-[11px] text-slate-400 mt-0.5">Sinkronisasi data master segmen jaringan fiber optik langsung dari Google Spreadsheet dengan pembersihan otomatis format koordinat.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="window.syncGoogleSheetCsv(true)" class="bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition shadow-md">
+              <i data-feather="refresh-cw" class="w-3.5 h-3.5 text-rose-400"></i> Sync Spreadsheet
+            </button>
+            <button onclick="window.exportDatabaseExcel()" class="bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition shadow-md">
+              <i data-feather="download" class="w-3.5 h-3.5 text-rose-400"></i> Export Excel
+            </button>
+          </div>
+        </div>
+
+        <div class="glass-card p-3 rounded-xl flex flex-col md:flex-row gap-3 items-center justify-between flex-shrink-0">
+          <div class="relative w-full md:w-80">
+            <i data-feather="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"></i>
+            <input type="text" id="db-search" oninput="window.debouncedRenderDatabaseSegment()" placeholder="Cari Area, Site NE/FE..." class="bg-slate-900/90 border border-slate-700/80 text-xs text-white rounded-xl pl-9 pr-3 py-2 w-full focus:outline-none focus:border-rose-500">
+          </div>
+          <div id="db-status-badge" class="text-xs text-rose-400 font-mono flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-rose-400 animate-ping"></span> Total Master Segment: <span id="db-total-count" class="text-white font-bold">0</span>
+          </div>
+        </div>
+
+        <div class="glass-card rounded-xl overflow-hidden shadow-xl flex-1 flex flex-col min-h-0">
+          <div class="flex-1 overflow-x-hidden overflow-y-auto">
+            <table class="w-full text-left text-xs text-slate-300 table-fixed">
+              <colgroup>
+                <col style="width: 45px;">
+                <col style="width: 100px;">
+                <col style="width: 130px;">
+                <col>
+                <col style="width: 130px;">
+                <col style="width: 130px;">
+                <col style="width: 130px;">
+                <col>
+                <col style="width: 130px;">
+                <col style="width: 120px;">
+                <col style="width: 80px;">
+              </colgroup>
+              <thead class="bg-slate-900/90 text-slate-400 uppercase font-semibold text-[10px] tracking-wider border-b border-slate-800 sticky top-0 z-10">
+                <tr>
+                  <th class="p-2.5 truncate">No.</th>
+                  <th class="p-2.5 truncate">Area</th>
+                  <th class="p-2.5 truncate">ID Site NE</th>
+                  <th class="p-2.5 truncate">Site Name NE</th>
+                  <th class="p-2.5 truncate">Owner NE</th>
+                  <th class="p-2.5 text-rose-300 truncate">Koordinat NE</th>
+                  <th class="p-2.5 truncate">ID Site FE</th>
+                  <th class="p-2.5 truncate">Site Name FE</th>
+                  <th class="p-2.5 truncate">Owner FE</th>
+                  <th class="p-2.5 text-amber-300 truncate">Koordinat FE</th>
+                  <th class="p-2.5 truncate">Panjang</th>
+                </tr>
+              </thead>
+              <tbody id="db-segment-tbody" class="divide-y divide-slate-800/60 text-[11px]"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- MODALS -->
+  <div id="modal-input" class="fixed inset-0 bg-slate-950/40 backdrop-blur-sm hidden flex items-center justify-center p-4 z-[500]">
+    <div class="glass-card rounded-3xl w-full max-w-xl p-6 shadow-2xl border border-rose-500/30">
+      <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-800">
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          <i data-feather="terminal" class="text-rose-400 w-5 h-5"></i> Paste Raw Broadcast Trouble Ticket
+        </h3>
+        <button onclick="window.closeInputModal()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition"><i data-feather="x" class="w-5 h-5"></i></button>
+      </div>
+      <p class="text-xs text-slate-400 mb-3">Tempelkan pesan broadcast/WhatsApp dari NOC/Partner di bawah ini.</p>
+      
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Pilih / Deteksi Klaster Wilayah Tiket</label>
+          <select id="raw-input-cluster" class="w-full bg-slate-900/90 border border-slate-700/80 text-xs text-slate-200 rounded-xl p-3 focus:outline-none focus:border-rose-500 cursor-pointer">
+            <option value="">-- Auto Detect AI / Pilih Klaster --</option>
+            <option value="Kab. Tangerang">Kab. Tangerang</option>
+            <option value="Tangerang">Tangerang</option>
+            <option value="Cilegon">Cilegon</option>
+            <option value="Jakarta Southern">Jakarta Southern</option>
+            <option value="Jakarta Northern">Jakarta Northern</option>
+            <option value="Bogor - Depok">Bogor - Depok</option>
+            <option value="Bekasi">Bekasi</option>
+            <option value="Pekanbaru">Pekanbaru</option>
+            <option value="Samarinda">Samarinda</option>
+            <option value="Banjarbaru">Banjarbaru</option>
+            <option value="Kotawaringin Barat">Kotawaringin Barat</option>
+            <option value="Kotawaringin Timur">Kotawaringin Timur</option>
+            <option value="Ketapang">Ketapang</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Raw Broadcast Message</label>
+          <textarea id="raw-ticket-input" oninput="window.previewAutoCluster()" rows="5" placeholder="Contoh: Fiber Cut CSR ## IP Link From_3G_GEREM_RAYA... INCM-20260910-00029680 TR-20260910-00000635 [2026-09-10 15:25:38]" class="w-full bg-slate-900/90 border border-slate-700/80 text-xs text-slate-200 rounded-xl p-3.5 focus:outline-none focus:border-rose-500 font-mono"></textarea>
+        </div>
+      </div>
+      
+      <div class="mt-5 flex justify-end gap-2.5">
+        <button onclick="window.closeInputModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-medium transition">Batal</button>
+        <button onclick="window.processRawTicket()" class="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white font-medium rounded-xl text-xs transition shadow-lg shadow-rose-600/25">Parse & Simpan ke Cloud</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-progress" class="fixed inset-0 bg-slate-950/40 backdrop-blur-sm hidden flex items-center justify-center p-4 z-[500] overflow-y-auto">
+    <div class="glass-card rounded-3xl w-full max-w-2xl p-6 shadow-2xl border border-rose-500/30 my-8">
+      <div class="flex justify-between items-center mb-5 border-b border-slate-800 pb-3">
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          <i data-feather="edit-3" class="text-rose-400 w-5 h-5"></i> Log Progress, RCA & Evidence
+        </h3>
+        <button onclick="window.closeProgressModal()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition"><i data-feather="x" class="w-5 h-5"></i></button>
+      </div>
+      
+      <input type="hidden" id="edit-ticket-id">
+
+      <div class="space-y-4 text-xs">
+        <div class="glass-card-sm p-4 rounded-2xl space-y-2">
+          <label class="block font-semibold text-rose-400 text-[11px] flex items-center gap-1.5">
+            <i data-feather="map-pin" class="w-3.5 h-3.5"></i> Update Klaster Wilayah / Koreksi Wilayah
+          </label>
+          <select id="update-cluster" class="w-full bg-slate-900 border border-slate-700/80 text-white rounded-xl p-2.5 focus:outline-none focus:border-rose-500 cursor-pointer">
+            <option value="Kab. Tangerang">Kab. Tangerang</option>
+            <option value="Tangerang">Tangerang</option>
+            <option value="Cilegon">Cilegon</option>
+            <option value="Jakarta Southern">Jakarta Southern</option>
+            <option value="Jakarta Northern">Jakarta Northern</option>
+            <option value="Bogor - Depok">Bogor - Depok</option>
+            <option value="Bekasi">Bekasi</option>
+            <option value="Pekanbaru">Pekanbaru</option>
+            <option value="Samarinda">Samarinda</option>
+            <option value="Banjarbaru">Banjarbaru</option>
+            <option value="Kotawaringin Barat">Kotawaringin Barat</option>
+            <option value="Kotawaringin Timur">Kotawaringin Timur</option>
+            <option value="Ketapang">Ketapang</option>
+          </select>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block font-medium text-slate-400 mb-1.5">Status Lapangan</label>
+            <select id="update-status" class="w-full bg-slate-900/90 border border-slate-700/80 text-white rounded-xl p-2.5 focus:outline-none focus:border-rose-500">
+              <option value="Open">Open</option>
+              <option value="In Progress">In Progress (Dispatch/Work Progress)</option>
+              <option value="Pending">Pending (Stop Clock / Waiting Parts)</option>
+              <option value="Closed">Closed (Selesai)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-medium text-slate-400 mb-1.5">Deskripsi Ringkas Aktivitas</label>
+            <input type="text" id="update-activity" placeholder="e.g. Splicing FO selesai, koordinat telah diisi" class="w-full bg-slate-900/90 border border-slate-700/80 text-white rounded-xl p-2.5 focus:outline-none focus:border-rose-500">
+          </div>
+        </div>
+
+        <div class="glass-card-sm p-4 rounded-2xl space-y-2">
+          <label class="block font-semibold text-rose-300 text-[11px] flex items-center gap-1.5">
+            <i data-feather="clock" class="w-3.5 h-3.5"></i> Waktu Aktual Aktivitas Lapangan (Menyesuaikan Laporan Teknisi)
+          </label>
+          <input type="datetime-local" id="update-actual-time" class="w-full bg-slate-900 border border-slate-700/80 text-white rounded-xl p-2.5 font-mono text-xs focus:outline-none focus:border-rose-500">
+          <p class="text-[10px] text-slate-400">Kosongkan jika ingin menggunakan waktu sistem saat ini.</p>
+        </div>
+
+        <div class="glass-card-sm p-4 rounded-2xl space-y-3">
+          <span class="font-semibold text-amber-400 block text-[11px] flex items-center gap-1.5">
+            <i data-feather="cpu" class="w-3.5 h-3.5"></i> Klasifikasi Root Cause Analysis (RCA)
+          </span>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div>
+              <label class="text-[10px] text-slate-400 block mb-1">Status Ticket</label>
+              <select id="rca-status-ticket" onchange="window.updateRcaPartOptions()" class="w-full bg-slate-900 border border-slate-700/80 text-white rounded-lg p-2 focus:outline-none focus:border-rose-500">
+                <option value="">-- Pilih Status --</option>
+                <option value="Ticket Confirm">Ticket Confirm</option>
+                <option value="Ticket Cancellation">Ticket Cancellation</option>
+              </select>
+            </div>
+            <div>
+              <label class="text-[10px] text-slate-400 block mb-1">Part Of</label>
+              <select id="rca-part-of" onchange="window.updateRca1Options()" class="w-full bg-slate-900 border border-slate-700/80 text-white rounded-lg p-2 focus:outline-none focus:border-rose-500">
+                <option value="">-- Pilih Part Of --</option>
+              </select>
+            </div>
+            <div>
+              <label class="text-[10px] text-slate-400 block mb-1">RCA 1</label>
+              <select id="rca-1" onchange="window.updateRca2Options()" class="w-full bg-slate-900 border border-slate-700/80 text-white rounded-lg p-2 focus:outline-none focus:border-rose-500">
+                <option value="">-- Pilih RCA 1 --</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="text-[10px] text-slate-400 block mb-1">RCA 2 (Detail Specific Cause)</label>
+            <select id="rca-2" class="w-full bg-slate-900 border border-slate-700/80 text-white rounded-lg p-2 focus:outline-none focus:border-rose-500">
+              <option value="">-- Pilih RCA 2 --</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="glass-card-sm p-4 rounded-2xl space-y-3">
+          <div class="flex justify-between items-center">
+            <span class="font-semibold text-amber-300 text-[11px] flex items-center gap-1.5">
+              <i data-feather="clock" class="w-3.5 h-3.5"></i> Kondisi Stop Clock
+            </span>
+            <label class="flex items-center gap-2 text-[11px] text-slate-300 cursor-pointer select-none">
+              <input type="checkbox" id="enable-stopclock" onchange="window.toggleStopClockSection()" class="rounded bg-slate-900 border-slate-700 text-rose-600">
+              Aktifkan Stop Clock
+            </label>
+          </div>
+
+          <div id="stopclock-fields" class="grid grid-cols-1 md:grid-cols-3 gap-3 hidden">
+            <div>
+              <label class="text-[10px] text-slate-400 block mb-1">RCA 3 (Stop Clock)</label>
+              <select id="sc-rca3" onchange="window.updateScIssueOptions()" class="w-full bg-slate-900 border border-slate-700/80 text-white rounded-lg p-2 focus:outline-none focus:border-rose-500">
+                <option value="">-- Pilih RCA 3 --</option>
+              </select>
+            </div>
+            <div>
+              <label class="text-[10px] text-slate-400 block mb-1">Stop Clock Issue</label>
+              <select id="sc-issue" onchange="window.autoFillScDuration()" class="w-full bg-slate-900 border border-slate-700/80 text-white rounded-lg p-2 focus:outline-none focus:border-rose-500">
+                <option value="">-- Pilih Issue --</option>
+              </select>
+            </div>
+            <div>
+              <label class="text-[10px] text-slate-400 block mb-1">Durasi Standar</label>
+              <input type="text" id="sc-duration" placeholder="e.g. 02:00" class="w-full bg-slate-900 border border-slate-700/80 text-white rounded-lg p-2 font-mono">
+            </div>
+          </div>
+        </div>
+
+        <div class="glass-card-sm p-4 rounded-2xl space-y-3">
+          <span class="font-semibold text-rose-400 block text-[11px] flex items-center gap-1.5">
+            <i data-feather="camera" class="w-3.5 h-3.5"></i> Evidence Foto FO Cut & Koordinat
+          </span>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 items-center">
+            <div>
+              <label class="block text-[10px] text-slate-400 mb-1">Upload Foto Titik FO Cut</label>
+              <input type="file" id="evidence-file" accept="image/*" onchange="window.handleEvidenceUpload(event)" class="w-full text-slate-300 bg-slate-900 border border-slate-700/80 rounded-lg p-1.5 text-xs file:mr-2 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:text-xs file:bg-rose-600 file:text-white cursor-pointer">
+            </div>
+
+            <div>
+              <label class="block text-[10px] text-slate-400 mb-1">Koordinat (lat,long)</label>
+              <input type="text" id="evidence-gps" placeholder="-6.2454487,106.9004475" class="w-full bg-slate-900 border border-slate-700/80 text-white rounded-lg p-2 font-mono text-xs focus:outline-none focus:border-rose-500">
+            </div>
+          </div>
+
+          <div id="evidence-preview-container" class="hidden flex items-center gap-3 pt-2">
+            <img id="evidence-preview" class="w-16 h-16 object-cover rounded-xl border border-slate-700 shadow-md">
+            <div class="text-[10px] text-slate-400 space-y-0.5">
+              <p id="evidence-time" class="font-mono text-rose-400 font-medium"></p>
+              <p id="evidence-gps-info" class="font-mono text-slate-300"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-6 flex justify-end gap-2.5">
+        <button onclick="window.closeProgressModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-medium transition">Batal</button>
+        <button onclick="window.saveProgressUpdate()" class="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white font-medium rounded-xl text-xs transition shadow-lg shadow-rose-600/25">Update Cloud</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-timely-report" class="fixed inset-0 bg-slate-950/40 backdrop-blur-sm hidden flex items-center justify-center p-4 z-[500]">
+    <div class="glass-card rounded-3xl w-full max-w-2xl p-6 shadow-2xl border border-rose-500/30">
+      <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-800">
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          <i data-feather="file-text" class="text-rose-400 w-5 h-5"></i> Timely Report Chronology
+        </h3>
+        <button onclick="window.closeTimelyReportModal()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition"><i data-feather="x" class="w-5 h-5"></i></button>
+      </div>
+      
+      <div class="bg-slate-950/80 border border-slate-800 rounded-2xl p-4 font-mono text-xs text-slate-200 h-64 overflow-y-auto whitespace-pre-wrap leading-relaxed select-all" id="timely-report-content"></div>
+
+      <div id="timely-report-evidence-container" class="hidden mt-4 pt-3 border-t border-slate-800 flex items-center gap-4">
+        <img id="timely-report-img" class="w-20 h-20 object-cover rounded-xl border border-rose-500/30 shadow-lg" alt="Evidence FO Cut">
+        <div class="text-xs space-y-1 font-mono">
+          <p class="text-rose-400 font-semibold flex items-center gap-1.5"><i data-feather="camera" class="w-3.5 h-3.5"></i> Lampiran Evidence Foto Terlampir</p>
+          <p id="timely-report-gps" class="text-slate-300"></p>
+        </div>
+      </div>
+
+      <div class="mt-5 flex justify-between items-center">
+        <span id="copy-status" class="text-xs text-rose-400 font-medium opacity-0 transition-opacity flex items-center gap-1">
+          <i data-feather="check-circle" class="w-3.5 h-3.5"></i> Berhasil di-copy!
+        </span>
+        <div class="flex gap-2.5">
+          <button onclick="window.closeTimelyReportModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-medium transition">Tutup</button>
+          <button onclick="window.copyTimelyReport()" class="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white font-medium rounded-xl text-xs flex items-center gap-2 transition shadow-lg shadow-rose-600/25">
+            <i data-feather="copy" class="w-3.5 h-3.5"></i> Copy Report Teks
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getDatabase, ref, push, set, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAhFyv1rbboT9Ji0rhmqa5dFQtPuJL-b14",
+      authDomain: "tracker-tt.firebaseapp.com",
+      databaseURL: "https://tracker-tt-default-rtdb.asia-southeast1.firebasedatabase.app/",
+      projectId: "tracker-tt",
+      storageBucket: "tracker-tt.firebasestorage.app",
+      messagingSenderId: "981495258865",
+      appId: "1:981495258865:web:13b82ebe8b7e370c30d350",
+      measurementId: "G-1Z8CH5D6TM"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+    const ticketsRef = ref(db, 'tickets');
+    const emailTicketsRef = ref(db, 'email-tickets');
+
+    window.firebaseDb = db;
+    window.firebaseRef = ref;
+    window.firebasePush = push;
+    window.firebaseSet = set;
+    window.firebaseUpdate = update;
+
+    window.ticketList = [];
+    window.emailInboxList = [];
+    window.segmentList = [];
+
+    window.handleLogin = function(e) {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value;
+      const password = document.getElementById('login-password').value;
+      const errorBox = document.getElementById('login-error');
+
+      errorBox.classList.add('hidden');
+
+      signInWithEmailAndPassword(auth, email, password)
+        .catch((error) => {
+          errorBox.classList.remove('hidden');
+          errorBox.innerText = "Gagal login: " + error.message;
+        });
+    };
+
+    window.handleLogout = function() {
+      signOut(auth);
+    };
+
+    window.saveTicketToFirebase = function(ticketObj) {
+      const newRef = push(ticketsRef);
+      set(newRef, ticketObj);
+    };
+
+    window.updateTicketInFirebase = function(key, updatedFields) {
+      const itemRef = ref(db, `tickets/${key}`);
+      update(itemRef, updatedFields);
+    };
+
+    function cleanAndFormatCoordExact(latRaw, lonRaw) {
+      function cleanVal(v) {
+        if (v === undefined || v === null) return null;
+        let s = String(v).trim().replace(/^["']|["']$/g, '').trim();
+        if (!s || s === '-' || s === 'undefined' || s === 'null') return null;
+        s = s.replace(/,/g, '.');
+        let parsed = parseFloat(s);
+        if (isNaN(parsed)) return null;
+        return s;
+      }
+
+      let latStr = cleanVal(latRaw);
+      let lonStr = cleanVal(lonRaw);
+
+      if (latStr !== null && lonStr !== null) {
+        let displayStr = `${latStr}, ${lonStr}`;
+        let mapUrl = `https://www.google.com/maps/search/?api=1&query=${latStr},${lonStr}`;
+        return { display: displayStr, url: mapUrl, lat: parseFloat(latStr), lon: parseFloat(lonStr) };
+      }
+      return { display: '-', url: '#', lat: null, lon: null };
+    }
+
+    window.parseCoordObj = cleanAndFormatCoordExact;
+
+    window.syncGoogleSheetCsv = async function(force = false) {
+      const statusEl = document.getElementById('db-status-badge');
+      if (statusEl) statusEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span> Mengunduh dan memproses data dari Google Spreadsheet...`;
+
+      const rawUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS80V5Lijol1MsoDq0P75g44YEkhcedXXxcfXfJDRr2OWlT3GcaFvSMo4yrVHRXQA/pub?output=csv';
+      const proxies = [
+        `https://api.allorigins.win/raw?url=${encodeURIComponent(rawUrl)}`,
+        `https://corsproxy.io/?${encodeURIComponent(rawUrl)}`,
+        `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(rawUrl)}`
+      ];
+
+      let csvText = null;
+      for (let pUrl of proxies) {
+        try {
+          const res = await fetch(pUrl);
+          if (res.ok) {
+            csvText = await res.text();
+            if (csvText && csvText.length > 50) break;
+          }
+        } catch(e) {
+          console.warn("Proxy attempt failed:", pUrl);
+        }
+      }
+
+      if (csvText) {
+        try {
+          const workbook = XLSX.read(csvText, { type: 'string', raw: true });
+          const firstSheetName = workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[firstSheetName];
+          const json = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+
+          if (json && json.length > 0) {
+            window.segmentList = json.map((row, idx) => {
+              return {
+                firebaseKey: `seg_${idx}`,
+                no: row["no"] || row["No"] || row["NO"] || (idx + 1),
+                witel: row["witel"] || row["Witel"] || row["WITEL"] || row["Area"] || row["area"] || '-',
+                site_ne: row["site_ne"] || row["Site NE"] || row["SITE_NE"] || row["ID Site NE"] || '-',
+                site_name_ne: row["site_name_ne"] || row["Site Name NE"] || row["SITE_NAME_NE"] || '-',
+                site_owner_ne: row["site_owner_ne"] || row["Site Owner NE"] || row["SITE_OWNER_NE"] || '-',
+                lat_ne: row["site_lat_ne"] || row["Site Lat NE"] || '',
+                lon_ne: row["site_long_ne"] || row["Site Long NE"] || '',
+                site_fe: row["site_fe"] || row["Site FE"] || row["SITE_FE"] || row["ID Site FE"] || '-',
+                site_name_fe: row["site_name_fe"] || row["Site Name FE"] || row["SITE_NAME_FE"] || '-',
+                site_owner_fe: row["site_owner_fe"] || row["Site Owner FE"] || row["SITE_OWNER_FE"] || '-',
+                lat_fe: row["site_lat_fe"] || row["Site Lat FE"] || '',
+                lon_fe: row["site_long_fe"] || row["Site Long FE"] || '',
+                panjang: row["Panjang Referensi"] || row["panjang"] || row["Panjang (Km)"] || '0'
+              };
+            });
+
+            if (statusEl) statusEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-rose-400"></span> Total Master Segment: <span id="db-total-count" class="text-white font-bold">${window.segmentList.length}</span>`;
+            if (typeof window.renderDatabaseSegment === 'function') window.renderDatabaseSegment();
+            return;
+          }
+        } catch (err) {
+          console.error("Parse error:", err);
+        }
+      }
+
+      window.segmentList = [
+        { firebaseKey: "s1", no: "1", witel: "Pekanbaru", site_ne: "SUM-RI-PBR-0908", site_name_ne: "Cinta Raja KOTA PEKANBARU", site_owner_ne: "PT PROFESIONAL TELEKOMUNIKASI INDONESIA", lat_ne: "0,504027778", lon_ne: "101,5238889", site_fe: "SUM-RI-PBR-0943", site_name_fe: "TENAYAN JAYA RELOCATION", site_owner_fe: "PT PROFESIONAL TELEKOMUNIKASI INDONESIA", lat_fe: "0,485716667", lon_ne: "101,5278917", panjang: "4.779" }
+      ];
+      if (statusEl) statusEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-rose-400"></span> Total Master Segment (Fallback): <span id="db-total-count" class="text-white font-bold">${window.segmentList.length}</span>`;
+      if (typeof window.renderDatabaseSegment === 'function') window.renderDatabaseSegment();
+    };
+
+    onAuthStateChanged(auth, (user) => {
+      const loginOverlay = document.getElementById('login-overlay');
+      const dashboardContent = document.getElementById('dashboard-content');
+      
+      if (user) {
+        loginOverlay.classList.add('hidden');
+        dashboardContent.classList.remove('hidden');
+        document.getElementById('user-display-email').innerText = user.email || 'user@mitratel.co.id';
+      } else {
+        loginOverlay.classList.remove('hidden');
+        dashboardContent.classList.add('hidden');
+      }
+      
+      onValue(ticketsRef, (snapshot) => {
+        const data = snapshot.val();
+        if (data && Object.keys(data).length > 0) {
+          window.ticketList = [];
+          Object.keys(data).forEach(key => {
+            window.ticketList.unshift({ firebaseKey: key, ...data[key] });
+          });
+        } else {
+          window.ticketList = [];
+        }
+        if (typeof window.renderTable === 'function') window.renderTable();
+      }, (error) => {
+        console.error("Firebase read error (tickets):", error);
+      });
+
+      onValue(emailTicketsRef, (snapshot) => {
+        const data = snapshot.val();
+        const syncStatusEl = document.getElementById('email-sync-status');
+        
+        if (syncStatusEl) {
+          syncStatusEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-red-400 animate-pulse"></span> Gmail Live Sync Active`;
+          syncStatusEl.className = "text-xs font-mono text-red-300 bg-red-500/10 border border-red-500/30 px-3 py-1.5 rounded-xl flex items-center gap-2";
+        }
+
+        if (data) {
+          let rawList = [];
+          if (Array.isArray(data)) {
+            rawList = data.filter(Boolean).map((item, idx) => ({ id: `email_${idx}`, ...item }));
+          } else if (typeof data === 'object') {
+            rawList = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+          }
+
+          window.emailInboxList = rawList.map(item => {
+            let formattedDate = item.timestamp || item.receivedDateTime || item.date || '-';
+            const rawTimeVal = item.timestamp || item.receivedDateTime || item.date || item.created_at;
+            if (rawTimeVal) {
+              try {
+                const d = new Date(rawTimeVal);
+                if (!isNaN(d.getTime())) {
+                  formattedDate = d.toLocaleString('id-ID', {
+                    timeZone: 'Asia/Jakarta',
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false
+                  });
+                }
+              } catch(e) {
+                formattedDate = String(rawTimeVal);
+              }
+            }
+
+            let category = item.category || 'OTHER';
+            const strCheck = ((item.subject || '') + ' ' + (item.body || '') + ' ' + (item.sender || '')).toUpperCase();
+            if (category === 'OTHER' || !category) {
+              if (strCheck.includes('XLSMART') || strCheck.includes('XL SMART') || strCheck.includes('TR@OWS') || strCheck.includes('TR-SDMT')) {
+                category = 'XLSMART';
+              } else if (strCheck.includes('IOH') || strCheck.includes('INDOSAT') || strCheck.includes('INC') || strCheck.includes('DATACOM') || strCheck.includes('MSH 3PP')) {
+                category = 'IOH';
+              }
+            }
+
+            return {
+              id: item.id || item.firebaseKey || Math.random().toString(),
+              sender: item.sender || item.from || 'TR-SDMT',
+              subject: item.subject || 'No Subject',
+              body: item.body || item.text || '',
+              category: category,
+              status: item.status || 'NEW',
+              receivedDateTime: formattedDate
+            };
+          }).reverse();
+        } else {
+          window.emailInboxList = [
+            {
+              id: "em_1",
+              sender: "MSH 3PP",
+              subject: "[FLP_3rd_UMT][Open - Major] DOWN - 23BJM005S_KAYU_TANGI_MT(17BJM002)<>23MRB023_TRANSKALIMANTAN_CM(173048) - DATACOM-INC-20260915-00027214",
+              body: "Dear Partner, Kindly need your help for troubleshooting DOWN link 23BJM005S_KAYU_TANGI_MT <> 23MRB023_TRANSKALIMANTAN_CM. Segment = 23BJM005S_KAYU_TANGI_MT(17BJM002)<>23MRB023_TRANSKALIMANTAN_CM(173048). Ticket INC: DATACOM-INC-20260915-00027214. Down time: [2026-09-15 20:35:00]",
+              category: "IOH",
+              receivedDateTime: "15/09/2026 20:35:00"
+            },
+            {
+              id: "em_2",
+              sender: "TR-SDMT",
+              subject: "[TR@OWS] (Open) MS Partner Checking Final Answer [TR-20260915-00000376] UMT-Leased Fiber-260913006 : Fiber Cut CSR ## IP Link From_Klungkung_PAG-BASRP1083-03H <TO> Keramas",
+              body: "Fiber Cut CSR ## IP Link From_Klungkung_PAG-BASRP1083-03H <TO> Keramas INCM-20260915-00029680 TR-20260915-00000376 [2026-09-15 20:34:00]",
+              category: "XLSMART",
+              receivedDateTime: "15/09/2026 20:34:00"
+            }
+          ];
+        }
+
+        const countBadge = document.getElementById('email-count-badge');
+        if (countBadge) countBadge.innerText = `${window.emailInboxList.length} Emails`;
+
+        const xlsCount = window.emailInboxList.filter(e => e.category === 'XLSMART').length;
+        const iohCount = window.emailInboxList.filter(e => e.category === 'IOH').length;
+        
+        if (document.getElementById('stat-email-total')) document.getElementById('stat-email-total').innerText = window.emailInboxList.length;
+        if (document.getElementById('stat-email-xls')) document.getElementById('stat-email-xls').innerText = xlsCount;
+        if (document.getElementById('stat-email-ioh')) document.getElementById('stat-email-ioh').innerText = iohCount;
+
+        if (typeof window.renderEmailTickets === 'function') window.renderEmailTickets();
+      }, (error) => {
+        console.error("Firebase email-tickets read error:", error);
+      });
+
+      window.syncGoogleSheetCsv();
+    });
+  </script>
+
+  <script>
+    let chartStatusInstance = null;
+    let chartRcaInstance = null;
+    let chartAreaInstance = null;
+    let isSidebarOpen = true;
+    let searchDebounceTimer = null;
+    let emailSearchDebounceTimer = null;
+
+    window.emailSortColumn = 'date';
+    window.emailSortDirection = 'desc';
+
+    window.sortEmailTickets = function(col) {
+      if (window.emailSortColumn === col) {
+        window.emailSortDirection = window.emailSortDirection === 'asc' ? 'desc' : 'asc';
+      } else {
+        window.emailSortColumn = col;
+        window.emailSortDirection = (col === 'date' || col === 'no') ? 'desc' : 'asc';
+      }
+      window.renderEmailTickets();
+    };
+
+    window.debouncedRenderEmailTickets = function() {
+      clearTimeout(emailSearchDebounceTimer);
+      emailSearchDebounceTimer = setTimeout(() => {
+        window.renderEmailTickets();
+      }, 100);
+    };
+
+    window.showToast = function(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      if (!container) return;
+      
+      const toast = document.createElement('div');
+      const bg = type === 'success' ? 'from-rose-600 to-red-600 border-rose-400/40' : 'from-amber-600 to-orange-600 border-amber-400/40';
+      toast.className = `bg-gradient-to-r ${bg} text-white px-4 py-3 rounded-2xl shadow-2xl border font-medium text-xs flex items-center gap-2.5 pointer-events-auto animate-bounce transition-all`;
+      toast.innerHTML = `<i data-feather="${type === 'success' ? 'check-circle' : 'alert-circle'}" class="w-4 h-4"></i> ${message}`;
+      
+      container.appendChild(toast);
+      feather.replace({ words: true });
+      
+      setTimeout(() => {
+        toast.remove();
+      }, 3500);
+    };
+
+    window.toggleSidebar = function() {
+      const sidebar = document.getElementById('sidebar-nav');
+      isSidebarOpen = !isSidebarOpen;
+      const labels = sidebar.querySelectorAll('.sidebar-label');
+      const textContents = sidebar.querySelectorAll('.sidebar-text-content');
+
+      if (isSidebarOpen) {
+        sidebar.classList.remove('w-20');
+        sidebar.classList.add('w-64');
+        labels.forEach(el => el.classList.remove('hidden'));
+        textContents.forEach(el => el.classList.remove('hidden'));
+      } else {
+        sidebar.classList.remove('w-64');
+        sidebar.classList.add('w-20');
+        labels.forEach(el => el.classList.add('hidden'));
+        textContents.forEach(el => el.classList.add('hidden'));
+      }
+    };
+
+    const rcaDataMatrix = {
+      "Ticket Confirm": {
+        "FLP & FOB": {
+          "VEHICULAR ACCIDENT": ["HIT BY VEHICLE / HIT BY TRUCK"],
+          "GOVERNMENT PROJECT": [
+            "ROAD WIDENING / TOLL / BRIDGE / BUILDING (CONSTRUCTION)",
+            "GAS / DRAINAGE / WATER / POWER CABLE / TRAIN (PIPE PROJECT)",
+            "POLE INSTALLATION", "PLN ACTIVITY", "PEDESTRIAN"
+          ],
+          "NON GOVERNMENT PROJECT": ["TELCO PROJECT / VENDOR MAINTENANCE"],
+          "THEFT AND VANDALISM": ["THEFT AND VANDALISM"],
+          "ANIMAL ATTACK": ["BITES / BITTEN BY RODDEN / TRAPPED / (ANIMAL CASE)"],
+          "INFRASTRUCTURE ISSUE": [
+            "REMOVABLE BRACKET / CRUSHED BY HEAVY EQUIPMENT (AERIAL CABLE FALLEN)",
+            "ELECTRIC CONDUCTED CABLE", "WEDGED / CIVIL DRAINAGE", "KITCHENED WITH A WEIGHT OBJECT",
+            "HEAVY RAIN / STRONG WIND", "TREE / GRASS / POLE (TRIMMING - LOGGING - COLLAPSED)"
+          ],
+          "INDIVIDUAL CORE TROUBLE": [
+            "CUT / BENDING / BAD CORE / CORE NOT CONNECTED / (PARTIAL)",
+            "CROSSING CORE", "HARD BENDING", "PINCHED TUBE", "JOINT CLOSURE DAMAGE", "CABLE BURNED"
+          ],
+          "FIBER EQUIPMENT": [
+            "BAD INSTALLATION", "JOINT BOX-CONNECTOR-BROKEN", "ODP PROBLEM",
+            "PATCHCORD BROKEN", "PATCHCORD DIRTY/BAD CONTACT", "PATCHCORE PROBLEM", "CONNECTOR ISSUE"
+          ]
+        },
+        "Non FLP & FOB": {
+          "FORCE MAJEUR": ["LAND SLIDE/SOIL/STONE EROSION", "EARTHQUAKE", "FLOODING", "BUILDING BURNT", "BUILDING COLLAPSED"],
+          "FIRE": ["FOREST FIRE", "ENVIRONMENT COMBUSTION", "ENVIRONMENT BURNT"],
+          "COMMUNITY": ["COMMUNITY ACTIVITY", "BLOCK ACCESS", "CONTRACT ISSUE"]
+        }
+      },
+      "Ticket Cancellation": {
+        "Non FLP & FOB": {
+          "SEGMENT NO ISSUE": [
+            "OTDR DAN OPM (PLUG UNPLUG)", "SFP ISSUE", "NE STOLEN", "PC NE",
+            "OTHER FLP/MMP ISSUE", "POWER ISSUE BASED ON INFO FSO",
+            "POWER ISSUE AFTER VISIT SITE", "NOT RECEIVED TT", "DOUBLE TT SAME SEGMENT"
+          ]
+        }
+      }
+    };
+
+    const stopClockMatrix = {
+      "SC WEATHER": { "HEAVY RAIN/STRONG WIND": "02:00" },
+      "SC MSH RESPONSIBILITY": { "RESPONSE NOC": "01:00" },
+      "SC COMMUNITY": { "BLOCK ACCESS / COMMCASE / ACCSESS LIMIT": "02:00" },
+      "SC GOVERNMENT PROJECT": { "PLN ACTIVITY": "03:00", "POWER ISSUE": "03:00" },
+      "SC K3 - MINOR": { "TRAFFIC JAM : 08:00 - 20:00": "03:00" },
+      "SC K3 - MAJOR": { "VULNERABLE AREAS : 19:00 - 00:00": "05:00" },
+      "SC K3 - EMERGENCY": { "VULNERABLE AREAS : 00:00 - 08:00": "08:00" },
+      "SC JOVIS": { "MULTIPLE INCIDENTS CASE FLP/MMP/FSO": "05:00" },
+      "SC FORCE MAJEUR": { "LAND SLIDE/SOIL/STONE EROSION/EARTHQUAKE/FLOODING/BUILDING BURNT/BUILDING COLLAPSED/FOREST FIRE/ENVIRONMENT COMBUSTIONENVIRONMENT BURNT": "24:00:00" }
+    };
+
+    function detectAreaClusterAI(text) {
+      if (!text) return "Tangerang";
+      const upper = text.toUpperCase();
+
+      if (upper.includes("KAB. TANGERANG") || upper.includes("KABUPATEN TANGERANG") || /KAB[_\s-]?TGR/i.test(upper)) return "Kab. Tangerang";
+      if (/CILEGON|CLG|MERAK|BOJONEGARA/i.test(upper)) return "Cilegon";
+      if (/JAKARTA\s*SOUTHERN|JAKSEL|JAKARTA\s*SELATAN|JKT[-_\s]?S|PONDOK\s*INDAH|KEBAYORAN|TEBET|PASAR\s*MINGGU|CILANDAK/i.test(upper)) return "Jakarta Southern";
+      if (/JAKARTA\s*NORTHERN|JAKUT|JAKARTA\s*UTARA|JKT[-_\s]?N|TANJUNG\s*PRIOK|ANCOL|PLUIT|KELAPA\s*GADING/i.test(upper)) return "Jakarta Northern";
+      if (/BOGOR|DEPOK|BGR|DPK|CIBINONG|CIMANGGIS|MARGONDA/i.test(upper)) return "Bogor - Depok";
+      if (/BEKASI|BKS|TAMBUN|CIKARANG|JATIASIH|SUMMARECON\s*BEKASI/i.test(upper)) return "Bekasi";
+      if (/PEKANBARU|PKU|RUMBAI|PANAM|DURI/i.test(upper)) return "Pekanbaru";
+      if (/SAMARINDA|SMD|LOA\s*JANAN|SUNGAI\s*KUNJANG/i.test(upper)) return "Samarinda";
+      if (/BANJARBARU|BJB|MARTAPURA/i.test(upper)) return "Banjarbaru";
+      if (/KOTAWARINGIN\s*BARAT|PANGKALAN\s*BUN|KOBAR/i.test(upper)) return "Kotawaringin Barat";
+      if (/KOTAWARINGIN\s*TIMUR|SAMPIT|KOTIM/i.test(upper)) return "Kotawaringin Timur";
+      if (/KETAPANG|KTP|DELTA\s*PAWAN/i.test(upper)) return "Ketapang";
+      return "Tangerang";
+    }
+
+    window.previewAutoCluster = function() {
+      const text = document.getElementById('raw-ticket-input').value;
+      const detected = detectAreaClusterAI(text);
+      document.getElementById('raw-input-cluster').value = detected;
+    };
+
+    function formatDateTimeString(timestamp) {
+      if (!timestamp) return '-';
+      const d = new Date(timestamp);
+      if (isNaN(d.getTime())) return timestamp;
+      
+      return d.toLocaleString('id-ID', {
+        timeZone: 'Asia/Jakarta',
+        day: '2-digit',
+        month: '2-digit',
+        year: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      });
+    }
+
+    window.onload = () => {
+      feather.replace();
+      window.initStopClockOptions();
+      window.switchTab('dashboard-noc');
+      setInterval(window.renderTable, 60000);
+    };
+
+    window.switchTab = function(tabId) {
+      document.getElementById('view-dashboard-noc').classList.add('hidden');
+      document.getElementById('view-email-ticket').classList.add('hidden');
+      document.getElementById('view-database-segment').classList.add('hidden');
+
+      document.getElementById('nav-dashboard-noc').className = "w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium text-slate-300 hover:bg-rose-500/10 hover:text-rose-300 transition-all";
+      document.getElementById('nav-email-ticket').className = "w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium text-slate-300 hover:bg-rose-500/10 hover:text-rose-300 transition-all";
+      document.getElementById('nav-database-segment').className = "w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium text-slate-300 hover:bg-rose-500/10 hover:text-rose-300 transition-all";
+
+      if (tabId === 'dashboard-noc') {
+        document.getElementById('view-dashboard-noc').classList.remove('hidden');
+        document.getElementById('nav-dashboard-noc').className = "w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium bg-gradient-to-r from-rose-600/30 to-red-600/10 text-rose-300 border border-rose-500/30 shadow-sm transition-all";
+        window.renderTable();
+      } else if (tabId === 'email-ticket') {
+        document.getElementById('view-email-ticket').classList.remove('hidden');
+        document.getElementById('nav-email-ticket').className = "w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium bg-gradient-to-r from-rose-600/30 to-red-600/10 text-rose-300 border border-rose-500/30 shadow-sm transition-all";
+        window.renderEmailTickets();
+      } else if (tabId === 'database-segment') {
+        document.getElementById('view-database-segment').classList.remove('hidden');
+        document.getElementById('nav-database-segment').className = "w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium bg-gradient-to-r from-rose-600/30 to-red-600/10 text-rose-300 border border-rose-500/30 shadow-sm transition-all";
+        window.renderDatabaseSegment();
+      }
+      feather.replace();
+    };
+
+    window.renderEmailTickets = function() {
+      const tbody = document.getElementById('email-ticket-table-body');
+      if (!tbody) return;
+
+      const sSender = (document.getElementById('filter-email-sender')?.value || '').toLowerCase();
+      const sSubject = (document.getElementById('filter-email-subject')?.value || '').toLowerCase();
+      const sBody = (document.getElementById('filter-email-body')?.value || '').toLowerCase();
+      const sDate = (document.getElementById('filter-email-date')?.value || '').toLowerCase();
+      const catQuick = document.getElementById('filter-email-quick')?.value || '';
+
+      let list = window.emailInboxList || [];
+
+      let filtered = list.filter(item => {
+        const matchCat = catQuick ? item.category === catQuick : true;
+        return matchCat &&
+               (!sSender || (item.sender || '').toLowerCase().includes(sSender)) &&
+               (!sSubject || (item.subject || '').toLowerCase().includes(sSubject)) &&
+               (!sBody || (item.body || '').toLowerCase().includes(sBody)) &&
+               (!sDate || (item.receivedDateTime || '').toLowerCase().includes(sDate));
+      });
+
+      filtered.sort((a, b) => {
+        let valA, valB;
+        if (window.emailSortColumn === 'sender') {
+          valA = (a.sender || '').toLowerCase();
+          valB = (b.sender || '').toLowerCase();
+        } else if (window.emailSortColumn === 'subject') {
+          valA = (a.subject || '').toLowerCase();
+          valB = (b.subject || '').toLowerCase();
+        } else if (window.emailSortColumn === 'body') {
+          valA = (a.body || '').toLowerCase();
+          valB = (b.body || '').toLowerCase();
+        } else if (window.emailSortColumn === 'no') {
+          valA = a.id || '';
+          valB = b.id || '';
+        } else {
+          valA = a.receivedDateTime || '';
+          valB = b.receivedDateTime || '';
+        }
+
+        if (valA < valB) return window.emailSortDirection === 'asc' ? -1 : 1;
+        if (valA > valB) return window.emailSortDirection === 'asc' ? 1 : -1;
+        return 0;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-10 text-slate-500">Tidak ada email tiket yang cocok dengan filter pencarian.</td></tr>`;
+        return;
+      }
+
+      let rowsHtml = '';
+      filtered.forEach((item, idx) => {
+        const detailId = `email_detail_${item.id}`;
+
+        let formattedSubject = item.subject;
+        if (formattedSubject.includes('[TR@OWS] (New)')) {
+          formattedSubject = `<span class="text-rose-400 font-bold">[TR@OWS] (New)</span> ` + formattedSubject.replace('[TR@OWS] (New)', '');
+        } else if (formattedSubject.includes('[TR@OWS] (Open)')) {
+          formattedSubject = `<span class="text-amber-400 font-bold">[TR@OWS] (Open)</span> ` + formattedSubject.replace('[TR@OWS] (Open)', '');
+        } else if (formattedSubject.includes('DATACOM-INC')) {
+          formattedSubject = `<span class="text-rose-300 font-bold">[DATACOM-INC]</span> ` + formattedSubject;
+        }
+
+        const shortBodyPreview = (item.body || '').length > 55 ? (item.body || '').substring(0, 55) + '...' : (item.body || '');
+        const isIoh = item.category === 'IOH' || ((item.subject || '') + ' ' + (item.body || '')).toUpperCase().includes('DATACOM');
+        const importBtnLabel = isIoh ? "Auto-Import ke Dashboard (Subject & Segment)" : "Auto-Import ke Dashboard (Subject & Title)";
+
+        const safeIndexId = String(item.id).replace(/'/g, "\\'");
+
+        rowsHtml += `
+          <tr class="hover:bg-slate-800/50 transition-colors border-b border-slate-800/50">
+            <td class="p-2.5 text-center">
+              <button onclick="window.toggleEmailDetail('${safeIndexId}')" class="w-5 h-5 rounded-full bg-rose-500/20 text-rose-400 hover:bg-rose-500 hover:text-white transition flex items-center justify-center mx-auto text-[11px] font-bold font-mono" id="btn_toggle_${item.id}">
+                +
+              </button>
+            </td>
+            <td class="p-2.5 text-center text-slate-500 font-medium">${idx + 1}</td>
+            <td class="p-2.5 font-mono text-rose-300 truncate" title="${item.sender}">${item.sender}</td>
+            <td class="p-2.5 font-medium text-white truncate max-w-[250px]" title="${item.subject}">${formattedSubject}</td>
+            <td class="p-2.5 text-slate-400 font-mono truncate max-w-[280px]" title="${item.body}">${shortBodyPreview}</td>
+            <td class="p-2.5 font-mono text-[10px] text-slate-400 whitespace-nowrap">${item.receivedDateTime}</td>
+          </tr>
+          <tr id="${detailId}" class="hidden bg-slate-900/90 border-b border-rose-500/30">
+            <td colspan="6" class="p-4">
+              <div class="glass-card p-4 rounded-xl space-y-3 border border-rose-500/30">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 border-b border-slate-800 pb-2">
+                  <div>
+                    <h4 class="text-[10px] font-bold text-rose-400 font-mono uppercase tracking-wider">DETAIL ISI EMAIL (hdfomtel@gmail.com)</h4>
+                    <p class="text-[11px] text-slate-300 mt-0.5 truncate max-w-xl" title="${item.subject}">Subject: <span class="text-white font-semibold">${item.subject}</span></p>
+                  </div>
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <span class="text-[10px] text-slate-300 font-mono bg-slate-950 px-2.5 py-1 rounded-lg border border-slate-800 whitespace-nowrap">Received: ${item.receivedDateTime}</span>
+                    <button onclick="window.autoImportEmailSmart('${safeIndexId}')" class="bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 text-white px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 shadow-lg shadow-rose-500/20 transition active:scale-95 whitespace-nowrap">
+                      <i data-feather="zap" class="w-4 h-4 text-amber-300"></i> ${importBtnLabel}
+                    </button>
+                  </div>
+                </div>
+                <div class="bg-slate-950 p-3 rounded-lg border border-slate-800 font-mono text-xs text-slate-200 whitespace-pre-wrap leading-relaxed select-all max-h-72 overflow-y-auto font-normal">${item.body}</div>
+              </div>
+            </td>
+          </tr>
+        `;
+      });
+      tbody.innerHTML = rowsHtml;
+      feather.replace();
+    };
+
+    window.toggleEmailDetail = function(id) {
+      const detailRow = document.getElementById(`email_detail_${id}`);
+      const btn = document.getElementById(`btn_toggle_${id}`);
+      if (!detailRow || !btn) return;
+      if (detailRow.classList.contains('hidden')) {
+        detailRow.classList.remove('hidden');
+        btn.innerText = '-';
+        btn.className = "w-5 h-5 rounded-full bg-rose-500/20 text-rose-400 hover:bg-rose-500 hover:text-white transition flex items-center justify-center mx-auto text-[11px] font-bold font-mono";
+      } else {
+        detailRow.classList.add('hidden');
+        btn.innerText = '+';
+        btn.className = "w-5 h-5 rounded-full bg-rose-500/20 text-rose-400 hover:bg-rose-500 hover:text-white transition flex items-center justify-center mx-auto text-[11px] font-bold font-mono";
+      }
+    };
+
+    window.autoImportEmailSmart = function(emailId) {
+      const item = (window.emailInboxList || []).find(e => String(e.id) === String(emailId));
+      if (!item) {
+        window.showToast("Data email tidak ditemukan!", "error");
+        return;
+      }
+
+      const subject = item.subject || '';
+      const body = item.body || '';
+      const fullText = subject + "\n" + body;
+      const upperCat = (item.category || '').toUpperCase();
+      const isIoh = upperCat.includes('IOH') || fullText.toUpperCase().includes('DATACOM');
+
+      let parsedPayload = "";
+
+      if (isIoh) {
+        let segmentVal = "";
+        const lines = body.split('\n');
+        for (let i = 0; i < lines.length; i++) {
+          let line = lines[i].trim();
+          if (line.startsWith('Segment =') || line.startsWith('Segment:')) {
+            segmentVal = line.replace(/^Segment\s*[:=]\s*/, '').trim();
+            if (!segmentVal && i + 1 < lines.length) {
+              segmentVal = lines[i + 1].trim();
+            }
+            break;
+          }
+          if (line.includes('<>') && (line.includes('_') || line.toUpperCase().includes('TGX') || line.toUpperCase().includes('BJM'))) {
+            segmentVal = line;
+            break;
+          }
+        }
+        if (!segmentVal) {
+          const matchSeg = body.match(/([A-Z0-9_-]+_[<>][A-Z0-9_-]+)/);
+          if (matchSeg) segmentVal = matchSeg[1];
+        }
+        parsedPayload = `${subject}\nSegment = ${segmentVal || body.substring(0, 80)}`;
+      } else {
+        let fullTitle = "";
+        const bodyLines = body.split('\n');
+        let capturing = false;
+        for (let l of bodyLines) {
+          let trimmed = l.trim();
+          if (trimmed.startsWith('Title :') || trimmed.startsWith('Title:')) {
+            capturing = true;
+            fullTitle += trimmed.replace(/^Title\s*[:]\s*/, '').trim() + " ";
+            continue;
+          }
+          if (capturing) {
+            if (trimmed.startsWith('Ticket No.') || trimmed.startsWith('Ticket No') || trimmed.startsWith('ERN :') || trimmed.startsWith('Site ID')) {
+              break;
+            }
+            if (trimmed === '') {
+              break;
+            }
+            fullTitle += trimmed + " ";
+          }
+        }
+        fullTitle = fullTitle.replace(/\s+/g, ' ').trim();
+
+        if (!fullTitle) {
+          const matchTitle = body.match(/Title\s*[:]\s*([^\n]+(?:\n(?![A-Za-z\s]+:)[^\n]+)*)/i);
+          if (matchTitle) {
+            fullTitle = matchTitle[1].replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
+          } else {
+            fullTitle = body.substring(0, 80);
+          }
+        }
+
+        parsedPayload = `${subject}\nTitle : ${fullTitle}`;
+      }
+
+      window.parseAndAddTicket(parsedPayload);
+      window.showToast("Tiket dari Email Berhasil Di-Import ke Dashboard!", "success");
+    };
+
+    window.debouncedRenderDatabaseSegment = function() {
+      clearTimeout(searchDebounceTimer);
+      searchDebounceTimer = setTimeout(() => {
+        window.renderDatabaseSegment();
+      }, 150);
+    };
+
+    window.renderDatabaseSegment = function() {
+      const tbody = document.getElementById('db-segment-tbody');
+      if (!tbody) return;
+      const search = (document.getElementById('db-search')?.value || '').toLowerCase().trim();
+      tbody.innerHTML = '';
+
+      let list = window.segmentList || [];
+      const totalCountEl = document.getElementById('db-total-count');
+      if (totalCountEl) totalCountEl.innerText = list.length;
+
+      let filtered = list.filter(s => {
+        if (!search) return true;
+        const area = String(s.witel || '').toLowerCase();
+        const siteNe = String(s.site_ne || '').toLowerCase();
+        const siteNameNe = String(s.site_name_ne || '').toLowerCase();
+        const siteFe = String(s.site_fe || '').toLowerCase();
+        const siteNameFe = String(s.site_name_fe || '').toLowerCase();
+        
+        return area.includes(search) || 
+               siteNe.includes(search) || 
+               siteNameNe.includes(search) ||
+               siteFe.includes(search) ||
+               siteNameFe.includes(search);
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="11" class="text-center py-8 text-slate-500">Tidak ada data segment yang cocok dengan kata kunci "${search}".</td></tr>`;
+        return;
+      }
+
+      let htmlContent = "";
+
+      filtered.forEach((s, idx) => {
+        const neCoord = window.parseCoordObj(s.lat_ne, s.lon_ne);
+        const feCoord = window.parseCoordObj(s.lat_fe, s.lon_fe);
+
+        htmlContent += `
+          <tr class="hover:bg-slate-800/40 transition-colors border-b border-slate-800/50">
+            <td class="p-2.5 text-slate-500 font-medium truncate">${s.no || (idx + 1)}</td>
+            <td class="p-2.5 text-white font-medium truncate" title="${s.witel || '-'}">${s.witel || '-'}</td>
+            <td class="p-2.5 font-mono text-rose-300 text-[11px] truncate" title="${s.site_ne || '-'}">${s.site_ne || '-'}</td>
+            <td class="p-2.5 text-slate-200 truncate" title="${s.site_name_ne || '-'}">${s.site_name_ne || '-'}</td>
+            <td class="p-2.5 text-slate-400 text-[11px] truncate" title="${s.site_owner_ne || '-'}">${s.site_owner_ne || '-'}</td>
+            <td class="p-2.5 font-mono text-[11px] truncate">
+              <a href="${neCoord.url}" target="_blank" class="text-rose-400 hover:text-rose-300 underline underline-offset-2 flex items-center gap-1" title="Buka di Google Maps">
+                <i data-feather="external-link" class="w-3 h-3 flex-shrink-0"></i> <span class="truncate">${neCoord.display}</span>
+              </a>
+            </td>
+            <td class="p-2.5 font-mono text-amber-300 text-[11px] truncate" title="${s.site_fe || '-'}">${s.site_fe || '-'}</td>
+            <td class="p-2.5 text-slate-200 truncate" title="${s.site_name_fe || '-'}">${s.site_name_fe || '-'}</td>
+            <td class="p-2.5 text-slate-400 text-[11px] truncate" title="${s.site_owner_fe || '-'}">${s.site_owner_fe || '-'}</td>
+            <td class="p-2.5 font-mono text-[11px] truncate">
+              <a href="${feCoord.url}" target="_blank" class="text-amber-400 hover:text-amber-300 underline underline-offset-2 flex items-center gap-1" title="Buka di Google Maps">
+                <i data-feather="external-link" class="w-3 h-3 flex-shrink-0"></i> <span class="truncate">${feCoord.display}</span>
+              </a>
+            </td>
+            <td class="p-2.5 font-mono text-slate-300 truncate" title="${s.panjang || '-'}">${s.panjang || '-'}</td>
+          </tr>
+        `;
+      });
+      tbody.innerHTML = htmlContent;
+      feather.replace();
+    };
+
+    window.exportDatabaseExcel = function() {
+      if (!window.segmentList || window.segmentList.length === 0) {
+        window.showToast("Tidak ada data segment untuk diexport!", "error");
+        return;
+      }
+      const excelData = window.segmentList.map((s, idx) => {
+        const neC = window.parseCoordObj(s.lat_ne, s.lon_ne);
+        const feC = window.parseCoordObj(s.lat_fe, s.lon_fe);
+        return {
+          "No.": s.no || (idx + 1),
+          "Area": s.witel || '',
+          "ID Site NE": s.site_ne || '',
+          "Site Name NE": s.site_name_ne || '',
+          "Site Owner NE": s.site_owner_ne || '',
+          "Koordinat NE": neC.display,
+          "ID Site FE": s.site_fe || '',
+          "Site Name FE": s.site_name_fe || '',
+          "Site Owner FE": s.site_owner_fe || '',
+          "Koordinat FE": feC.display,
+          "Panjang (Km)": s.panjang || ''
+        };
+      });
+
+      const worksheet = XLSX.utils.json_to_sheet(excelData);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Database Segment");
+      XLSX.writeFile(workbook, "Mitratel_FTTT_Database_Segment.xlsx");
+    };
+
+    window.parseAndAddTicket = function(rawText) {
+      if (!rawText.trim()) return;
+
+      const trMatches = rawText.match(/TR-\d+-\d+/g) || [];
+      const incmMatches = rawText.match(/INCM-\d+-\d+/g) || [];
+      const incMatches = (rawText.match(/INC-\d+-\d+/g) || []).filter(item => !item.startsWith('INCM-'));
+
+      let customerList = [];
+      if (trMatches.length > 0 || incmMatches.length > 0) customerList.push('XLS');
+      if (incMatches.length > 0) customerList.push('IOH');
+      const customerTag = customerList.join(' & ') || 'UNKNOWN';
+
+      let detectTimeStr = '-';
+      let createdTimestamp = Date.now();
+
+      const timeMatchSquare = rawText.match(/\[(\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2})\]/);
+      const timeMatchDownAt = rawText.match(/down at (\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2})/i);
+
+      if (timeMatchSquare) {
+        detectTimeStr = timeMatchSquare[1];
+        createdTimestamp = new Date(detectTimeStr.replace(' ', 'T')).getTime() || Date.now();
+      } else if (timeMatchDownAt) {
+        detectTimeStr = timeMatchDownAt[1];
+        createdTimestamp = new Date(timeMatchDownAt[1].replace(' ', 'T')).getTime() || Date.now();
+      }
+
+      const allTickets = [...incmMatches, ...trMatches, ...incMatches].join(', ');
+      let routeCase = rawText.replace(/\[\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}\]/, '').replace(/down at \d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}/i, '').trim();
+
+      const manualClusterSelect = document.getElementById('raw-input-cluster')?.value;
+      const areaCluster = manualClusterSelect || detectAreaClusterAI(routeCase);
+
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const dateStr = now.toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+      const newTicketObj = {
+        id: Date.now() + Math.random(),
+        customer: customerTag,
+        areaCluster: areaCluster,
+        ticketNumbers: allTickets || 'N/A',
+        routeCase: routeCase,
+        detectTime: detectTimeStr,
+        status: 'Open',
+        rca1: '-',
+        rca2: '-',
+        stopClock: '-',
+        lastRemark: 'Tiket dicreate',
+        updatedAt: timeStr,
+        createdAtTime: createdTimestamp,
+        closedAtTime: null,
+        closedAtFormatted: '-',
+        timelyLogs: [
+          { time: timeStr, date: dateStr, text: `Tiket dicreate [Klaster Wilayah: ${areaCluster}]` }
+        ]
+      };
+
+      if (window.saveTicketToFirebase) {
+        window.saveTicketToFirebase(newTicketObj);
+      }
+    };
+
+    function calculateTicketTTR(ticket) {
+      const endTime = ticket.status === 'Closed' && ticket.closedAtTime ? ticket.closedAtTime : Date.now();
+      const diffMs = Math.max(0, endTime - ticket.createdAtTime);
+      
+      const totalMinutes = Math.floor(diffMs / (1000 * 60));
+      const hours = Math.floor(totalMinutes / 60);
+      const minutes = totalMinutes % 60;
+
+      return {
+        totalMinutes,
+        formattedStr: `${String(hours).padStart(2, '0')}j ${String(minutes).padStart(2, '0')}m`
+      };
+    }
+
+    window.updateRcaPartOptions = function() {
+      const statusTicket = document.getElementById('rca-status-ticket').value;
+      const partSelect = document.getElementById('rca-part-of');
+      partSelect.innerHTML = '<option value="">-- Pilih Part Of --</option>';
+      document.getElementById('rca-1').innerHTML = '<option value="">-- Pilih RCA 1 --</option>';
+      document.getElementById('rca-2').innerHTML = '<option value="">-- Pilih RCA 2 --</option>';
+      if (!statusTicket || !rcaDataMatrix[statusTicket]) return;
+      Object.keys(rcaDataMatrix[statusTicket]).forEach(part => partSelect.innerHTML += `<option value="${part}">${part}</option>`);
+    };
+
+    window.updateRca1Options = function() {
+      const statusTicket = document.getElementById('rca-status-ticket').value;
+      const partOf = document.getElementById('rca-part-of').value;
+      const rca1Select = document.getElementById('rca-1');
+      rca1Select.innerHTML = '<option value="">-- Pilih RCA 1 --</option>';
+      document.getElementById('rca-2').innerHTML = '<option value="">-- Pilih RCA 2 --</option>';
+      if (!statusTicket || !partOf || !rcaDataMatrix[statusTicket][partOf]) return;
+      Object.keys(rcaDataMatrix[statusTicket][partOf]).forEach(rca1 => rca1Select.innerHTML += `<option value="${rca1}">${rca1}</option>`);
+    };
+
+    window.updateRca2Options = function() {
+      const statusTicket = document.getElementById('rca-status-ticket').value;
+      const partOf = document.getElementById('rca-part-of').value;
+      const rca1 = document.getElementById('rca-1').value;
+      const rca2Select = document.getElementById('rca-2');
+      rca2Select.innerHTML = '<option value="">-- Pilih RCA 2 --</option>';
+      if (!statusTicket || !partOf || !rca1 || !rcaDataMatrix[statusTicket][partOf][rca1]) return;
+      rcaDataMatrix[statusTicket][partOf][rca1].forEach(rca2 => rca2Select.innerHTML += `<option value="${rca2}">${rca2}</option>`);
+    };
+
+    window.initStopClockOptions = function() {
+      const rca3Select = document.getElementById('sc-rca3');
+      if (!rca3Select) return;
+      rca3Select.innerHTML = '<option value="">-- Pilih RCA 3 --</option>';
+      Object.keys(stopClockMatrix).forEach(rca3 => rca3Select.innerHTML += `<option value="${rca3}">${rca3}</option>`);
+    };
+
+    window.updateScIssueOptions = function() {
+      const rca3 = document.getElementById('sc-rca3').value;
+      const issueSelect = document.getElementById('sc-issue');
+      issueSelect.innerHTML = '<option value="">-- Pilih Issue --</option>';
+      document.getElementById('sc-duration').value = '';
+      if (!rca3 || !stopClockMatrix[rca3]) return;
+      Object.keys(stopClockMatrix[rca3]).forEach(issue => issueSelect.innerHTML += `<option value="${issue}">${issue}</option>`);
+    };
+
+    window.autoFillScDuration = function() {
+      const rca3 = document.getElementById('sc-rca3').value;
+      const issue = document.getElementById('sc-issue').value;
+      if (rca3 && issue && stopClockMatrix[rca3][issue]) document.getElementById('sc-duration').value = stopClockMatrix[rca3][issue];
+    };
+
+    window.toggleStopClockSection = function() {
+      const enabled = document.getElementById('enable-stopclock').checked;
+      document.getElementById('stopclock-fields').classList.toggle('hidden', !enabled);
+    };
+
+    window.handleEvidenceUpload = function(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        document.getElementById('evidence-preview').src = e.target.result;
+        document.getElementById('evidence-preview-container').classList.remove('hidden');
+        EXIF.getData(file, function() {
+          const lat = EXIF.getTag(this, "GPSLatitude");
+          const latRef = EXIF.getTag(this, "GPSLatitudeRef");
+          const lon = EXIF.getTag(this, "GPSLongitude");
+          const lonRef = EXIF.getTag(this, "GPSLongitudeRef");
+          if (lat && lon) {
+            const decLat = convertDMSToDD(lat[0], lat[1], lat[2], latRef);
+            const decLon = convertDMSToDD(lon[0], lon[1], lon[2], lonRef);
+            const gpsStr = `${decLat.toFixed(7)},${decLon.toFixed(7)}`;
+            document.getElementById('evidence-gps').value = gpsStr;
+            document.getElementById('evidence-gps-info').innerText = `GPS Terdeteksi: ${gpsStr}`;
+          }
+        });
+      };
+      reader.readAsDataURL(file);
+    };
+
+    function convertDMSToDD(degrees, minutes, seconds, direction) {
+      let dd = degrees + minutes / 60 + seconds / 3600;
+      if (direction === "S" || direction === "W") dd = dd * -1;
+      return dd;
+    }
+
+    window.openInputModal = function() { document.getElementById('modal-input').classList.remove('hidden'); };
+    window.closeInputModal = function() { document.getElementById('modal-input').classList.add('hidden'); document.getElementById('raw-ticket-input').value = ''; document.getElementById('raw-input-cluster').value = ''; };
+
+    window.processRawTicket = function() {
+      window.parseAndAddTicket(document.getElementById('raw-ticket-input').value);
+      window.closeInputModal();
+    };
+
+    window.openProgressModal = function(ticketKey) {
+      const ticket = window.ticketList.find(t => t.firebaseKey === ticketKey);
+      if (!ticket) return;
+      document.getElementById('edit-ticket-id').value = ticket.firebaseKey;
+      document.getElementById('update-cluster').value = ticket.areaCluster || 'Tangerang';
+      document.getElementById('update-status').value = ticket.status;
+      document.getElementById('update-activity').value = '';
+      
+      const nowLocal = new Date();
+      nowLocal.setMinutes(nowLocal.getMinutes() - nowLocal.getTimezoneOffset());
+      document.getElementById('update-actual-time').value = nowLocal.toISOString().slice(0, 16);
+
+      document.getElementById('evidence-gps').value = '';
+      document.getElementById('evidence-file').value = '';
+      document.getElementById('evidence-preview-container').classList.add('hidden');
+      document.getElementById('modal-progress').classList.remove('hidden');
+    };
+
+    window.closeProgressModal = function() { document.getElementById('modal-progress').classList.add('hidden'); };
+
+    window.saveProgressUpdate = function() {
+      const ticketKey = document.getElementById('edit-ticket-id').value;
+      const ticket = window.ticketList.find(t => t.firebaseKey === ticketKey);
+
+      if (ticket) {
+        const actualInputVal = document.getElementById('update-actual-time').value;
+        let updateDateObj = actualInputVal ? new Date(actualInputVal) : new Date();
+        if (isNaN(updateDateObj.getTime())) updateDateObj = new Date();
+
+        const timeStr = updateDateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const dateStr = updateDateObj.toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+        const prevStatus = ticket.status;
+        const newStatus = document.getElementById('update-status').value;
+        const newCluster = document.getElementById('update-cluster').value;
+        const activity = document.getElementById('update-activity').value.trim();
+
+        let closedAtTime = ticket.closedAtTime || null;
+        let closedAtFormatted = ticket.closedAtFormatted || '-';
+
+        if (newStatus === 'Closed' && prevStatus !== 'Closed') {
+          closedAtTime = updateDateObj.getTime();
+          closedAtFormatted = formatDateTimeString(closedAtTime);
+        } else if (newStatus !== 'Closed') {
+          closedAtTime = null;
+          closedAtFormatted = '-';
+        }
+
+        const rca1 = document.getElementById('rca-1').value || ticket.rca1;
+        const rca2 = document.getElementById('rca-2').value || ticket.rca2;
+
+        let stopClock = ticket.stopClock;
+        const isSc = document.getElementById('enable-stopclock').checked;
+        
+        const timelyLogs = [...(ticket.timelyLogs || [])];
+
+        if (newCluster !== ticket.areaCluster) {
+          timelyLogs.push({ time: timeStr, date: dateStr, text: `Koreksi Klaster Wilayah: ${ticket.areaCluster} -> ${newCluster}` });
+        }
+
+        if (isSc) {
+          const scRca3 = document.getElementById('sc-rca3').value;
+          const scDur = document.getElementById('sc-duration').value;
+          stopClock = `${scRca3} (${scDur})`;
+          timelyLogs.push({ time: timeStr, date: dateStr, text: `STOP CLOCK: ${scRca3} | Durasi: ${scDur}` });
+        }
+
+        const gps = document.getElementById('evidence-gps').value.trim();
+        const evidenceImgSrc = document.getElementById('evidence-preview').src;
+        let hasEvidence = document.getElementById('evidence-preview-container').classList.contains('hidden') ? false : true;
+
+        let logEntry = activity || `Status diupdate ke: ${newStatus}`;
+        if (rca1 !== '-' && rca2 !== '-') logEntry += `\nRCA: ${rca1} -> ${rca2}`;
+        if (gps) logEntry += `\nEvidence Koordinat: ${gps}`;
+        if (hasEvidence) logEntry += `\n[Lampiran Foto Evidence Tersedia]`;
+
+        timelyLogs.push({ time: timeStr, date: dateStr, text: logEntry });
+
+        const updatedFields = {
+          areaCluster: newCluster,
+          status: newStatus,
+          closedAtTime: closedAtTime,
+          closedAtFormatted: closedAtFormatted,
+          rca1: rca1,
+          rca2: rca2,
+          stopClock: stopClock,
+          lastRemark: activity || `Status: ${newStatus}`,
+          updatedAt: timeStr,
+          evidenceImage: hasEvidence ? evidenceImgSrc : (ticket.evidenceImage || null),
+          evidenceGps: gps || ticket.evidenceGps || null,
+          timelyLogs: timelyLogs
+        };
+
+        if (window.updateTicketInFirebase) {
+          window.updateTicketInFirebase(ticketKey, updatedFields);
+        }
+      }
+
+      window.closeProgressModal();
+    };
+
+    window.openTimelyReport = function(ticketKey) {
+      const ticket = window.ticketList.find(t => t.firebaseKey === ticketKey);
+      if (!ticket) return;
+
+      const ttrData = calculateTicketTTR(ticket);
+      const mainDate = (ticket.timelyLogs && ticket.timelyLogs[0]) ? ticket.timelyLogs[0].date : 'N/A';
+      
+      let reportText = `Mitratel Timely Report\n${mainDate}\n\n`;
+      reportText += `Klaster Wilayah: ${ticket.areaCluster}\n`;
+      reportText += `Nomor Tiket    : ${ticket.ticketNumbers}\n`;
+      reportText += `Route Case     : ${ticket.routeCase}\n`;
+      reportText += `Ticket Open    : ${formatDateTimeString(ticket.createdAtTime)}\n`;
+      reportText += `Ticket Close   : ${ticket.closedAtFormatted || '-'}\n`;
+      reportText += `TTR Tiket      : ${ttrData.formattedStr}\n`;
+      reportText += `RCA 1          : ${ticket.rca1}\n`;
+      reportText += `RCA 2          : ${ticket.rca2}\n`;
+      if (ticket.stopClock !== '-') reportText += `Stop Clock     : ${ticket.stopClock}\n`;
+      if (ticket.evidenceGps) reportText += `GPS Evidence   : ${ticket.evidenceGps}\n`;
+      reportText += `--------------------------------------------------\nKronologi Aktivitas:\n\n`;
+
+      if (ticket.timelyLogs) {
+        ticket.timelyLogs.forEach(log => reportText += `${log.time} (${log.date}) = ${log.text}\n`);
+      }
+
+      document.getElementById('timely-report-content').innerText = reportText;
+      
+      const evidenceContainer = document.getElementById('timely-report-evidence-container');
+      if (ticket.evidenceImage) {
+        document.getElementById('timely-report-img').src = ticket.evidenceImage;
+        document.getElementById('timely-report-gps').innerText = ticket.evidenceGps ? `GPS: ${ticket.evidenceGps}` : 'GPS Koordinat Tidak Tercatat';
+        evidenceContainer.classList.remove('hidden');
+      } else {
+        evidenceContainer.classList.add('hidden');
+      }
+
+      document.getElementById('modal-timely-report').classList.remove('hidden');
+      feather.replace();
+    };
+
+    window.closeTimelyReportModal = function() { document.getElementById('modal-timely-report').classList.add('hidden'); };
+
+    window.copyTimelyReport = function() {
+      const text = document.getElementById('timely-report-content').innerText;
+      document.execCommand('copy') || navigator.clipboard.writeText(text).then(() => {
+        const status = document.getElementById('copy-status');
+        status.classList.remove('opacity-0');
+        setTimeout(() => status.classList.add('opacity-0'), 2000);
+      });
+    };
+
+    window.exportToExcel = function() {
+      const search = (document.getElementById('search-input')?.value || '').toLowerCase();
+      const customerFilter = document.getElementById('filter-customer')?.value || '';
+      const areaFilter = document.getElementById('filter-area')?.value || '';
+      const statusFilter = document.getElementById('filter-status')?.value || '';
+
+      let list = window.ticketList || [];
+      let filtered = list.filter(t => {
+        const matchSearch = (t.ticketNumbers || '').toLowerCase().includes(search) || (t.routeCase || '').toLowerCase().includes(search);
+        const matchCustomer = customerFilter ? (t.customer || '').includes(customerFilter) : true;
+        const matchArea = areaFilter ? t.areaCluster === areaFilter : true;
+        const matchStatus = statusFilter ? t.status === statusFilter : true;
+        return matchSearch && matchCustomer && matchArea && matchStatus;
+      });
+
+      if (filtered.length === 0) {
+        window.showToast("Tidak ada data tiket untuk diexport!", "error");
+        return;
+      }
+
+      const excelData = filtered.map((t, index) => {
+        const ttr = calculateTicketTTR(t);
+        return {
+          "No": index + 1,
+          "Customer": t.customer || '-',
+          "Klaster Wilayah": t.areaCluster || '-',
+          "Nomor Tiket": t.ticketNumbers || '-',
+          "Detail Route / Link Case": t.routeCase || '-',
+          "Ticket Open": formatDateTimeString(t.createdAtTime || t.detectTime),
+          "Ticket Close": t.closedAtFormatted || '-',
+          "RCA 1": t.rca1 || '-',
+          "RCA 2": t.rca2 || '-',
+          "Stop Clock": t.stopClock || '-',
+          "TTR Tiket": ttr.formattedStr,
+          "Status": t.status || '-'
+        };
+      });
+
+      const worksheet = XLSX.utils.json_to_sheet(excelData);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Data Ticket FTTT");
+
+      const max_widths = Object.keys(excelData[0]).map(key => ({
+        wch: Math.max(key.length, ...excelData.map(row => String(row[key] || '').length)) + 2
+      }));
+      worksheet['!cols'] = max_widths;
+
+      const dateToday = new Date().toISOString().slice(0, 10);
+      XLSX.writeFile(workbook, `Mitratel_FTTT_Trouble_Tickets_${dateToday}.xlsx`);
+    };
+
+    window.debouncedRenderTable = function() {
+      clearTimeout(searchDebounceTimer);
+      searchDebounceTimer = setTimeout(() => {
+        window.renderTable();
+      }, 150);
+    };
+
+    window.renderTable = function() {
+      const tbody = document.getElementById('ticket-table-body');
+      if (!tbody) return;
+
+      const search = (document.getElementById('search-input')?.value || '').toLowerCase();
+      const customerFilter = document.getElementById('filter-customer')?.value || '';
+      const areaFilter = document.getElementById('filter-area')?.value || '';
+      const statusFilter = document.getElementById('filter-status')?.value || '';
+
+      tbody.innerHTML = '';
+
+      let list = window.ticketList || [];
+      let filtered = list.filter(t => {
+        const matchSearch = (t.ticketNumbers || '').toLowerCase().includes(search) || (t.routeCase || '').toLowerCase().includes(search);
+        const matchCustomer = customerFilter ? (t.customer || '').includes(customerFilter) : true;
+        const matchArea = areaFilter ? t.areaCluster === areaFilter : true;
+        const matchStatus = statusFilter ? t.status === statusFilter : true;
+        return matchSearch && matchCustomer && matchArea && matchStatus;
+      });
+
+      const totalCount = list.length;
+      const openCount = list.filter(t => t.status === 'Open').length;
+      const progressCount = list.filter(t => t.status === 'In Progress').length;
+      const pendingCount = list.filter(t => t.status === 'Pending').length;
+      const closedTickets = list.filter(t => t.status === 'Closed');
+      const closeCount = closedTickets.length;
+
+      let mttrText = "0j 0m";
+      if (closeCount > 0) {
+        const totalMinutes = closedTickets.reduce((acc, t) => acc + calculateTicketTTR(t).totalMinutes, 0);
+        const avgMinutes = Math.round(totalMinutes / closeCount);
+        const hours = Math.floor(avgMinutes / 60);
+        const mins = avgMinutes % 60;
+        mttrText = `${hours}j ${mins}m`;
+      }
+
+      document.getElementById('stat-total').innerText = totalCount;
+      document.getElementById('stat-open').innerText = openCount;
+      document.getElementById('stat-progress').innerText = progressCount;
+      document.getElementById('stat-pending').innerText = pendingCount;
+      document.getElementById('stat-close').innerText = closeCount;
+      document.getElementById('stat-mttr').innerText = mttrText;
+
+      updateCharts(filtered);
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="12" class="text-center py-10 text-slate-500">Tidak ada data trouble ticket di cloud.</td></tr>`;
+        return;
+      }
+
+      const renderBatch = filtered.slice(0, 150);
+      let htmlContent = "";
+
+      renderBatch.forEach((t, index) => {
+        let custBadge = `<span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 font-bold px-1.5 py-0.5 rounded text-[9px] inline-flex items-center gap-0.5"><span class="w-1 h-1 rounded-full bg-rose-400"></span>XLS</span>`;
+        if (t.customer && t.customer.includes('IOH')) {
+          custBadge = `<span class="bg-amber-500/10 text-amber-400 border border-amber-500/20 font-bold px-1.5 py-0.5 rounded text-[9px] inline-flex items-center gap-0.5"><span class="w-1 h-1 rounded-full bg-amber-400"></span>IOH</span>`;
+        }
+
+        let statusBadge = `<span class="bg-slate-700/50 text-slate-300 border border-slate-600/50 px-2 py-0.5 rounded text-[10px] font-medium">${t.status}</span>`;
+        if (t.status === 'Open') {
+          statusBadge = `<span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 px-2 py-0.5 rounded text-[10px] font-semibold inline-flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span>Open</span>`;
+        } else if (t.status === 'In Progress') {
+          statusBadge = `<span class="bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded text-[10px] font-semibold inline-flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>In Progress</span>`;
+        } else if (t.status === 'Pending') {
+          statusBadge = `<span class="bg-yellow-500/10 text-yellow-400 border border-yellow-500/20 px-2 py-0.5 rounded text-[10px] font-semibold inline-flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-yellow-400"></span>Pending</span>`;
+        } else if (t.status === 'Closed') {
+          statusBadge = `<span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded text-[10px] font-semibold inline-flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>Closed</span>`;
+        }
+
+        const ttr = calculateTicketTTR(t);
+        let ttrBadgeColor = "text-emerald-400 bg-emerald-500/10 border-emerald-500/20";
+        if (ttr.totalMinutes >= 180 && ttr.totalMinutes <= 240) {
+          ttrBadgeColor = "text-amber-400 bg-amber-500/10 border-amber-500/20";
+        } else if (ttr.totalMinutes > 240) {
+          ttrBadgeColor = "text-rose-400 bg-rose-500/10 border-rose-500/20";
+        }
+
+        const openTimeStr = formatDateTimeString(t.createdAtTime || t.detectTime);
+        const closeTimeStr = t.closedAtFormatted || '-';
+
+        htmlContent += `
+          <tr class="hover:bg-slate-800/40 transition-colors border-b border-slate-800/50">
+            <td class="py-2 px-1.5 font-medium text-slate-500 truncate">${index + 1}</td>
+            <td class="py-2 px-1.5 truncate">${custBadge}</td>
+            <td class="py-2 px-1.5 truncate">
+              <span class="bg-slate-900 text-slate-200 border border-rose-500/20 px-1.5 py-0.5 rounded font-mono text-[10px] truncate block">${t.areaCluster}</span>
+            </td>
+            <td class="py-2 px-1.5 font-mono font-semibold text-white truncate text-[11px]" title="${t.ticketNumbers}">${t.ticketNumbers}</td>
+            <td class="py-2 px-1.5 text-slate-200 truncate text-[11px]" title="${t.routeCase}">${t.routeCase}</td>
+            <td class="py-2 px-1.5 font-mono text-[9px] text-rose-400/95 truncate" title="${openTimeStr}">${openTimeStr}</td>
+            <td class="py-2 px-1.5 font-mono text-[9px] text-emerald-400/95 truncate" title="${closeTimeStr}">${closeTimeStr}</td>
+            <td class="py-2 px-1.5 truncate">
+              <p class="font-medium text-slate-100 text-[10px] truncate" title="${t.rca1}">${t.rca1}</p>
+              <p class="text-[9px] text-slate-400 truncate" title="${t.rca2}">${t.rca2}</p>
+            </td>
+            <td class="py-2 px-1.5 text-amber-400 font-mono text-[9px] truncate" title="${t.stopClock}">${t.stopClock}</td>
+            <td class="py-2 px-1.5 truncate">
+              <span class="px-1.5 py-0.5 rounded border font-mono font-bold text-[9px] inline-block ${ttrBadgeColor}" title="${ttr.formattedStr}">${ttr.formattedStr}</span>
+            </td>
+            <td class="py-2 px-1.5 truncate">${statusBadge}</td>
+            <td class="py-2 px-1.5 text-center truncate">
+              <div class="flex items-center justify-center gap-1">
+                <button onclick="window.openProgressModal('${t.firebaseKey}')" class="p-1.5 bg-slate-800 hover:bg-slate-700 text-rose-300 border border-rose-500/30 rounded-lg transition active:scale-95 shadow-sm" title="Log Progress & RCA">
+                  <i data-feather="edit-2" class="w-3.5 h-3.5 text-rose-400"></i>
+                </button>
+                <button onclick="window.openTimelyReport('${t.firebaseKey}')" class="p-1.5 bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 rounded-lg transition active:scale-95 shadow-sm" title="Timely Report">
+                  <i data-feather="file-text" class="w-3.5 h-3.5 text-rose-400"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      });
+      tbody.innerHTML = htmlContent;
+      feather.replace();
+    };
+
+    function updateCharts(dataList) {
+      const statusCounts = { 'Open': 0, 'In Progress': 0, 'Pending': 0, 'Closed': 0 };
+      const rcaCounts = {};
+      const areaCounts = {};
+      
+      dataList.forEach(t => {
+        if(statusCounts[t.status] !== undefined) statusCounts[t.status]++;
+        
+        let rcaKey = t.rca1 && t.rca1 !== '-' ? t.rca1 : 'Unclassified';
+        rcaCounts[rcaKey] = (rcaCounts[rcaKey] || 0) + 1;
+
+        if(t.areaCluster) {
+          areaCounts[t.areaCluster] = (areaCounts[t.areaCluster] || 0) + 1;
+        }
+      });
+      
+      const ctxStatus = document.getElementById('chart-status')?.getContext('2d');
+      if (ctxStatus) {
+        const newData = [statusCounts['Open'], statusCounts['In Progress'], statusCounts['Pending'], statusCounts['Closed']];
+        if (chartStatusInstance) {
+          chartStatusInstance.data.datasets[0].data = newData;
+          chartStatusInstance.update('none');
+        } else {
+          chartStatusInstance = new Chart(ctxStatus, {
+            type: 'doughnut',
+            data: {
+              labels: ['Open', 'In Progress', 'Pending', 'Closed'],
+              datasets: [{
+                data: newData,
+                backgroundColor: ['#f43f5e', '#fbbf24', '#eab308', '#10b981'],
+                borderColor: 'rgba(30, 10, 15, 0.9)',
+                borderWidth: 2,
+                hoverOffset: 4
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              animation: { duration: 250 },
+              cutout: '55%',
+              plugins: {
+                legend: { 
+                  position: 'right', 
+                  labels: { color: '#cbd5e1', font: { size: 8, family: "'Inter', sans-serif" }, usePointStyle: true, boxWidth: 4 } 
+                }
+              }
+            }
+          });
+        }
+      }
+
+      const ctxRca = document.getElementById('chart-rca')?.getContext('2d');
+      if (ctxRca) {
+        const sortedRca = Object.entries(rcaCounts).sort((a, b) => b[1] - a[1]).slice(0, 4);
+        const rcaLabels = sortedRca.map(item => item[0]);
+        const rcaData = sortedRca.map(item => item[1]);
+
+        if (chartRcaInstance) {
+          chartRcaInstance.data.labels = rcaLabels;
+          chartRcaInstance.data.datasets[0].data = rcaData;
+          chartRcaInstance.update('none');
+        } else {
+          chartRcaInstance = new Chart(ctxRca, {
+            type: 'bar',
+            data: {
+              labels: rcaLabels,
+              datasets: [{
+                label: 'Jumlah RCA',
+                data: rcaData,
+                backgroundColor: 'rgba(244, 63, 94, 0.7)',
+                borderColor: '#f43f5e',
+                borderWidth: 1,
+                borderRadius: 2,
+                barThickness: 'flex',
+                maxBarThickness: 14
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              animation: { duration: 250 },
+              scales: {
+                y: { 
+                  beginAtZero: true, 
+                  ticks: { color: '#94a3b8', stepSize: 1, font: { size: 7, family: "'Inter', sans-serif" } }, 
+                  grid: { color: 'rgba(255,255,255,0.05)', borderDash: [4, 4] },
+                  border: { display: false }
+                },
+                x: { 
+                  ticks: { color: '#94a3b8', font: { size: 6, family: "'Inter', sans-serif" }, maxRotation: 15, minRotation: 0 }, 
+                  grid: { display: false },
+                  border: { display: false }
+                }
+              },
+              plugins: { legend: { display: false } }
+            }
+          });
+        }
+      }
+      
+      const ctxArea = document.getElementById('chart-area')?.getContext('2d');
+      if (ctxArea) {
+        const sortedArea = Object.entries(areaCounts).sort((a, b) => b[1] - a[1]);
+        const areaLabels = sortedArea.map(item => item[0]);
+        const areaData = sortedArea.map(item => item[1]);
+        
+        if (chartAreaInstance) {
+          chartAreaInstance.data.labels = areaLabels;
+          chartAreaInstance.data.datasets[0].data = areaData;
+          chartAreaInstance.update('none');
+        } else {
+          chartAreaInstance = new Chart(ctxArea, {
+            type: 'bar',
+            data: {
+              labels: areaLabels,
+              datasets: [{
+                label: 'Jumlah Tiket',
+                data: areaData,
+                backgroundColor: 'rgba(225, 29, 72, 0.7)',
+                borderColor: '#e11d48',
+                borderWidth: 1,
+                borderRadius: 2,
+                barThickness: 'flex',
+                maxBarThickness: 14
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              animation: { duration: 250 },
+              scales: {
+                y: { 
+                  beginAtZero: true, 
+                  ticks: { color: '#94a3b8', stepSize: 1, font: { size: 7, family: "'Inter', sans-serif" } }, 
+                  grid: { color: 'rgba(255,255,255,0.05)', borderDash: [4, 4] },
+                  border: { display: false }
+                },
+                x: { 
+                  ticks: { color: '#94a3b8', font: { size: 6, family: "'Inter', sans-serif" }, maxRotation: 20, minRotation: 0 }, 
+                  grid: { display: false },
+                  border: { display: false }
+                }
+              },
+              plugins: { legend: { display: false } }
+            }
+          });
+        }
+      }
+    }
+  </script>
+</body>
+</html>
